@@ -1,0 +1,82 @@
+using System;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class BankAccountService : MonoBehaviour
+{
+    public static BankAccountService Instance { get; private set; }
+
+    [System.Serializable]
+    public class Transaction
+    {
+        public string description;
+        public float amountPounds;
+        public DateTime timestamp;
+        public string category;
+
+        public Transaction(string description, float amountPounds, DateTime timestamp, string category)
+        {
+            this.description = description;
+            this.amountPounds = amountPounds;
+            this.timestamp = timestamp;
+            this.category = category;
+        }
+    }
+
+    private float balancePounds = 500f;
+    private List<Transaction> transactions = new List<Transaction>();
+
+    private void Awake()
+    {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
+        Instance = this;
+        DontDestroyOnLoad(gameObject);
+    }
+
+    public float GetBalance()
+    {
+        return balancePounds;
+    }
+
+    public bool Spend(float amountPounds, string description, string category)
+    {
+        if (amountPounds <= 0f || amountPounds > balancePounds)
+        {
+            return false;
+        }
+
+        balancePounds -= amountPounds;
+
+        transactions.Add(new Transaction(description, -amountPounds, DateTime.Now, category));
+
+        return true;
+    }
+
+    public void Earn(float amountPounds, string description)
+    {
+        if (amountPounds <= 0f)
+        {
+            return;
+        }
+
+        balancePounds += amountPounds;
+
+        transactions.Add(new Transaction(description, amountPounds, DateTime.Now, "income"));
+    }
+
+    public List<Transaction> GetRecentTransactions(int count)
+    {
+        if (count <= 0)
+        {
+            return new List<Transaction>();
+        }
+
+        int start = Mathf.Max(0, transactions.Count - count);
+        return transactions.GetRange(start, transactions.Count - start);
+    }
+}
