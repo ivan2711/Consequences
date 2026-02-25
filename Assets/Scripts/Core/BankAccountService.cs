@@ -36,6 +36,15 @@ public class BankAccountService : MonoBehaviour
 
         Instance = this;
         DontDestroyOnLoad(gameObject);
+
+        if (PlayerPrefs.HasKey("BankBalance"))
+        {
+            balancePounds = PlayerPrefs.GetFloat("BankBalance");
+        }
+        else
+        {
+            balancePounds = 500f;
+        }
     }
 
     public float GetBalance()
@@ -54,6 +63,9 @@ public class BankAccountService : MonoBehaviour
 
         transactions.Add(new Transaction(description, -amountPounds, DateTime.Now, category));
 
+        PlayerPrefs.SetFloat("BankBalance", balancePounds);
+        PlayerPrefs.Save();
+
         return true;
     }
 
@@ -67,6 +79,9 @@ public class BankAccountService : MonoBehaviour
         balancePounds += amountPounds;
 
         transactions.Add(new Transaction(description, amountPounds, DateTime.Now, "income"));
+
+        PlayerPrefs.SetFloat("BankBalance", balancePounds);
+        PlayerPrefs.Save();
     }
 
     public List<Transaction> GetRecentTransactions(int count)
