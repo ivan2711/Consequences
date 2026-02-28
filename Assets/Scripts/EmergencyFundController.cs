@@ -1,7 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-using System.Collections;
 using FinancialLiteracy.UI;
 
 public class EmergencyFundController : MonoBehaviour
@@ -16,19 +15,27 @@ public class EmergencyFundController : MonoBehaviour
     public StarRating starRating;
     public DuckReaction duckReaction;
     public DuckReactionBackgroundChanger backgroundChanger;
-    
-    [Header("Game Settings")]
-    public int maxWeeks = 9;
-    public int goalAmount = 600;
-    public int progressBarMax =6000; // Progress bar max
-    public int weeklyLeftover = 120; // £200 income - £80 costs
-    
+
+    [Header("Season Settings")]
+    public int totalWeeks = 6;
+    public int weeklyIncome = 80;
+    public int weeklyCosts = 28;
+    public int goalAmount = 80;
+    public int progressBarMax = 80;
+
     [Header("Game State")]
-    public int emergencyFund = 0;
     public int currentWeek = 0;
-    
-    // Week types: normal (gets £120), event (emergency/bonus/etc)
-        // --- Inactivity tracking ---
+    public int emergencyFundBalance = 0;
+
+    // --- Season tracking ---
+    private bool _wentIntoDebt = false;
+    private int _totalOptionalSpend = 0;
+    private int _totalSavedToFund = 0;
+
+    // Week 6 crisis sub-phase (0 = travel prompt, 1 = social prompt)
+    private int _crisisPhase = 0;
+
+    // --- Inactivity tracking ---
     private float _idleTimer = 0f;
     private float _idleCooldown = 0f;
     private const float IdleThresholdSeconds = 60f;
@@ -37,52 +44,31 @@ public class EmergencyFundController : MonoBehaviour
     private GameObject _reengagePanel;
     private TextMeshProUGUI _reengageText;
     private float _reengageCooldown = 0f;
-    private bool _forceEasierNext = false;
-    private string _lastWeekType = "";
-    private string _lastEventId = "";
 
     private const float ReengageCooldownNormal = 60f;
     private const float ReengageCooldownCalm = 120f;
     private const float ReengageIdleThreshold = 20f;
 
+    // ==================== LIFECYCLE ====================
 
-    
-private string[] weekSequence = {
-        "normal",      // Week 1: Regular payday
-        "choice",      // Week 2: Choice event (cinema, etc)
-        "bonus",       // Week 3: Extra shifts (+£100 bonus)
-        "emergency",   // Week 4: Emergency (phone broke)
-        "choice",      // Week 5: Choice event
-        "normal",      // Week 6: Regular payday
-        "crisis",      // Week 7: Crisis (two emergencies)
-        "lucky",       // Week 8: Lucky (birthday money)
-        "normal"       // Week 9: Regular payday
-    };
-    
-void Start()
+    void Start()
     {
         currentWeek = 0;
-        emergencyFund = 0;
-                BuildReengagementPopup();
-        
-UpdateUI();
-        
-        // FOR TESTING: Always wait for tutorial
-        // Tutorial will call StartGameAfterTutorial() when done
-        
-        /* ORIGINAL CODE (re-enable for final build):
-        bool tutorialShown = PlayerPrefs.GetInt("EmergencyFundTutorialShown", 0) == 1;
-        
-        if (tutorialShown)
-        {
-            StartGameAfterTutorial();
-        }
-        */
+        emergencyFundBalance = 0;
+        _wentIntoDebt = false;
+        _totalOptionalSpend = 0;
+        _totalSavedToFund = 0;
+        _crisisPhase = 0;
+
+        PlayerPrefs.SetInt("EmergencyFundBalance", 0);
+        PlayerPrefs.Save();
+
+        BuildReengagementPopup();
+        UpdateUI();
     }
 
     void Update()
     {
-        // Detect any user interaction
         bool hasInput = Input.anyKeyDown || Input.GetMouseButtonDown(0) || Input.GetMouseButtonDown(1)
             || (Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Began);
 
@@ -94,33 +80,27 @@ UpdateUI();
 
         _idleTimer += Time.deltaTime;
 
-        // Tick down calm-mode cooldown
         if (_idleCooldown > 0f)
             _idleCooldown -= Time.deltaTime;
 
-                // Re-engagement cooldown tick & trigger check
         if (_reengageCooldown > 0f)
             _reengageCooldown -= Time.deltaTime;
         CheckReengagementTrigger();
 
-        
-if (_idleTimer >= IdleThresholdSeconds)
+        if (_idleTimer >= IdleThresholdSeconds)
         {
-            // In calm mode, enforce a 60s cooldown between recordings
             if (GameSettings.CalmMode && _idleCooldown > 0f)
                 return;
 
             if (PlayerModelService.Instance != null)
-            {
                 PlayerModelService.Instance.RecordInactivity();
-            }
 
             _idleTimer = 0f;
             _idleCooldown = IdleThresholdSeconds;
         }
     }
 
-    
+    // Called by tutorial when it finishes
     public void StartGameAfterTutorial()
     {
         if (duckReaction != null)
@@ -128,578 +108,709 @@ if (_idleTimer >= IdleThresholdSeconds)
             duckReaction.ShowReaction(DuckReaction.Emotion.Neutral, "Let's build an emergency fund!");
             if (backgroundChanger != null) backgroundChanger.CheckAndChangeBackground("Let's build an emergency fund!");
         }
-        
+
         Invoke("StartNewWeek", 1.5f);
     }
-    
-void StartNewWeek()
+
+    // ==================== WEEKLY FLOW ====================
+
+    void StartNewWeek()
     {
         currentWeek++;
-        
-        if (roundCounterText != null)
+
+        if (currentWeek > totalWeeks)
         {
-            roundCounterText.text = "Week " + currentWeek + " of " + maxWeeks;
-        }
-        
-        if (currentWeek > maxWeeks)
-        {
-            EndGame();
+            ShowReflection();
             return;
         }
-        
-        string weekType = weekSequence[currentWeek - 1];
-        
-        // --- Re-engagement popup override ---
-        if (_forceEasierNext)
-        {
-            Debug.Log($"[Reengage] Force easier: {weekType} -> bonus (week {currentWeek})");
-            weekType = "bonus";
-            _forceEasierNext = false;
-        }
 
-        // --- Engagement-based override ---
-        if (PlayerModelService.Instance != null)
-        {
-            var state = PlayerModelService.Instance.GetEngagementState();
-            if (state == PlayerModelService.EngagementState.Frustrated)
-            {
-                Debug.Log($"[Adaptive] Frustrated override: {weekType} -> bonus (week {currentWeek})");
-                weekType = "bonus";
-            }
-            else if (state == PlayerModelService.EngagementState.Bored)
-            {
-                Debug.Log($"[Adaptive] Bored override: {weekType} -> choice (week {currentWeek})");
-                weekType = "choice";
-            }
-        }
+        if (roundCounterText != null)
+            roundCounterText.text = "Week " + currentWeek + " of " + totalWeeks;
 
-        // --- No consecutive duplicate types ---
-        if (weekType == _lastWeekType)
-        {
-            string[] alternatives = { "normal", "choice", "bonus", "lucky" };
-            foreach (string alt in alternatives)
-            {
-                if (alt != _lastWeekType)
-                {
-                    Debug.Log($"[Variety] Avoiding repeat: {weekType} -> {alt} (week {currentWeek})");
-                    weekType = alt;
-                    break;
-                }
-            }
-        }
-        _lastWeekType = weekType;
-        
-        // --- Data-driven event loading ---
-        if (EventLoader.Instance != null && EventLoader.Instance.TotalEventsLoaded > 0)
-        {
-            EmergencyFundEvent evt = EventLoader.Instance.GetEvent(weekType, _lastEventId);
-            if (evt != null)
-            {
-                _lastEventId = evt.id;
-                ShowEventFromData(evt);
-                return;
-            }
-            Debug.LogWarning($"[EF] No data for type '{weekType}', falling back to hardcoded");
-        }
+        // Step 1: Income arrives
+        BankAccountService.Instance.Earn(weeklyIncome, "Week " + currentWeek + " income");
 
-        // Fallback to hardcoded if no JSON data loaded
-        switch (weekType)
+        // Step 2: Mandatory costs
+        BankAccountService.Instance.Spend(weeklyCosts, "Week " + currentWeek + " living costs", "Needs");
+
+        UpdateUI();
+
+        // Step 3: Fixed weekly event
+        switch (currentWeek)
         {
-            case "normal": ShowNormalWeek(); break;
-            case "choice": ShowChoiceWeek(); break;
-            case "bonus": ShowBonusWeek(); break;
-            case "emergency": ShowEmergencyWeek(); break;
-            case "crisis": ShowCrisisWeek(); break;
-            case "lucky": ShowLuckyWeek(); break;
+            case 1: ShowWeek1(); break;
+            case 2: ShowWeek2(); break;
+            case 3: ShowWeek3(); break;
+            case 4: ShowWeek4(); break;
+            case 5: ShowWeek5(); break;
+            case 6: _crisisPhase = 0; ShowWeek6(); break;
         }
     }
-    
-void ShowNormalWeek()
+
+    // ==================== WEEK 1: Choose how much to put into emergency fund ====================
+
+    void ShowWeek1()
     {
-        eventText.text = "PAYDAY!\n\nYou have £120\n\nHow much will you save?";
-        
+        float bank = BankAccountService.Instance.GetBalance();
+        eventText.text = "WEEK 1 — GETTING STARTED\n\n"
+            + "Income: +\u00a3" + weeklyIncome + "  Costs: -\u00a3" + weeklyCosts + "\n"
+            + "Bank: \u00a3" + bank.ToString("F0") + "\n\n"
+            + "How much will you put into your emergency fund?";
+
         if (duckReaction != null)
         {
-            duckReaction.ShowReaction(DuckReaction.Emotion.Happy, "Pay day! £");
-            if (backgroundChanger != null) backgroundChanger.CheckAndChangeBackground("Pay day! £");
+            duckReaction.ShowReaction(DuckReaction.Emotion.Thinking, "Start saving early!");
+            if (backgroundChanger != null) backgroundChanger.CheckAndChangeBackground("Start saving early!");
         }
-        
+
         ClearChoices();
-        CreateChoiceButton("£ Save all £120", weeklyLeftover, new Color(0.3f, 0.8f, 0.3f));
-        CreateChoiceButton("£ Save half £60", weeklyLeftover / 2, new Color(0.5f, 0.7f, 0.5f));
-        CreateChoiceButton("£ Spend all", 0, new Color(0.9f, 0.5f, 0.3f));
+        CreateActionButton("Save \u00a350", new Color(0.2f, 0.9f, 0.3f), () => DepositToFund(50));
+        CreateActionButton("Save \u00a335", new Color(0.5f, 0.7f, 0.5f), () => DepositToFund(35));
+        CreateActionButton("Save \u00a320", new Color(0.6f, 0.7f, 0.9f), () => DepositToFund(20));
+        CreateActionButton("Save nothing", new Color(0.9f, 0.5f, 0.3f), () => DepositToFund(0));
     }
-    
-    void ShowChoiceWeek()
+
+    // ==================== WEEK 2: Friends invite (£18) ====================
+
+    void ShowWeek2()
     {
-        int choice = Random.Range(0, 5);
-        
+        float bank = BankAccountService.Instance.GetBalance();
+        eventText.text = "WEEK 2 — FRIENDS INVITE\n\n"
+            + "Income: +\u00a3" + weeklyIncome + "  Costs: -\u00a3" + weeklyCosts + "\n"
+            + "Bank: \u00a3" + bank.ToString("F0") + "\n\n"
+            + "Your mates want to go out. It'll cost \u00a318.\nWill you go?";
+
         if (duckReaction != null)
         {
             duckReaction.ShowReaction(DuckReaction.Emotion.Thinking, "Decide wisely...");
             if (backgroundChanger != null) backgroundChanger.CheckAndChangeBackground("Decide wisely...");
         }
-        
+
         ClearChoices();
-        
-        switch(choice)
-        {
-            case 0:
-                eventText.text = "WEEKEND!\n\nCinema + meal: £30\n\nYou have £120";
-                CreateChoiceButton("[OK] Go\n(Save £90)", 90, new Color(0.6f, 0.7f, 0.9f));
-                CreateChoiceButton("£ Stay home\n(Save £120)", weeklyLeftover, new Color(0.3f, 0.8f, 0.3f));
-                break;
-            case 1:
-                eventText.text = "GAME SALE!\n\nNew game on sale: £25\n\nYou have £120";
-                CreateChoiceButton("£ Buy game\n(Save £95)", 95, new Color(0.6f, 0.7f, 0.9f));
-                CreateChoiceButton("£ Skip it\n(Save £120)", weeklyLeftover, new Color(0.3f, 0.8f, 0.3f));
-                break;
-            case 2:
-                eventText.text = "SHOPPING!\n\nNew trainers you want: £40\n\nYou have £120";
-                CreateChoiceButton("£ Buy trainers\n(Save £80)", 80, new Color(0.6f, 0.7f, 0.9f));
-                CreateChoiceButton("£ Wait\n(Save £120)", weeklyLeftover, new Color(0.3f, 0.8f, 0.3f));
-                break;
-            case 3:
-                eventText.text = "HUNGRY!\n\nTakeaway or cook at home?\nTakeaway: £20\n\nYou have £120";
-                CreateChoiceButton("Takeaway\n(Save £100)", 100, new Color(0.6f, 0.7f, 0.9f));
-                CreateChoiceButton("Cook home\n(Save £120)", weeklyLeftover, new Color(0.3f, 0.8f, 0.3f));
-                break;
-            case 4:
-                eventText.text = "BIRTHDAY!\n\nFriend's birthday gift: £30\n\nYou have £120";
-                CreateChoiceButton("Buy gift\n(Save £90)", 90, new Color(0.6f, 0.7f, 0.9f));
-                CreateChoiceButton("Make gift\n(Save £120)", weeklyLeftover, new Color(0.3f, 0.8f, 0.3f));
-                break;
-        }
+        CreateActionButton("Go out (\u00a318)", new Color(0.6f, 0.7f, 0.9f), () => HandleOptionalSpend(18, "Going out with friends", "Social"));
+        CreateActionButton("Stay in (free)", new Color(0.3f, 0.8f, 0.3f), () => HandleOptionalSkip("\u00a318 saved by staying in."));
     }
-    
-    void ShowBonusWeek()
+
+    // ==================== WEEK 3: Minor emergency (£25) ====================
+
+    void ShowWeek3()
     {
-        int bonusAmount = 100;
-        int total = weeklyLeftover + bonusAmount;
-        
-        eventText.text = "BONUS!\n\nExtra shifts: +£100\n\nYou have £220";
-        
+        float bank = BankAccountService.Instance.GetBalance();
+        eventText.text = "WEEK 3 — EMERGENCY!\n\n"
+            + "Income: +\u00a3" + weeklyIncome + "  Costs: -\u00a3" + weeklyCosts + "\n"
+            + "Bank: \u00a3" + bank.ToString("F0") + "  Fund: \u00a3" + emergencyFundBalance + "\n\n"
+            + "Your phone screen cracked! Repair costs \u00a325.";
+
         if (duckReaction != null)
         {
-            duckReaction.ShowReaction(DuckReaction.Emotion.Excited, "Bonus week!");
-            if (backgroundChanger != null) backgroundChanger.CheckAndChangeBackground("Bonus week!");
-        }
-        
-        ClearChoices();
-        CreateChoiceButton("£ Save all £220", total, new Color(0.2f, 0.9f, 0.3f));
-        CreateChoiceButton("£ Save half £110", total / 2, new Color(0.5f, 0.7f, 0.5f));
-        CreateChoiceButton("£ Spend all", 0, new Color(0.9f, 0.6f, 0.3f));
-    }
-    
-    void ShowEmergencyWeek()
-    {
-        int emergencyCost = 80;
-        int remaining = weeklyLeftover - emergencyCost;
-        
-        eventText.text = "EMERGENCY!\n\nPhone broke: -£80\n\nLeftover: £40";
-        
-        if (duckReaction != null)
-        {
-            if (emergencyFund >= emergencyCost)
+            if (emergencyFundBalance >= 25)
             {
                 duckReaction.ShowReaction(DuckReaction.Emotion.Thinking, "Use your fund!");
                 if (backgroundChanger != null) backgroundChanger.CheckAndChangeBackground("Use your fund!");
             }
             else
             {
-                duckReaction.ShowReaction(DuckReaction.Emotion.Shocked, "Unexpected!");
-                if (backgroundChanger != null) backgroundChanger.CheckAndChangeBackground("Unexpected!");
+                duckReaction.ShowReaction(DuckReaction.Emotion.Shocked, "Unexpected cost!");
+                if (backgroundChanger != null) backgroundChanger.CheckAndChangeBackground("Unexpected cost!");
             }
         }
-        
+
         ClearChoices();
-        CreateChoiceButton("Paid £80\n(Save £40)", remaining, new Color(0.8f, 0.6f, 0.3f));
+        CreateActionButton("Pay \u00a325 repair", new Color(0.8f, 0.6f, 0.3f), () => HandleEmergency(25, "Phone screen repair"));
     }
-    
-    void ShowCrisisWeek()
+
+    // ==================== WEEK 4: Bonus +£30 then choice ====================
+
+    void ShowWeek4()
     {
-        int crisisCost = 90;
-        int remaining = weeklyLeftover - crisisCost;
-        
-        eventText.text = "CRISIS!\n\nTextbook + Bus pass: -£90\n\nLeftover: £30";
-        
+        // Add bonus to bank
+        BankAccountService.Instance.Earn(30, "Week 4 bonus earnings");
+
+        float bank = BankAccountService.Instance.GetBalance();
+        eventText.text = "WEEK 4 — BONUS!\n\n"
+            + "Income: +\u00a3" + weeklyIncome + "  Costs: -\u00a3" + weeklyCosts + "\n"
+            + "Plus a \u00a330 bonus!\n"
+            + "Bank: \u00a3" + bank.ToString("F0") + "  Fund: \u00a3" + emergencyFundBalance + "\n\n"
+            + "What will you do with the extra \u00a330?";
+
         if (duckReaction != null)
         {
-            duckReaction.ShowReaction(DuckReaction.Emotion.Worried, "Two things!");
-            if (backgroundChanger != null) backgroundChanger.CheckAndChangeBackground("Two things!");
+            duckReaction.ShowReaction(DuckReaction.Emotion.Excited, "Bonus week!");
+            if (backgroundChanger != null) backgroundChanger.CheckAndChangeBackground("Bonus week!");
         }
-        
+
         ClearChoices();
-        CreateChoiceButton("Paid £90\n(Save £30)", remaining, new Color(0.9f, 0.5f, 0.3f));
-    }
-    
-    void ShowLuckyWeek()
-    {
-        int luckyBonus = 60;
-        int total = weeklyLeftover + luckyBonus;
-        
-        eventText.text = "LUCKY!\n\nBirthday money: +£60\n\nYou have £180";
-        
-        if (duckReaction != null)
+        CreateActionButton("Add \u00a330 to fund", new Color(0.2f, 0.9f, 0.3f), () => DepositToFund(30));
+        CreateActionButton("Keep in bank", new Color(0.6f, 0.7f, 0.9f), () =>
         {
-            duckReaction.ShowReaction(DuckReaction.Emotion.Celebrating, "Lucky you!");
-            if (backgroundChanger != null) backgroundChanger.CheckAndChangeBackground("Lucky you!");
-        }
-        
-        ClearChoices();
-        CreateChoiceButton("£ Save all £180", total, new Color(0.2f, 0.9f, 0.3f));
-        CreateChoiceButton("£ Save half £90", total / 2, new Color(0.5f, 0.7f, 0.5f));
-        CreateChoiceButton("£ Spend all", 0, new Color(0.9f, 0.6f, 0.3f));
-    }
-
-/// <summary>
-    /// Data-driven event display. Reads title, description, choices, duck reactions
-    /// all from the EmergencyFundEvent JSON data instead of hardcoded values.
-    /// </summary>
-    void ShowEventFromData(EmergencyFundEvent evt)
-    {
-        Debug.Log($"[EF] Showing data event: {evt.id} ({evt.type}) - {evt.title}");
-
-        // Build display text
-        int totalIncome = evt.weeklyIncomePounds + evt.bonusPounds;
-        string displayText = evt.title.ToUpper() + "\n\n" + evt.description;
-
-        if (evt.costPounds > 0)
-            displayText += "\n\nCost: \u00a3" + evt.costPounds;
-        if (evt.bonusPounds > 0)
-            displayText += "\n\nBonus: +\u00a3" + evt.bonusPounds;
-
-        displayText += "\n\nYou have: \u00a3" + totalIncome;
-        eventText.text = displayText;
-
-        // Duck reaction from data
-        if (duckReaction != null)
-        {
-            DuckReaction.Emotion emotion = MapDuckEmotion(evt.duckEmotion);
-            string duckLine = string.IsNullOrEmpty(evt.duckLine) ? evt.title : evt.duckLine;
-            duckReaction.ShowReaction(emotion, duckLine);
-            if (backgroundChanger != null) backgroundChanger.CheckAndChangeBackground(duckLine);
-        }
-
-        // Build choice buttons from data
-        ClearChoices();
-        for (int i = 0; i < evt.choices.Length; i++)
-        {
-            EventChoice choice = evt.choices[i];
-            Color btnColor = GetChoiceColor(choice.savePounds, totalIncome, i, evt.choices.Length);
-            string btnLabel = choice.label + "\n(Save \u00a3" + choice.savePounds + ")";
-            CreateChoiceButton(btnLabel, choice.savePounds, btnColor);
-        }
-    }
-
-    DuckReaction.Emotion MapDuckEmotion(string emotionStr)
-    {
-        switch (emotionStr)
-        {
-            case "happy": return DuckReaction.Emotion.Happy;
-            case "sad": return DuckReaction.Emotion.Sad;
-            case "excited": return DuckReaction.Emotion.Excited;
-            case "shocked": return DuckReaction.Emotion.Shocked;
-            case "worried": return DuckReaction.Emotion.Worried;
-            case "thinking": return DuckReaction.Emotion.Thinking;
-            case "celebrating": return DuckReaction.Emotion.Celebrating;
-            default: return DuckReaction.Emotion.Neutral;
-        }
-    }
-
-    Color GetChoiceColor(int savePounds, int totalIncome, int index, int totalChoices)
-    {
-        // High save = green, medium = blue, low/zero = orange
-        float saveRatio = totalIncome > 0 ? (float)savePounds / totalIncome : 0f;
-        if (saveRatio >= 0.9f) return new Color(0.2f, 0.9f, 0.3f);   // Green - save most/all
-        if (saveRatio >= 0.5f) return new Color(0.5f, 0.7f, 0.5f);   // Muted green - save half+
-        if (savePounds > 0)    return new Color(0.6f, 0.7f, 0.9f);   // Blue - some saving
-        return new Color(0.9f, 0.5f, 0.3f);                          // Orange - spend all
-    }
-
-    
-    void ClearChoices()
-    {
-        foreach (Transform child in choicesPanel)
-        {
-            Destroy(child.gameObject);
-        }
-    }
-    
-    void CreateChoiceButton(string text, int saveAmount, Color buttonColor)
-    {
-        GameObject button = new GameObject("ChoiceButton");
-        button.transform.SetParent(choicesPanel, false);
-        
-        RectTransform rect = button.AddComponent<RectTransform>();
-        rect.sizeDelta = new Vector2(280, 120);
-        
-        Image img = button.AddComponent<Image>();
-        img.color = buttonColor;
-        
-        Button btn = button.AddComponent<Button>();
-        
-        GameObject btnText = new GameObject("Text");
-        btnText.transform.SetParent(button.transform, false);
-        RectTransform textRect = btnText.AddComponent<RectTransform>();
-        textRect.anchorMin = Vector2.zero;
-        textRect.anchorMax = Vector2.one;
-        textRect.sizeDelta = new Vector2(-20, -20);
-        
-        TextMeshProUGUI tmp = btnText.AddComponent<TextMeshProUGUI>();
-        tmp.text = text;
-        tmp.fontSize = 24;
-        tmp.color = Color.white;
-        tmp.alignment = TextAlignmentOptions.Center;
-        tmp.fontStyle = FontStyles.Bold;
-        
-        int saveAmountCopy = saveAmount;
-        btn.onClick.AddListener(() => MakeChoice(saveAmountCopy));
-    }
-    
-void MakeChoice(int saveAmount)
-    {
-                _idleTimer = 0f; // Reset inactivity on choice
-int previousFund = emergencyFund;
-        emergencyFund += saveAmount;
-        
-        // Show floating money text
-        FloatingMoneyText floatingMoney = FindObjectOfType<FloatingMoneyText>();
-        if (floatingMoney != null)
-        {
-            Vector3 screenCenter = new Vector3(Screen.width / 2, Screen.height / 2 + 100, 0);
-            floatingMoney.ShowMoneyChange(saveAmount, screenCenter);
-        }
-        
-        if (duckReaction != null)
-        {
-            if (saveAmount >= 100)
+            _idleTimer = 0f;
+            if (duckReaction != null)
             {
-                duckReaction.ShowReaction(DuckReaction.Emotion.Happy, "Great save! £");
-                if (backgroundChanger != null) backgroundChanger.CheckAndChangeBackground("Great save! £");
+                duckReaction.ShowReaction(DuckReaction.Emotion.Neutral, "Kept the bonus.");
+                if (backgroundChanger != null) backgroundChanger.CheckAndChangeBackground("Kept the bonus.");
             }
-            else if (saveAmount >= 50)
+            UpdateUI();
+            ShowWeekFeedback("You kept the \u00a330 bonus in your bank.");
+        });
+    }
+
+    // ==================== WEEK 5: Bigger emergency (£60) ====================
+
+    void ShowWeek5()
+    {
+        float bank = BankAccountService.Instance.GetBalance();
+        eventText.text = "WEEK 5 — BIG EMERGENCY!\n\n"
+            + "Income: +\u00a3" + weeklyIncome + "  Costs: -\u00a3" + weeklyCosts + "\n"
+            + "Bank: \u00a3" + bank.ToString("F0") + "  Fund: \u00a3" + emergencyFundBalance + "\n\n"
+            + "Your laptop broke! Repair costs \u00a360.";
+
+        if (duckReaction != null)
+        {
+            if (emergencyFundBalance >= 60)
             {
-                duckReaction.ShowReaction(DuckReaction.Emotion.Neutral, "Some saved!");
-                if (backgroundChanger != null) backgroundChanger.CheckAndChangeBackground("Some saved!");
-            }
-            else if (saveAmount > 0)
-            {
-                duckReaction.ShowReaction(DuckReaction.Emotion.Worried, "Save more!");
-                if (backgroundChanger != null) backgroundChanger.CheckAndChangeBackground("Save more!");
+                duckReaction.ShowReaction(DuckReaction.Emotion.Thinking, "Your fund can cover this!");
+                if (backgroundChanger != null) backgroundChanger.CheckAndChangeBackground("Your fund can cover this!");
             }
             else
             {
-                duckReaction.ShowReaction(DuckReaction.Emotion.Sad, "Nothing saved!");
-                if (backgroundChanger != null) backgroundChanger.CheckAndChangeBackground("Nothing saved!");
+                duckReaction.ShowReaction(DuckReaction.Emotion.Worried, "This is a big one...");
+                if (backgroundChanger != null) backgroundChanger.CheckAndChangeBackground("This is a big one...");
             }
         }
-        
-        UpdateUI();
-        
-        // Milestone celebrations
-        if (emergencyFund >= 150 && previousFund < 150)
-        {
-            if (duckReaction != null)
-            {
-                duckReaction.ShowReaction(DuckReaction.Emotion.Happy, "More than £150 saved!");
-                if (backgroundChanger != null) backgroundChanger.CheckAndChangeBackground("More than £150 saved!");
-            }
-        }
-        else if (emergencyFund >= 300 && previousFund < 300)
-        {
-            if (duckReaction != null)
-            {
-                duckReaction.ShowReaction(DuckReaction.Emotion.Celebrating, "Halfway!");
-                if (backgroundChanger != null) backgroundChanger.CheckAndChangeBackground("Halfway!");
-            }
-        }
-        else if (emergencyFund >= 450 && previousFund < 450)
-        {
-            if (duckReaction != null)
-            {
-                duckReaction.ShowReaction(DuckReaction.Emotion.Excited, "Almost there!");
-                if (backgroundChanger != null) backgroundChanger.CheckAndChangeBackground("Almost there!");
-            }
-        }
-        
-        Invoke("StartNewWeek", 1.5f);
+
+        ClearChoices();
+        CreateActionButton("Pay \u00a360 repair", new Color(0.9f, 0.5f, 0.3f), () => HandleEmergency(60, "Laptop repair"));
     }
-    
-void UpdateUI()
+
+    // ==================== WEEK 6: Crisis — two sequential prompts ====================
+
+    void ShowWeek6()
     {
-        if (progressText != null)
+        if (_crisisPhase == 0)
         {
-            progressText.text = "£" + emergencyFund + " / £" + goalAmount;
-        }
-        
-        // Progress bar fills to progressBarMax (600) which matches goalAmount (600)nt (600)
-        float progress = (float)emergencyFund / progressBarMax;
-        progress = Mathf.Clamp01(progress);
-        
-        if (progressBarFill != null)
-        {
-            RectTransform rect = progressBarFill.GetComponent<RectTransform>();
-            rect.sizeDelta = new Vector2(650 * progress, 40);
-        }
-    }
-    
-void EndGame()
-    {
-        Debug.Log("🎮 GAME ENDED! Final amount: £" + emergencyFund);
-        
-        
-        // Record round in player model
-        if (PlayerModelService.Instance != null)
-        {
-            PlayerModelService.Instance.RecordEmergencyFundRound(emergencyFund, goalAmount);
-        }
-int stars = CalculateStars();
-        
-        string resultMessage = "";
-        DuckReaction.Emotion duckEmotion = DuckReaction.Emotion.Neutral;
-        
-        if (emergencyFund >= goalAmount)
-        {
-            resultMessage = "AMAZING!\n\nYou saved: £" + emergencyFund + "\n\nGoal reached!";
-            duckEmotion = DuckReaction.Emotion.Celebrating;
-        }
-        else if (emergencyFund >= 400)
-        {
-            resultMessage = "GREAT!\n\nYou saved: £" + emergencyFund + "\n\nAlmost there!";
-            duckEmotion = DuckReaction.Emotion.Happy;
-        }
-        else if (emergencyFund >= 250)
-        {
-            resultMessage = "GOOD!\n\nYou saved: £" + emergencyFund + "\n\nKeep building!";
-            duckEmotion = DuckReaction.Emotion.Happy;
+            float bank = BankAccountService.Instance.GetBalance();
+            eventText.text = "WEEK 6 — CRISIS WEEK!\n\n"
+                + "Income: +\u00a3" + weeklyIncome + "  Costs: -\u00a3" + weeklyCosts + "\n"
+                + "Bank: \u00a3" + bank.ToString("F0") + "  Fund: \u00a3" + emergencyFundBalance + "\n\n"
+                + "Family event coming up. Travel costs \u00a320.\nWill you go?";
+
+            if (duckReaction != null)
+            {
+                duckReaction.ShowReaction(DuckReaction.Emotion.Worried, "Tough week ahead...");
+                if (backgroundChanger != null) backgroundChanger.CheckAndChangeBackground("Tough week ahead...");
+            }
+
+            ClearChoices();
+            CreateActionButton("Pay \u00a320 travel", new Color(0.8f, 0.6f, 0.3f), () => HandleCrisisTravel(true));
+            CreateActionButton("Skip the trip", new Color(0.3f, 0.8f, 0.3f), () => HandleCrisisTravel(false));
         }
         else
         {
-            resultMessage = "TRY AGAIN!\n\nYou saved: £" + emergencyFund + "\n\nSave more next time!";
-            duckEmotion = DuckReaction.Emotion.Neutral;
+            float bank = BankAccountService.Instance.GetBalance();
+            eventText.text = "WEEK 6 — CRISIS CONTINUES\n\n"
+                + "Bank: \u00a3" + bank.ToString("F0") + "  Fund: \u00a3" + emergencyFundBalance + "\n\n"
+                + "Friends invite you to a goodbye party. Cost: \u00a315.\nWill you go?";
+
+            if (duckReaction != null)
+            {
+                duckReaction.ShowReaction(DuckReaction.Emotion.Thinking, "One more decision...");
+                if (backgroundChanger != null) backgroundChanger.CheckAndChangeBackground("One more decision...");
+            }
+
+            ClearChoices();
+            CreateActionButton("Go to party (\u00a315)", new Color(0.6f, 0.7f, 0.9f), () => HandleCrisisSocial(true));
+            CreateActionButton("Stay home (free)", new Color(0.3f, 0.8f, 0.3f), () => HandleCrisisSocial(false));
         }
-        
-        eventText.text = resultMessage;
-        
+    }
+
+    // ==================== CHOICE HANDLERS ====================
+
+    void DepositToFund(int amount)
+    {
+        _idleTimer = 0f;
+
+        if (amount > 0)
+        {
+            float bank = BankAccountService.Instance.GetBalance();
+            int actual = Mathf.Min(amount, (int)bank);
+            if (actual > 0)
+            {
+                BankAccountService.Instance.Spend(actual, "Emergency fund deposit", "Emergency");
+                emergencyFundBalance += actual;
+                _totalSavedToFund += actual;
+                SaveEmergencyFund();
+            }
+
+            ShowFloatingMoney(actual);
+
+            if (duckReaction != null)
+            {
+                if (actual >= 50)
+                {
+                    duckReaction.ShowReaction(DuckReaction.Emotion.Celebrating, "Great start!");
+                    if (backgroundChanger != null) backgroundChanger.CheckAndChangeBackground("Great start!");
+                }
+                else if (actual >= 30)
+                {
+                    duckReaction.ShowReaction(DuckReaction.Emotion.Happy, "Good choice!");
+                    if (backgroundChanger != null) backgroundChanger.CheckAndChangeBackground("Good choice!");
+                }
+                else
+                {
+                    duckReaction.ShowReaction(DuckReaction.Emotion.Neutral, "Every bit helps.");
+                    if (backgroundChanger != null) backgroundChanger.CheckAndChangeBackground("Every bit helps.");
+                }
+            }
+
+            UpdateUI();
+            ShowWeekFeedback("You added \u00a3" + actual + " to your emergency fund.");
+        }
+        else
+        {
+            if (duckReaction != null)
+            {
+                duckReaction.ShowReaction(DuckReaction.Emotion.Worried, "No savings this week...");
+                if (backgroundChanger != null) backgroundChanger.CheckAndChangeBackground("No savings this week...");
+            }
+            UpdateUI();
+            ShowWeekFeedback("You didn't save anything this week.");
+        }
+    }
+
+    void HandleOptionalSpend(int cost, string description, string category)
+    {
+        _idleTimer = 0f;
+
+        float bank = BankAccountService.Instance.GetBalance();
+        if (bank >= cost)
+        {
+            BankAccountService.Instance.Spend(cost, description, category);
+            _totalOptionalSpend += cost;
+            ShowFloatingMoney(-cost);
+
+            if (duckReaction != null)
+            {
+                duckReaction.ShowReaction(DuckReaction.Emotion.Happy, "Had a good time!");
+                if (backgroundChanger != null) backgroundChanger.CheckAndChangeBackground("Had a good time!");
+            }
+
+            UpdateUI();
+            ShowWeekFeedback("You spent \u00a3" + cost + " going out.");
+        }
+        else
+        {
+            // Can't fully afford it — spend what's available, mark debt
+            int canPay = (int)bank;
+            if (canPay > 0)
+                BankAccountService.Instance.Spend(canPay, description, category);
+            _totalOptionalSpend += cost;
+            _wentIntoDebt = true;
+
+            if (duckReaction != null)
+            {
+                duckReaction.ShowReaction(DuckReaction.Emotion.Sad, "You couldn't quite afford that...");
+                if (backgroundChanger != null) backgroundChanger.CheckAndChangeBackground("You couldn't quite afford that...");
+            }
+
+            UpdateUI();
+            ShowWeekFeedback("You went out but couldn't fully afford it. You went into debt!");
+        }
+    }
+
+    void HandleOptionalSkip(string message)
+    {
+        _idleTimer = 0f;
+
         if (duckReaction != null)
         {
-            duckReaction.ShowReaction(duckEmotion, "Game over!");
-            if (backgroundChanger != null) backgroundChanger.CheckAndChangeBackground("Game over!");
+            duckReaction.ShowReaction(DuckReaction.Emotion.Happy, "Saved your money!");
+            if (backgroundChanger != null) backgroundChanger.CheckAndChangeBackground("Saved your money!");
         }
-        
-        if (starRating != null)
+
+        UpdateUI();
+        ShowWeekFeedback(message);
+    }
+
+    void HandleEmergency(int cost, string description)
+    {
+        _idleTimer = 0f;
+
+        int coveredByFund = Mathf.Min(emergencyFundBalance, cost);
+        emergencyFundBalance -= coveredByFund;
+        int remaining = cost - coveredByFund;
+
+        string result = "";
+        if (coveredByFund > 0)
+            result += "Paid \u00a3" + coveredByFund + " from emergency fund.\n";
+
+        if (remaining > 0)
         {
-            starRating.SetRating(stars);
+            float bank = BankAccountService.Instance.GetBalance();
+            if (bank >= remaining)
+            {
+                BankAccountService.Instance.Spend(remaining, description, "Emergency");
+                result += "Paid \u00a3" + remaining + " from bank.\n";
+            }
+            else
+            {
+                int fromBank = (int)bank;
+                if (fromBank > 0)
+                    BankAccountService.Instance.Spend(fromBank, description, "Emergency");
+                int deficit = remaining - fromBank;
+                _wentIntoDebt = true;
+                result += "Paid \u00a3" + fromBank + " from bank.\n";
+                result += "Couldn't cover \u00a3" + deficit + " — you went into debt!\n";
+            }
         }
-        
-        //ShowConsequencePanel();
-        ClearChoices();
-        CreateSeeResultsButton();
-        
-        Debug.Log("⏰ Scheduling consequence panel in 2 seconds...");
-        if (consequencePanel != null)
+
+        SaveEmergencyFund();
+        ShowFloatingMoney(-cost);
+
+        if (duckReaction != null)
         {
-            Invoke("ShowConsequencePanel", 2f);
+            if (coveredByFund >= cost)
+            {
+                duckReaction.ShowReaction(DuckReaction.Emotion.Celebrating, "Your fund saved you!");
+                if (backgroundChanger != null) backgroundChanger.CheckAndChangeBackground("Your fund saved you!");
+            }
+            else if (!_wentIntoDebt)
+            {
+                duckReaction.ShowReaction(DuckReaction.Emotion.Worried, "That was close...");
+                if (backgroundChanger != null) backgroundChanger.CheckAndChangeBackground("That was close...");
+            }
+            else
+            {
+                duckReaction.ShowReaction(DuckReaction.Emotion.Sad, "You're in debt...");
+                if (backgroundChanger != null) backgroundChanger.CheckAndChangeBackground("You're in debt...");
+            }
+        }
+
+        UpdateUI();
+        ShowWeekFeedback(result);
+    }
+
+    void HandleCrisisTravel(bool pay)
+    {
+        _idleTimer = 0f;
+
+        if (pay)
+        {
+            float bank = BankAccountService.Instance.GetBalance();
+            if (bank >= 20)
+            {
+                BankAccountService.Instance.Spend(20, "Family event travel", "Needs");
+                _totalOptionalSpend += 20;
+                ShowFloatingMoney(-20);
+                if (duckReaction != null)
+                {
+                    duckReaction.ShowReaction(DuckReaction.Emotion.Neutral, "Family comes first.");
+                    if (backgroundChanger != null) backgroundChanger.CheckAndChangeBackground("Family comes first.");
+                }
+            }
+            else
+            {
+                int canPay = (int)bank;
+                if (canPay > 0)
+                    BankAccountService.Instance.Spend(canPay, "Family event travel", "Needs");
+                _totalOptionalSpend += 20;
+                _wentIntoDebt = true;
+                ShowFloatingMoney(-20);
+                if (duckReaction != null)
+                {
+                    duckReaction.ShowReaction(DuckReaction.Emotion.Sad, "Tight budget...");
+                    if (backgroundChanger != null) backgroundChanger.CheckAndChangeBackground("Tight budget...");
+                }
+            }
         }
         else
         {
-            Debug.LogError("[X] Consequence panel is NULL in EndGame! Cannot show!");
+            if (duckReaction != null)
+            {
+                duckReaction.ShowReaction(DuckReaction.Emotion.Sad, "Missed the family event...");
+                if (backgroundChanger != null) backgroundChanger.CheckAndChangeBackground("Missed the family event...");
+            }
+        }
+
+        // Advance to second crisis prompt
+        _crisisPhase = 1;
+        UpdateUI();
+        Invoke("ShowWeek6", 1.5f);
+    }
+
+    void HandleCrisisSocial(bool go)
+    {
+        _idleTimer = 0f;
+
+        if (go)
+        {
+            float bank = BankAccountService.Instance.GetBalance();
+            if (bank >= 15)
+            {
+                BankAccountService.Instance.Spend(15, "Goodbye party", "Social");
+                _totalOptionalSpend += 15;
+                ShowFloatingMoney(-15);
+                if (duckReaction != null)
+                {
+                    duckReaction.ShowReaction(DuckReaction.Emotion.Happy, "Great send-off!");
+                    if (backgroundChanger != null) backgroundChanger.CheckAndChangeBackground("Great send-off!");
+                }
+            }
+            else
+            {
+                int canPay = (int)bank;
+                if (canPay > 0)
+                    BankAccountService.Instance.Spend(canPay, "Goodbye party", "Social");
+                _totalOptionalSpend += 15;
+                _wentIntoDebt = true;
+                ShowFloatingMoney(-15);
+                if (duckReaction != null)
+                {
+                    duckReaction.ShowReaction(DuckReaction.Emotion.Sad, "Couldn't quite afford it...");
+                    if (backgroundChanger != null) backgroundChanger.CheckAndChangeBackground("Couldn't quite afford it...");
+                }
+            }
+        }
+        else
+        {
+            if (duckReaction != null)
+            {
+                duckReaction.ShowReaction(DuckReaction.Emotion.Neutral, "Saved \u00a315.");
+                if (backgroundChanger != null) backgroundChanger.CheckAndChangeBackground("Saved \u00a315.");
+            }
+        }
+
+        UpdateUI();
+        ShowWeekFeedback("End of the season!");
+    }
+
+    // ==================== FEEDBACK & CONSEQUENCE ====================
+
+    void ShowWeekFeedback(string message)
+    {
+        float bank = BankAccountService.Instance.GetBalance();
+        string summary = message + "\n\n"
+            + "Fund: \u00a3" + emergencyFundBalance + "  Bank: \u00a3" + bank.ToString("F0");
+        if (_wentIntoDebt)
+            summary += "  (in debt)";
+
+        eventText.text = summary;
+        ClearChoices();
+
+        // Show consequence panel for this week, then a Continue/Results button
+        if (currentWeek >= totalWeeks)
+        {
+            CreateActionButton("See Your Results", new Color(0.9f, 0.7f, 0.2f), () =>
+            {
+                ClearChoices();
+                ShowReflection();
+            });
+        }
+        else
+        {
+            CreateActionButton("Continue", new Color(0.5f, 0.7f, 1f), () =>
+            {
+                ClearChoices();
+                StartNewWeek();
+            });
         }
     }
 
-    void CreatePlayAgainButton()
-{
-    GameObject button = new GameObject("PlayAgainButton");
-    button.transform.SetParent(choicesPanel, false);
-    
-    RectTransform rect = button.AddComponent<RectTransform>();
-    rect.sizeDelta = new Vector2(280, 120);
-    
-    Image img = button.AddComponent<Image>();
-    img.color = new Color(0.5f, 0.7f, 1f);
-    
-    Button btn = button.AddComponent<Button>();
-    
-    GameObject btnText = new GameObject("Text");
-    btnText.transform.SetParent(button.transform, false);
-    RectTransform textRect = btnText.AddComponent<RectTransform>();
-    textRect.anchorMin = Vector2.zero;
-    textRect.anchorMax = Vector2.one;
-    textRect.sizeDelta = new Vector2(-20, -20);
-    
-    TextMeshProUGUI tmp = btnText.AddComponent<TextMeshProUGUI>();
-    tmp.text = "Play Again";
-    tmp.fontSize = 24;
-    tmp.color = Color.white;
-    tmp.alignment = TextAlignmentOptions.Center;
-    tmp.fontStyle = FontStyles.Bold;
-    
-    btn.onClick.AddListener(() => RestartGame());
-}
+    // ==================== END-OF-SEASON REFLECTION ====================
 
-void CreateSeeResultsButton()
-{
-    GameObject button = new GameObject("SeeResultsButton");
-    button.transform.SetParent(choicesPanel, false);
-
-    RectTransform rect = button.AddComponent<RectTransform>();
-    rect.sizeDelta = new Vector2(280, 120);
-
-    Image img = button.AddComponent<Image>();
-    img.color = new Color(0.9f, 0.7f, 0.2f);
-
-    Button btn = button.AddComponent<Button>();
-
-    GameObject btnText = new GameObject("Text");
-    btnText.transform.SetParent(button.transform, false);
-    RectTransform textRect = btnText.AddComponent<RectTransform>();
-    textRect.anchorMin = Vector2.zero;
-    textRect.anchorMax = Vector2.one;
-    textRect.sizeDelta = new Vector2(-20, -20);
-
-    TextMeshProUGUI tmp = btnText.AddComponent<TextMeshProUGUI>();
-    tmp.text = "See Your Results";
-    tmp.fontSize = 24;
-    tmp.color = Color.white;
-    tmp.alignment = TextAlignmentOptions.Center;
-    tmp.fontStyle = FontStyles.Bold;
-
-    btn.onClick.AddListener(() =>
+    void ShowReflection()
     {
+        Debug.Log("Season ended! Fund: \u00a3" + emergencyFundBalance + " Debt: " + _wentIntoDebt);
+
+        if (PlayerModelService.Instance != null)
+            PlayerModelService.Instance.RecordEmergencyFundRound(emergencyFundBalance, goalAmount);
+
+        int stars = CalculateStars();
+
+        // Build reflection summary
+        float bank = BankAccountService.Instance.GetBalance();
+        string reflection = "SEASON COMPLETE!\n\n"
+            + "Emergency fund: \u00a3" + emergencyFundBalance + "\n"
+            + "Bank balance: \u00a3" + bank.ToString("F0") + "\n"
+            + "Total saved to fund: \u00a3" + _totalSavedToFund + "\n"
+            + "Optional spending: \u00a3" + _totalOptionalSpend + "\n\n";
+
+        if (_wentIntoDebt)
+            reflection += "You went into debt during the season.\nA bigger emergency fund would have helped!\n";
+        else if (emergencyFundBalance > 0)
+            reflection += "You stayed out of debt and still have savings!\nGreat money management.\n";
+        else
+            reflection += "You avoided debt, but your fund is empty.\nTry saving more next time!\n";
+
+        eventText.text = reflection;
+
+        // Duck reaction based on outcome
+        DuckReaction.Emotion duckEmotion;
+        string duckLine;
+        if (stars >= 3)
+        {
+            duckEmotion = DuckReaction.Emotion.Celebrating;
+            duckLine = "Amazing season!";
+        }
+        else if (stars >= 2)
+        {
+            duckEmotion = DuckReaction.Emotion.Happy;
+            duckLine = "Well done!";
+        }
+        else if (stars >= 1)
+        {
+            duckEmotion = DuckReaction.Emotion.Neutral;
+            duckLine = "Room to improve!";
+        }
+        else
+        {
+            duckEmotion = DuckReaction.Emotion.Worried;
+            duckLine = "Try again!";
+        }
+
+        if (duckReaction != null)
+        {
+            duckReaction.ShowReaction(duckEmotion, duckLine);
+            if (backgroundChanger != null) backgroundChanger.CheckAndChangeBackground(duckLine);
+        }
+
+        if (starRating != null)
+            starRating.SetRating(stars);
+
         ClearChoices();
-        ShowConsequencePanel();
-    });
-}
-    
+        CreateActionButton("See Full Results", new Color(0.9f, 0.7f, 0.2f), () =>
+        {
+            ClearChoices();
+            ShowConsequencePanel();
+        });
+    }
+
     int CalculateStars()
     {
-        if (emergencyFund >= 600) return 3;
-        if (emergencyFund >= 400) return 2;
-        if (emergencyFund >= 250) return 1;
+        // 3 stars: fund > 0 and no debt (managed emergencies well)
+        // 2 stars: no debt but fund depleted
+        // 1 star: went into debt but tried saving
+        // 0 stars: went into debt and never saved
+        if (!_wentIntoDebt && emergencyFundBalance > 0) return 3;
+        if (!_wentIntoDebt) return 2;
+        if (_totalSavedToFund > 0) return 1;
         return 0;
     }
-    
-void ShowConsequencePanel()
+
+    void ShowConsequencePanel()
     {
-        Debug.Log(">>> Showing consequence panel...");
-        
+        Debug.Log("Showing consequence panel...");
         int stars = CalculateStars();
-        
+
         if (consequencePanel != null)
         {
-            Debug.Log($"Consequence panel found! Stars: {stars}, Amount: {emergencyFund}");
-            consequencePanel.ShowConsequences(emergencyFund, stars);
+            Debug.Log("Consequence panel found! Stars: " + stars + ", Fund: " + emergencyFundBalance);
+            consequencePanel.ShowConsequences(emergencyFundBalance, stars);
         }
         else
         {
             Debug.LogError("[X] Consequence panel is NULL! Not wired!");
         }
     }
-    
+
+    // ==================== UI HELPERS ====================
+
+    void UpdateUI()
+    {
+        if (progressText != null)
+            progressText.text = "\u00a3" + emergencyFundBalance + " / \u00a3" + goalAmount;
+
+        float progress = progressBarMax > 0 ? (float)emergencyFundBalance / progressBarMax : 0f;
+        progress = Mathf.Clamp01(progress);
+
+        if (progressBarFill != null)
+        {
+            RectTransform rect = progressBarFill.GetComponent<RectTransform>();
+            rect.sizeDelta = new Vector2(650 * progress, 40);
+        }
+    }
+
+    void SaveEmergencyFund()
+    {
+        PlayerPrefs.SetInt("EmergencyFundBalance", emergencyFundBalance);
+        PlayerPrefs.Save();
+    }
+
+    void ShowFloatingMoney(int amount)
+    {
+        FloatingMoneyText floatingMoney = FindObjectOfType<FloatingMoneyText>();
+        if (floatingMoney != null)
+        {
+            Vector3 screenCenter = new Vector3(Screen.width / 2, Screen.height / 2 + 100, 0);
+            floatingMoney.ShowMoneyChange(amount, screenCenter);
+        }
+    }
+
+    void ClearChoices()
+    {
+        foreach (Transform child in choicesPanel)
+            Destroy(child.gameObject);
+    }
+
+    void CreateActionButton(string text, Color buttonColor, System.Action callback)
+    {
+        GameObject button = new GameObject("ChoiceButton");
+        button.transform.SetParent(choicesPanel, false);
+
+        RectTransform rect = button.AddComponent<RectTransform>();
+        rect.sizeDelta = new Vector2(280, 120);
+
+        Image img = button.AddComponent<Image>();
+        img.color = buttonColor;
+
+        Button btn = button.AddComponent<Button>();
+
+        GameObject btnText = new GameObject("Text");
+        btnText.transform.SetParent(button.transform, false);
+        RectTransform textRect = btnText.AddComponent<RectTransform>();
+        textRect.anchorMin = Vector2.zero;
+        textRect.anchorMax = Vector2.one;
+        textRect.sizeDelta = new Vector2(-20, -20);
+
+        TextMeshProUGUI tmp = btnText.AddComponent<TextMeshProUGUI>();
+        tmp.text = text;
+        tmp.fontSize = 24;
+        tmp.color = Color.white;
+        tmp.alignment = TextAlignmentOptions.Center;
+        tmp.fontStyle = FontStyles.Bold;
+
+        btn.onClick.AddListener(() => callback());
+    }
+
+    // ==================== RESTART ====================
+
+    public void RestartGame()
+    {
+        currentWeek = 0;
+        emergencyFundBalance = 0;
+        _wentIntoDebt = false;
+        _totalOptionalSpend = 0;
+        _totalSavedToFund = 0;
+        _crisisPhase = 0;
+
+        PlayerPrefs.SetInt("EmergencyFundBalance", 0);
+        PlayerPrefs.Save();
+
+        UpdateUI();
+        ClearChoices();
+
+        if (duckReaction != null)
+        {
+            duckReaction.ShowReaction(DuckReaction.Emotion.Neutral, "Let's try again!");
+            if (backgroundChanger != null) backgroundChanger.CheckAndChangeBackground("Let's try again!");
+        }
+
+        Invoke("StartNewWeek", 1.5f);
+    }
+
+    // ==================== RE-ENGAGEMENT POPUP ====================
+
     void BuildReengagementPopup()
     {
-        // Create dedicated canvas at scene root (avoid parent transform issues)
         GameObject canvasGO = new GameObject("ReengageCanvas");
         Canvas canvas = canvasGO.AddComponent<Canvas>();
         canvas.renderMode = RenderMode.ScreenSpaceOverlay;
@@ -718,7 +829,6 @@ void ShowConsequencePanel()
         bg.color = new Color(0.12f, 0.12f, 0.18f, 0.95f);
         bg.raycastTarget = true;
 
-        // Message text
         GameObject textGO = new GameObject("ReengageText");
         textGO.transform.SetParent(_reengagePanel.transform, false);
         RectTransform textRect = textGO.AddComponent<RectTransform>();
@@ -728,15 +838,15 @@ void ShowConsequencePanel()
         textRect.offsetMax = Vector2.zero;
 
         _reengageText = textGO.AddComponent<TextMeshProUGUI>();
-        _reengageText.text = "Need a hand?\nWe can make the next week easier!";
+        _reengageText.text = "Need a hand?\nTake your time with this decision.";
         _reengageText.fontSize = 26f;
         _reengageText.color = Color.white;
         _reengageText.alignment = TextAlignmentOptions.Center;
         _reengageText.raycastTarget = false;
         _reengageText.enableWordWrapping = true;
 
-        CreateReengageButton("Try easier", new Color(0.3f, 0.8f, 0.4f),
-            new Vector2(0.08f, 0.08f), new Vector2(0.48f, 0.45f), OnTryEasier);
+        CreateReengageButton("Take a hint", new Color(0.3f, 0.8f, 0.4f),
+            new Vector2(0.08f, 0.08f), new Vector2(0.48f, 0.45f), OnTakeHint);
         CreateReengageButton("Keep going", new Color(0.5f, 0.6f, 0.8f),
             new Vector2(0.52f, 0.08f), new Vector2(0.92f, 0.45f), OnKeepGoing);
 
@@ -777,10 +887,10 @@ void ShowConsequencePanel()
 
     void CheckReengagementTrigger()
     {
-        if (_reengagePanel == null) { return; }
+        if (_reengagePanel == null) return;
         if (_reengagePanel.activeSelf) return;
         if (_reengageCooldown > 0f) return;
-        if (currentWeek <= 0 || currentWeek > maxWeeks) return;
+        if (currentWeek <= 0 || currentWeek > totalWeeks) return;
 
         bool idleTrigger = _idleTimer >= ReengageIdleThreshold;
         bool streakTrigger = PlayerModelService.Instance != null
@@ -789,10 +899,10 @@ void ShowConsequencePanel()
         if (idleTrigger || streakTrigger)
         {
             string reason = idleTrigger ? "idle" : "failStreak";
-            Debug.Log($"[Reengage] Showing popup (reason={reason}, idle={_idleTimer:F1}s, streak={PlayerModelService.Instance?.failedRoundsStreak})");
+            Debug.Log("[Reengage] Showing popup (reason=" + reason + ")");
             ShowReengagementPopup(idleTrigger
-                ? "Looks like you're thinking...\nWant an easier round?"
-                : "Tough streak!\nWant to try something easier?");
+                ? "Looks like you're thinking...\nTake your time!"
+                : "Tough stretch!\nSaving is hard — keep going!");
         }
     }
 
@@ -811,37 +921,28 @@ void ShowConsequencePanel()
         _idleTimer = 0f;
     }
 
-void OnTryEasier()
+    void OnTakeHint()
     {
-        Debug.Log("[Reengage] Player chose 'Try easier' -- loading bonus round now");
+        Debug.Log("[Reengage] Player asked for a hint");
         DismissReengagementPopup();
 
-        // Cancel any pending StartNewWeek invoke
-        CancelInvoke("StartNewWeek");
-
-        // Try data-driven easy event first
-        if (EventLoader.Instance != null && EventLoader.Instance.TotalEventsLoaded > 0)
+        // Show contextual hint based on current week
+        if (duckReaction != null)
         {
-            EmergencyFundEvent evt = EventLoader.Instance.GetEasyEvent(_lastEventId);
-            if (evt != null)
+            string hint;
+            switch (currentWeek)
             {
-                _lastWeekType = evt.type;
-                _lastEventId = evt.id;
-                Debug.Log($"[Reengage] Instant data-driven easy round: {evt.id}");
-                ShowEventFromData(evt);
-                return;
+                case 1: hint = "Saving more now means safety later!"; break;
+                case 2: hint = "Will you need that money later?"; break;
+                case 3: hint = "This is why we save!"; break;
+                case 4: hint = "A bonus is a chance to build your fund."; break;
+                case 5: hint = "Big costs show why funds matter."; break;
+                case 6: hint = "Tough week — choose carefully!"; break;
+                default: hint = "Think about what matters most."; break;
             }
+            duckReaction.ShowReaction(DuckReaction.Emotion.Thinking, hint);
+            if (backgroundChanger != null) backgroundChanger.CheckAndChangeBackground(hint);
         }
-
-        // Fallback to hardcoded
-        string easyType = (_lastWeekType != "bonus") ? "bonus" : "normal";
-        _lastWeekType = easyType;
-        Debug.Log($"[Reengage] Instant easy round (hardcoded): {easyType}");
-
-        if (easyType == "bonus")
-            ShowBonusWeek();
-        else
-            ShowNormalWeek();
     }
 
     void OnKeepGoing()
@@ -849,26 +950,4 @@ void OnTryEasier()
         Debug.Log("[Reengage] Player chose 'Keep going'");
         DismissReengagementPopup();
     }
-
-    
-public void RestartGame()
-    {
-        currentWeek = 0;
-        _lastWeekType = "";
-        _lastEventId = "";
-        _forceEasierNext = false;
-        
-        emergencyFund = 0;
-        UpdateUI();
-        ClearChoices();
-        
-        if (duckReaction != null)
-        {
-            duckReaction.ShowReaction(DuckReaction.Emotion.Neutral, "Let's try again!");
-            if (backgroundChanger != null) backgroundChanger.CheckAndChangeBackground("Let's try again!");
-        }
-        
-        Invoke("StartNewWeek", 1.5f);
-    }
 }
-
