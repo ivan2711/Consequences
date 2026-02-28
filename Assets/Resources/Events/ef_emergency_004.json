@@ -1,0 +1,35 @@
+{
+  "id": "ef_emergency_004",
+  "version": 1,
+  "type": "emergency",
+  "title": "School Shoes Broke",
+  "description": "The sole came off your school shoes. New ones cost \u00a340.",
+  "weeklyIncomePounds": 120,
+  "costPounds": 40,
+  "bonusPounds": 0,
+  "choices": [
+    {
+      "label": "Buy new shoes",
+      "savePounds": 80,
+      "flavourText": "Sorted. These should last a while."
+    },
+    {
+      "label": "Glue them for now",
+      "savePounds": 120,
+      "flavourText": "A temporary fix. Might not last."
+    }
+  ],
+  "duckEmotion": "shocked",
+  "duckLine": "Not the shoes!",
+  "difficulty": "medium",
+  "tags": [
+    "clothing",
+    "essentials",
+    "unexpected"
+  ],
+  "ageRangeMin": 12,
+  "ageRangeMax": 18,
+  "currencyCode": "GBP",
+  "author": "content-team",
+  "notes": "School uniform costs \u2014 very UK-specific."
+}

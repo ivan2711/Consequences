@@ -1,0 +1,35 @@
+{
+  "id": "ef_choice_002",
+  "version": 1,
+  "type": "choice",
+  "title": "New Trainers",
+  "description": "You spot some trainers you've wanted for ages. They're \u00a345 \u2014 not cheap.",
+  "weeklyIncomePounds": 120,
+  "costPounds": 0,
+  "bonusPounds": 0,
+  "choices": [
+    {
+      "label": "Buy trainers",
+      "savePounds": 75,
+      "flavourText": "They look great. Worth it?"
+    },
+    {
+      "label": "Wait for a sale",
+      "savePounds": 120,
+      "flavourText": "Patience might pay off later."
+    }
+  ],
+  "duckEmotion": "thinking",
+  "duckLine": "They are nice though...",
+  "difficulty": "medium",
+  "tags": [
+    "clothing",
+    "impulse",
+    "wants"
+  ],
+  "ageRangeMin": 12,
+  "ageRangeMax": 18,
+  "currencyCode": "GBP",
+  "author": "content-team",
+  "notes": "Higher-cost impulse buy."
+}

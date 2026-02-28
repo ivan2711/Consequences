@@ -1,0 +1,40 @@
+{
+  "id": "ef_lucky_001",
+  "version": 1,
+  "type": "lucky",
+  "title": "Cashback Surprise",
+  "description": "You got a \u00a325 cashback refund from an overcharge on your phone bill last month.",
+  "weeklyIncomePounds": 120,
+  "costPounds": 0,
+  "bonusPounds": 25,
+  "choices": [
+    {
+      "label": "Save all \u00a3145",
+      "savePounds": 145,
+      "flavourText": "Unexpected money, straight to savings."
+    },
+    {
+      "label": "Save \u00a370",
+      "savePounds": 70,
+      "flavourText": "Some saved, some enjoyed."
+    },
+    {
+      "label": "Spend the refund",
+      "savePounds": 120,
+      "flavourText": "You kept your regular savings at least."
+    }
+  ],
+  "duckEmotion": "celebrating",
+  "duckLine": "Free money!",
+  "difficulty": "easy",
+  "tags": [
+    "lucky",
+    "refund",
+    "bonus"
+  ],
+  "ageRangeMin": 12,
+  "ageRangeMax": 18,
+  "currencyCode": "GBP",
+  "author": "content-team",
+  "notes": "Cashback/refund \u2014 realistic, not lottery."
+}

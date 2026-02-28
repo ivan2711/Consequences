@@ -1,0 +1,34 @@
+{
+  "id": "ef_emergency_003",
+  "version": 1,
+  "type": "emergency",
+  "title": "Bike Puncture",
+  "description": "Your bike tyre went flat. A new inner tube and fitting costs \u00a318.",
+  "weeklyIncomePounds": 120,
+  "costPounds": 18,
+  "bonusPounds": 0,
+  "choices": [
+    {
+      "label": "Fix the bike",
+      "savePounds": 102,
+      "flavourText": "Rolling again by tomorrow."
+    },
+    {
+      "label": "Walk for now",
+      "savePounds": 120,
+      "flavourText": "It's slower but free."
+    }
+  ],
+  "duckEmotion": "worried",
+  "duckLine": "Psssss...",
+  "difficulty": "easy",
+  "tags": [
+    "transport",
+    "repair"
+  ],
+  "ageRangeMin": 12,
+  "ageRangeMax": 18,
+  "currencyCode": "GBP",
+  "author": "content-team",
+  "notes": "Low-cost emergency \u2014 good for younger players."
+}

@@ -1,0 +1,40 @@
+{
+  "id": "ef_bonus_003",
+  "version": 1,
+  "type": "bonus",
+  "title": "Grandparent's Visit",
+  "description": "Your nan came round and slipped you \u00a330. She said to spend it wisely.",
+  "weeklyIncomePounds": 120,
+  "costPounds": 0,
+  "bonusPounds": 30,
+  "choices": [
+    {
+      "label": "Save all \u00a3150",
+      "savePounds": 150,
+      "flavourText": "Nan would be proud."
+    },
+    {
+      "label": "Save \u00a375",
+      "savePounds": 75,
+      "flavourText": "Half wisely spent, half wisely saved."
+    },
+    {
+      "label": "Spend the gift",
+      "savePounds": 120,
+      "flavourText": "You kept your usual savings at least."
+    }
+  ],
+  "duckEmotion": "happy",
+  "duckLine": "Thanks, Nan!",
+  "difficulty": "easy",
+  "tags": [
+    "family",
+    "gift",
+    "bonus"
+  ],
+  "ageRangeMin": 12,
+  "ageRangeMax": 18,
+  "currencyCode": "GBP",
+  "author": "content-team",
+  "notes": "Family gift \u2014 culturally common UK scenario."
+}

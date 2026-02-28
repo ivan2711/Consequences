@@ -1,0 +1,40 @@
+{
+  "id": "ef_normal_007",
+  "version": 1,
+  "type": "normal",
+  "title": "Half Term Week",
+  "description": "It's half term \u2014 no school costs this week. You still have your \u00a3120.",
+  "weeklyIncomePounds": 120,
+  "costPounds": 0,
+  "bonusPounds": 0,
+  "choices": [
+    {
+      "label": "Save all \u00a3120",
+      "savePounds": 120,
+      "flavourText": "Half term and saving \u2014 nice combo."
+    },
+    {
+      "label": "Save \u00a350",
+      "savePounds": 50,
+      "flavourText": "A bit for fun, a bit for later."
+    },
+    {
+      "label": "Spend it all",
+      "savePounds": 0,
+      "flavourText": "Holiday spending got the better of you."
+    }
+  ],
+  "duckEmotion": "happy",
+  "duckLine": "No school!",
+  "difficulty": "easy",
+  "tags": [
+    "save",
+    "routine",
+    "holiday"
+  ],
+  "ageRangeMin": 12,
+  "ageRangeMax": 18,
+  "currencyCode": "GBP",
+  "author": "content-team",
+  "notes": ""
+}

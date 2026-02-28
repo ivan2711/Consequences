@@ -1,0 +1,35 @@
+{
+  "id": "ef_emergency_013",
+  "version": 1,
+  "type": "emergency",
+  "title": "Backpack Strap Snapped",
+  "description": "Your school bag strap broke. A decent replacement bag is \u00a322.",
+  "weeklyIncomePounds": 120,
+  "costPounds": 22,
+  "bonusPounds": 0,
+  "choices": [
+    {
+      "label": "Buy new bag",
+      "savePounds": 98,
+      "flavourText": "Should last the rest of the year."
+    },
+    {
+      "label": "Carry it by hand",
+      "savePounds": 120,
+      "flavourText": "Awkward but functional."
+    }
+  ],
+  "duckEmotion": "worried",
+  "duckLine": "Not the bag!",
+  "difficulty": "easy",
+  "tags": [
+    "school",
+    "essentials",
+    "unexpected"
+  ],
+  "ageRangeMin": 12,
+  "ageRangeMax": 18,
+  "currencyCode": "GBP",
+  "author": "content-team",
+  "notes": ""
+}

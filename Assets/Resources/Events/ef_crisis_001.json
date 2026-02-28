@@ -1,0 +1,36 @@
+{
+  "id": "ef_crisis_001",
+  "version": 1,
+  "type": "crisis",
+  "title": "Double Trouble",
+  "description": "Your coat zip broke and you need a textbook for a new module. Coat repair is \u00a315, textbook is \u00a322.",
+  "weeklyIncomePounds": 120,
+  "costPounds": 37,
+  "bonusPounds": 0,
+  "choices": [
+    {
+      "label": "Pay for both",
+      "savePounds": 83,
+      "flavourText": "Both sorted, but it cost you."
+    },
+    {
+      "label": "Just the textbook",
+      "savePounds": 98,
+      "flavourText": "School comes first. The coat can wait."
+    }
+  ],
+  "duckEmotion": "worried",
+  "duckLine": "Two things at once!",
+  "difficulty": "hard",
+  "tags": [
+    "essentials",
+    "school",
+    "clothing",
+    "unexpected"
+  ],
+  "ageRangeMin": 12,
+  "ageRangeMax": 18,
+  "currencyCode": "GBP",
+  "author": "content-team",
+  "notes": "Two simultaneous expenses \u2014 teaches prioritisation."
+}

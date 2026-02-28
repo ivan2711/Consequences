@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 480e7803cd7f14b4bbb47a4876d95c5e
+guid: 94dd1bb15a1d9431798a418da619d050
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 7203792320872836940
-    second: duck_use_your_fund_0
+      213: -1177886666936236780
+    second: emergency_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -113,7 +113,7 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: duck_use_your_fund_0
+      name: emergency_0
       rect:
         serializedVersion: 2
         x: 0
@@ -128,8 +128,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: c4fef41d2f209f360800000000000000
-      internalID: 7203792320872836940
+      spriteID: 415c89f215e47afe0800000000000000
+      internalID: -1177886666936236780
       vertices: []
       indices: 
       edges: []
@@ -148,7 +148,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      duck_use_your_fund_0: 7203792320872836940
+      emergency_0: -1177886666936236780
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

@@ -1,0 +1,39 @@
+{
+  "id": "ef_normal_005",
+  "version": 1,
+  "type": "normal",
+  "title": "Fresh Start Monday",
+  "description": "New week, fresh start. You've got your usual \u00a3120.",
+  "weeklyIncomePounds": 120,
+  "costPounds": 0,
+  "bonusPounds": 0,
+  "choices": [
+    {
+      "label": "Save all \u00a3120",
+      "savePounds": 120,
+      "flavourText": "Monday motivation \u2014 full save."
+    },
+    {
+      "label": "Save \u00a360",
+      "savePounds": 60,
+      "flavourText": "Half now, half for spending."
+    },
+    {
+      "label": "Spend it all",
+      "savePounds": 0,
+      "flavourText": "Gone before Tuesday."
+    }
+  ],
+  "duckEmotion": "happy",
+  "duckLine": "New week!",
+  "difficulty": "easy",
+  "tags": [
+    "save",
+    "routine"
+  ],
+  "ageRangeMin": 12,
+  "ageRangeMax": 18,
+  "currencyCode": "GBP",
+  "author": "content-team",
+  "notes": ""
+}

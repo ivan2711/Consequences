@@ -1,0 +1,35 @@
+{
+  "id": "ef_emergency_021",
+  "version": 1,
+  "type": "emergency",
+  "title": "Bike Light Stolen",
+  "description": "Someone nicked your bike lights. Replacements cost \u00a316 for front and back.",
+  "weeklyIncomePounds": 120,
+  "costPounds": 16,
+  "bonusPounds": 0,
+  "choices": [
+    {
+      "label": "Buy new lights",
+      "savePounds": 104,
+      "flavourText": "Safe to ride in the dark again."
+    },
+    {
+      "label": "Only ride in daylight",
+      "savePounds": 120,
+      "flavourText": "Limits when you can cycle."
+    }
+  ],
+  "duckEmotion": "sad",
+  "duckLine": "Who does that?!",
+  "difficulty": "easy",
+  "tags": [
+    "transport",
+    "unexpected",
+    "safety"
+  ],
+  "ageRangeMin": 12,
+  "ageRangeMax": 18,
+  "currencyCode": "GBP",
+  "author": "content-team",
+  "notes": ""
+}

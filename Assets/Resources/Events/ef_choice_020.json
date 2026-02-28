@@ -1,0 +1,35 @@
+{
+  "id": "ef_choice_020",
+  "version": 1,
+  "type": "choice",
+  "title": "Camping Trip",
+  "description": "Scouts or Guides are going camping this weekend. Contribution is \u00a315.",
+  "weeklyIncomePounds": 120,
+  "costPounds": 0,
+  "bonusPounds": 0,
+  "choices": [
+    {
+      "label": "Go camping",
+      "savePounds": 105,
+      "flavourText": "Marshmallows by the fire \u2014 worth it."
+    },
+    {
+      "label": "Stay home",
+      "savePounds": 120,
+      "flavourText": "Your sleeping bag stays dry."
+    }
+  ],
+  "duckEmotion": "thinking",
+  "duckLine": "Outdoors or indoors?",
+  "difficulty": "easy",
+  "tags": [
+    "social",
+    "outdoor",
+    "activities"
+  ],
+  "ageRangeMin": 12,
+  "ageRangeMax": 16,
+  "currencyCode": "GBP",
+  "author": "content-team",
+  "notes": ""
+}

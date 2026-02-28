@@ -1,0 +1,35 @@
+{
+  "id": "ef_choice_021",
+  "version": 1,
+  "type": "choice",
+  "title": "Charity Sponsored Walk",
+  "description": "You're doing a sponsored walk and need to buy proper walking socks. They're \u00a38.",
+  "weeklyIncomePounds": 120,
+  "costPounds": 0,
+  "bonusPounds": 0,
+  "choices": [
+    {
+      "label": "Buy the socks",
+      "savePounds": 112,
+      "flavourText": "No blisters \u2014 good call."
+    },
+    {
+      "label": "Wear what you have",
+      "savePounds": 120,
+      "flavourText": "Fingers crossed they hold up."
+    }
+  ],
+  "duckEmotion": "thinking",
+  "duckLine": "Comfort or savings?",
+  "difficulty": "easy",
+  "tags": [
+    "charity",
+    "clothing",
+    "outdoor"
+  ],
+  "ageRangeMin": 12,
+  "ageRangeMax": 18,
+  "currencyCode": "GBP",
+  "author": "content-team",
+  "notes": ""
+}

@@ -1,0 +1,34 @@
+{
+  "id": "ef_choice_008",
+  "version": 1,
+  "type": "choice",
+  "title": "Haircut",
+  "description": "Your hair's getting long. A trim at the barber costs \u00a315.",
+  "weeklyIncomePounds": 120,
+  "costPounds": 0,
+  "bonusPounds": 0,
+  "choices": [
+    {
+      "label": "Get the cut",
+      "savePounds": 105,
+      "flavourText": "Looking fresh."
+    },
+    {
+      "label": "Let it grow",
+      "savePounds": 120,
+      "flavourText": "Saved the money \u2014 hair can wait."
+    }
+  ],
+  "duckEmotion": "thinking",
+  "duckLine": "Fresh trim?",
+  "difficulty": "easy",
+  "tags": [
+    "grooming",
+    "routine"
+  ],
+  "ageRangeMin": 12,
+  "ageRangeMax": 18,
+  "currencyCode": "GBP",
+  "author": "content-team",
+  "notes": ""
+}

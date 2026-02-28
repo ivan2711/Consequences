@@ -1,0 +1,35 @@
+{
+  "id": "ef_choice_024",
+  "version": 1,
+  "type": "choice",
+  "title": "Stationery Haul",
+  "description": "New term, new stationery? A nice set of pens and folders is \u00a311.",
+  "weeklyIncomePounds": 120,
+  "costPounds": 0,
+  "bonusPounds": 0,
+  "choices": [
+    {
+      "label": "Buy new stationery",
+      "savePounds": 109,
+      "flavourText": "Organised and ready."
+    },
+    {
+      "label": "Reuse last term's",
+      "savePounds": 120,
+      "flavourText": "The old ones still work fine."
+    }
+  ],
+  "duckEmotion": "thinking",
+  "duckLine": "New pens though...",
+  "difficulty": "easy",
+  "tags": [
+    "school",
+    "wants",
+    "impulse"
+  ],
+  "ageRangeMin": 12,
+  "ageRangeMax": 18,
+  "currencyCode": "GBP",
+  "author": "content-team",
+  "notes": ""
+}

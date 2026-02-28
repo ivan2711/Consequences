@@ -1,0 +1,39 @@
+{
+  "id": "ef_normal_004",
+  "version": 1,
+  "type": "normal",
+  "title": "Regular Week",
+  "description": "School, home, repeat. You've got your \u00a3120 \u2014 what's the plan?",
+  "weeklyIncomePounds": 120,
+  "costPounds": 0,
+  "bonusPounds": 0,
+  "choices": [
+    {
+      "label": "Save everything",
+      "savePounds": 120,
+      "flavourText": "Discipline pays off."
+    },
+    {
+      "label": "Save \u00a340",
+      "savePounds": 40,
+      "flavourText": "A little bit adds up."
+    },
+    {
+      "label": "Spend it all",
+      "savePounds": 0,
+      "flavourText": "Maybe next week."
+    }
+  ],
+  "duckEmotion": "neutral",
+  "duckLine": "Same old, same old.",
+  "difficulty": "easy",
+  "tags": [
+    "save",
+    "routine"
+  ],
+  "ageRangeMin": 12,
+  "ageRangeMax": 18,
+  "currencyCode": "GBP",
+  "author": "content-team",
+  "notes": "Standard week with a lower middle option."
+}

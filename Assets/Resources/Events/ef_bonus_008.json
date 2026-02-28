@@ -1,0 +1,40 @@
+{
+  "id": "ef_bonus_008",
+  "version": 1,
+  "type": "bonus",
+  "title": "Babysitting",
+  "description": "You babysat your cousin for the evening. Auntie gave you \u00a325.",
+  "weeklyIncomePounds": 120,
+  "costPounds": 0,
+  "bonusPounds": 25,
+  "choices": [
+    {
+      "label": "Save all \u00a3145",
+      "savePounds": 145,
+      "flavourText": "Earned while they slept."
+    },
+    {
+      "label": "Save \u00a372",
+      "savePounds": 72,
+      "flavourText": "Half saved, half for you."
+    },
+    {
+      "label": "Spend the extra",
+      "savePounds": 120,
+      "flavourText": "Babysitting money treated you."
+    }
+  ],
+  "duckEmotion": "happy",
+  "duckLine": "Easy money!",
+  "difficulty": "easy",
+  "tags": [
+    "work",
+    "family",
+    "bonus"
+  ],
+  "ageRangeMin": 13,
+  "ageRangeMax": 18,
+  "currencyCode": "GBP",
+  "author": "content-team",
+  "notes": ""
+}

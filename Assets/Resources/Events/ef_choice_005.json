@@ -1,0 +1,35 @@
+{
+  "id": "ef_choice_005",
+  "version": 1,
+  "type": "choice",
+  "title": "School Trip Hoodie",
+  "description": "Everyone's buying the school trip hoodie. It's \u00a325 and optional.",
+  "weeklyIncomePounds": 120,
+  "costPounds": 0,
+  "bonusPounds": 0,
+  "choices": [
+    {
+      "label": "Buy the hoodie",
+      "savePounds": 95,
+      "flavourText": "You'll match the rest of the group."
+    },
+    {
+      "label": "Skip it",
+      "savePounds": 120,
+      "flavourText": "You'll remember the trip without it."
+    }
+  ],
+  "duckEmotion": "thinking",
+  "duckLine": "Everyone else is getting one...",
+  "difficulty": "medium",
+  "tags": [
+    "social",
+    "clothing",
+    "peer-pressure"
+  ],
+  "ageRangeMin": 12,
+  "ageRangeMax": 18,
+  "currencyCode": "GBP",
+  "author": "content-team",
+  "notes": "Peer pressure scenario \u2014 no wrong answer."
+}

@@ -1250,14 +1250,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DuckReactionBackgroundChanger
   backgroundImage: {fileID: 1647553787}
-  payDayBackground: {fileID: -7394567752836570792, guid: e7c31e8e4d680478f85c7de6c86d8bc0, type: 3}
-  decideWiselyBackground: {fileID: -5567579461701069381, guid: a94e0e1a8f63c467eb0c8f36c935efac, type: 3}
-  bonusWeekBackground: {fileID: -1967641167390974836, guid: cd37a8b1df747408f96a67858755f118, type: 3}
-  useYourFundBackground: {fileID: 7203792320872836940, guid: 480e7803cd7f14b4bbb47a4876d95c5e, type: 3}
-  luckyYouBackground: {fileID: 4388813402311408451, guid: f7628479aff134228b93fc4d007dab06, type: 3}
-  twoThingsBackground: {fileID: -438728400054587203, guid: bb98c44d79edf437fa5de3c02724ac73, type: 3}
-  gameOverBackground: {fileID: 4085571724165051593, guid: be1750a5f542941599705570aaab577b, type: 3}
-  perfectBackground: {fileID: -5359475602204758619, guid: a2c3d961b2811448a9a5dc371a557398, type: 3}
+  payDayBackground: {fileID: 4606157284126940538, guid: d1b2801c07b4a49d39d2e1d137ae427c, type: 3}
+  decideWiselyBackground: {fileID: -3563085532065423289, guid: cdb3a0f6c69c4443ba48bde61965a9ae, type: 3}
+  bonusWeekBackground: {fileID: 3822108714260272289, guid: 0e06b757b6df9422387e8b50274b5d68, type: 3}
+  useYourFundBackground: {fileID: 4606157284126940538, guid: 78d29d8b7e383469cb453b7b20279530, type: 3}
+  luckyYouBackground: {fileID: -3345844406473621077, guid: 1bc77d479b6484add98f8c1de616a622, type: 3}
+  twoThingsBackground: {fileID: -6185800999417998647, guid: 674cccbd4d4544f75a3bf40ab1f3c2ee, type: 3}
+  gameOverBackground: {fileID: 4606157284126940538, guid: 78d29d8b7e383469cb453b7b20279530, type: 3}
+  perfectBackground: {fileID: 4606157284126940538, guid: 78d29d8b7e383469cb453b7b20279530, type: 3}
 --- !u!1 &285335786
 GameObject:
   m_ObjectHideFlags: 0
@@ -2866,9 +2866,10 @@ RectTransform:
   - {fileID: 1138891376}
   - {fileID: 1565092322}
   - {fileID: 270625813}
+  - {fileID: 1309353814}
+  - {fileID: 1594225598}
   - {fileID: 838071600}
   - {fileID: 1666318552}
-  - {fileID: 1594225598}
   - {fileID: 366491248}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -4595,6 +4596,81 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1273032860}
   m_CullTransparentMesh: 1
+--- !u!1 &1309353813
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1309353814}
+  - component: {fileID: 1309353816}
+  - component: {fileID: 1309353815}
+  m_Layer: 5
+  m_Name: BalancePanel
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1309353814
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1309353813}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 738798645}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 1}
+  m_AnchorMax: {x: 0.5, y: 1}
+  m_AnchoredPosition: {x: -815, y: -130}
+  m_SizeDelta: {x: 200, y: 110}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1309353815
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1309353813}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
+  m_Type: 1
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!222 &1309353816
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1309353813}
+  m_CullTransparentMesh: 1
 --- !u!1 &1309846629
 GameObject:
   m_ObjectHideFlags: 0
@@ -6182,6 +6258,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: BankHUD
       objectReference: {fileID: 0}
+    - target: {fileID: 1877373666572019999, guid: 9eff40097ef63472b8c2141c4131913f, type: 3}
+      propertyPath: m_text
+      value: "Bank: \xA3500.00"
+      objectReference: {fileID: 0}
     - target: {fileID: 4662628628471343138, guid: 9eff40097ef63472b8c2141c4131913f, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -6244,11 +6324,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4662628628471343138, guid: 9eff40097ef63472b8c2141c4131913f, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: -705
+      value: 20
       objectReference: {fileID: 0}
     - target: {fileID: 4662628628471343138, guid: 9eff40097ef63472b8c2141c4131913f, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -450.5
+      value: -20
       objectReference: {fileID: 0}
     - target: {fileID: 4662628628471343138, guid: 9eff40097ef63472b8c2141c4131913f, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -6540,7 +6620,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 8126462219377913702, guid: 02fb6b0c5d95d4c5f974057e63b7eeb1, type: 3}
+  m_Sprite: {fileID: 4606157284126940538, guid: 78d29d8b7e383469cb453b7b20279530, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -8244,6 +8324,6 @@ MonoBehaviour:
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
-  - {fileID: 738798645}
-  - {fileID: 1743451456}
   - {fileID: 2137656902}
+  - {fileID: 1743451456}
+  - {fileID: 738798645}

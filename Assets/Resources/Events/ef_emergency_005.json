@@ -1,0 +1,35 @@
+{
+  "id": "ef_emergency_005",
+  "version": 1,
+  "type": "emergency",
+  "title": "Broken Headphones",
+  "description": "Your headphones stopped working. A decent replacement pair is \u00a330.",
+  "weeklyIncomePounds": 120,
+  "costPounds": 30,
+  "bonusPounds": 0,
+  "choices": [
+    {
+      "label": "Buy new ones",
+      "savePounds": 90,
+      "flavourText": "Music's back on."
+    },
+    {
+      "label": "Go without",
+      "savePounds": 120,
+      "flavourText": "Quiet commute for a while."
+    }
+  ],
+  "duckEmotion": "sad",
+  "duckLine": "No tunes?!",
+  "difficulty": "medium",
+  "tags": [
+    "tech",
+    "repair",
+    "wants"
+  ],
+  "ageRangeMin": 12,
+  "ageRangeMax": 18,
+  "currencyCode": "GBP",
+  "author": "content-team",
+  "notes": "Borderline need/want \u2014 good for discussion."
+}

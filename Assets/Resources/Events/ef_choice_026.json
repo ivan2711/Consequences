@@ -1,0 +1,35 @@
+{
+  "id": "ef_choice_026",
+  "version": 1,
+  "type": "choice",
+  "title": "Ice Skating",
+  "description": "There's a pop-up ice rink in town. Entry is \u00a310.",
+  "weeklyIncomePounds": 120,
+  "costPounds": 0,
+  "bonusPounds": 0,
+  "choices": [
+    {
+      "label": "Go skating",
+      "savePounds": 110,
+      "flavourText": "Wobbly but fun."
+    },
+    {
+      "label": "Skip it",
+      "savePounds": 120,
+      "flavourText": "It'll be back next year."
+    }
+  ],
+  "duckEmotion": "thinking",
+  "duckLine": "Hold onto the rail!",
+  "difficulty": "easy",
+  "tags": [
+    "entertainment",
+    "seasonal",
+    "social"
+  ],
+  "ageRangeMin": 12,
+  "ageRangeMax": 18,
+  "currencyCode": "GBP",
+  "author": "content-team",
+  "notes": ""
+}

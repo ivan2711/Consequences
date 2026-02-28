@@ -1,0 +1,35 @@
+{
+  "id": "ef_choice_025",
+  "version": 1,
+  "type": "choice",
+  "title": "Bowling Night",
+  "description": "Your cousin invited you bowling. Two games plus shoes is \u00a313.",
+  "weeklyIncomePounds": 120,
+  "costPounds": 0,
+  "bonusPounds": 0,
+  "choices": [
+    {
+      "label": "Go bowling",
+      "savePounds": 107,
+      "flavourText": "Strike! Well, mostly gutters."
+    },
+    {
+      "label": "Rain check",
+      "savePounds": 120,
+      "flavourText": "You'll go another time."
+    }
+  ],
+  "duckEmotion": "thinking",
+  "duckLine": "Spare or strike?",
+  "difficulty": "easy",
+  "tags": [
+    "social",
+    "entertainment",
+    "family"
+  ],
+  "ageRangeMin": 12,
+  "ageRangeMax": 18,
+  "currencyCode": "GBP",
+  "author": "content-team",
+  "notes": ""
+}

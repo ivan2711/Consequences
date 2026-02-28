@@ -1,0 +1,35 @@
+{
+  "id": "ef_choice_015",
+  "version": 1,
+  "type": "choice",
+  "title": "Milkshake Run",
+  "description": "Everyone's going to the milkshake place after school. A large is \u00a36.",
+  "weeklyIncomePounds": 120,
+  "costPounds": 0,
+  "bonusPounds": 0,
+  "choices": [
+    {
+      "label": "Get a milkshake",
+      "savePounds": 114,
+      "flavourText": "Delicious. Totally worth it... maybe."
+    },
+    {
+      "label": "Have water",
+      "savePounds": 120,
+      "flavourText": "Free and healthy."
+    }
+  ],
+  "duckEmotion": "thinking",
+  "duckLine": "Treat yourself?",
+  "difficulty": "easy",
+  "tags": [
+    "food",
+    "social",
+    "impulse"
+  ],
+  "ageRangeMin": 12,
+  "ageRangeMax": 18,
+  "currencyCode": "GBP",
+  "author": "content-team",
+  "notes": ""
+}

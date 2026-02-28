@@ -1,0 +1,35 @@
+{
+  "id": "ef_emergency_019",
+  "version": 1,
+  "type": "emergency",
+  "title": "Stained School Shirt",
+  "description": "You got a permanent stain on your school shirt. A new one from the school shop is \u00a316.",
+  "weeklyIncomePounds": 120,
+  "costPounds": 16,
+  "bonusPounds": 0,
+  "choices": [
+    {
+      "label": "Buy new shirt",
+      "savePounds": 104,
+      "flavourText": "Clean and smart again."
+    },
+    {
+      "label": "Wear the stained one",
+      "savePounds": 120,
+      "flavourText": "It's mostly hidden under your jumper."
+    }
+  ],
+  "duckEmotion": "worried",
+  "duckLine": "That won't come out!",
+  "difficulty": "easy",
+  "tags": [
+    "clothing",
+    "school",
+    "unexpected"
+  ],
+  "ageRangeMin": 12,
+  "ageRangeMax": 18,
+  "currencyCode": "GBP",
+  "author": "content-team",
+  "notes": ""
+}

@@ -1,0 +1,34 @@
+{
+  "id": "ef_choice_004",
+  "version": 1,
+  "type": "choice",
+  "title": "Birthday Present",
+  "description": "Your best mate's birthday is coming up. A decent gift would be about \u00a320.",
+  "weeklyIncomePounds": 120,
+  "costPounds": 0,
+  "bonusPounds": 0,
+  "choices": [
+    {
+      "label": "Buy a gift",
+      "savePounds": 100,
+      "flavourText": "They'll appreciate it."
+    },
+    {
+      "label": "Make something",
+      "savePounds": 120,
+      "flavourText": "Homemade and thoughtful."
+    }
+  ],
+  "duckEmotion": "thinking",
+  "duckLine": "It's the thought that counts.",
+  "difficulty": "easy",
+  "tags": [
+    "social",
+    "gifts"
+  ],
+  "ageRangeMin": 12,
+  "ageRangeMax": 18,
+  "currencyCode": "GBP",
+  "author": "content-team",
+  "notes": "Social pressure vs saving."
+}

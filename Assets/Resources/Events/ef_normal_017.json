@@ -1,0 +1,40 @@
+{
+  "id": "ef_normal_017",
+  "version": 1,
+  "type": "normal",
+  "title": "After School",
+  "description": "Another school day done. \u00a3120 sitting in your account.",
+  "weeklyIncomePounds": 120,
+  "costPounds": 0,
+  "bonusPounds": 0,
+  "choices": [
+    {
+      "label": "Save all \u00a3120",
+      "savePounds": 120,
+      "flavourText": "Straight home, straight to saving."
+    },
+    {
+      "label": "Save \u00a385",
+      "savePounds": 85,
+      "flavourText": "Good chunk saved."
+    },
+    {
+      "label": "Spend it all",
+      "savePounds": 0,
+      "flavourText": "The shops were too tempting."
+    }
+  ],
+  "duckEmotion": "neutral",
+  "duckLine": "Home time!",
+  "difficulty": "easy",
+  "tags": [
+    "save",
+    "routine",
+    "school"
+  ],
+  "ageRangeMin": 12,
+  "ageRangeMax": 18,
+  "currencyCode": "GBP",
+  "author": "content-team",
+  "notes": ""
+}

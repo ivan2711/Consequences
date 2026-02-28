@@ -1,11 +1,23 @@
-using UnityEngine;
+using UnityEngine;using System.Collections;
+
 using TMPro;
 
 public class BankHud : MonoBehaviour
 {
     public TextMeshProUGUI bankText;
 
-    private void OnEnable()
+    private void Start()
+    {
+        StartCoroutine(DelayedRefresh());
+    }
+
+    private IEnumerator DelayedRefresh()
+    {
+        yield return null;
+        Refresh();
+    }
+
+private void OnEnable()
     {
         Refresh();
     }
@@ -17,13 +29,20 @@ public class BankHud : MonoBehaviour
             return;
         }
 
-        if (BankAccountService.Instance == null)
+        BankAccountService svc = BankAccountService.Instance;
+
+        if (svc == null)
         {
-            bankText.text = "Bank: —";
+            svc = FindObjectOfType<BankAccountService>();
+        }
+
+        if (svc == null)
+        {
+            bankText.text = "Balance: —";
             return;
         }
 
-        float balance = BankAccountService.Instance.GetBalance();
-        bankText.text = $"Bank: £{balance:0.00}";
+        float balance = svc.GetBalance();
+        bankText.text = $"Balance: £{balance:0.00}";
     }
 }

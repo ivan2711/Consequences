@@ -1,0 +1,35 @@
+{
+  "id": "ef_emergency_018",
+  "version": 1,
+  "type": "emergency",
+  "title": "Lost Oyster Card",
+  "description": "You lost your Oyster card with \u00a315 on it. A new one costs \u00a35 plus top-up.",
+  "weeklyIncomePounds": 120,
+  "costPounds": 20,
+  "bonusPounds": 0,
+  "choices": [
+    {
+      "label": "Replace and top up",
+      "savePounds": 100,
+      "flavourText": "Back on the Tube."
+    },
+    {
+      "label": "Walk and bus it",
+      "savePounds": 120,
+      "flavourText": "Takes longer but saves money."
+    }
+  ],
+  "duckEmotion": "worried",
+  "duckLine": "Check your pockets!",
+  "difficulty": "easy",
+  "tags": [
+    "transport",
+    "unexpected",
+    "london"
+  ],
+  "ageRangeMin": 12,
+  "ageRangeMax": 18,
+  "currencyCode": "GBP",
+  "author": "content-team",
+  "notes": "London-specific but widely understood."
+}

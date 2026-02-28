@@ -1,0 +1,34 @@
+{
+  "id": "ef_emergency_024",
+  "version": 1,
+  "type": "emergency",
+  "title": "Earbuds in the Wash",
+  "description": "Your earbuds went through the washing machine. They're dead. Replacements cost \u00a320.",
+  "weeklyIncomePounds": 120,
+  "costPounds": 20,
+  "bonusPounds": 0,
+  "choices": [
+    {
+      "label": "Buy new earbuds",
+      "savePounds": 100,
+      "flavourText": "Check your pockets next time."
+    },
+    {
+      "label": "Use wired ones from a drawer",
+      "savePounds": 120,
+      "flavourText": "Old school but they work."
+    }
+  ],
+  "duckEmotion": "shocked",
+  "duckLine": "Always check pockets!",
+  "difficulty": "easy",
+  "tags": [
+    "tech",
+    "unexpected"
+  ],
+  "ageRangeMin": 12,
+  "ageRangeMax": 18,
+  "currencyCode": "GBP",
+  "author": "content-team",
+  "notes": ""
+}

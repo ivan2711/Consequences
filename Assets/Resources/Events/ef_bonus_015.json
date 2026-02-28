@@ -1,0 +1,39 @@
+{
+  "id": "ef_bonus_015",
+  "version": 1,
+  "type": "bonus",
+  "title": "Paper Round Pay",
+  "description": "You filled in on someone's paper round this week. Extra \u00a318 earned.",
+  "weeklyIncomePounds": 120,
+  "costPounds": 0,
+  "bonusPounds": 18,
+  "choices": [
+    {
+      "label": "Save all \u00a3138",
+      "savePounds": 138,
+      "flavourText": "Early mornings paid off."
+    },
+    {
+      "label": "Save \u00a369",
+      "savePounds": 69,
+      "flavourText": "Half and half."
+    },
+    {
+      "label": "Spend the extra",
+      "savePounds": 120,
+      "flavourText": "Paper money spent \u2014 regular savings safe."
+    }
+  ],
+  "duckEmotion": "happy",
+  "duckLine": "Special delivery!",
+  "difficulty": "easy",
+  "tags": [
+    "work",
+    "bonus"
+  ],
+  "ageRangeMin": 13,
+  "ageRangeMax": 18,
+  "currencyCode": "GBP",
+  "author": "content-team",
+  "notes": ""
+}

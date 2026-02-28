@@ -1,0 +1,35 @@
+{
+  "id": "ef_emergency_023",
+  "version": 1,
+  "type": "emergency",
+  "title": "Friend Needs Help",
+  "description": "Your friend is short \u00a310 for a school trip deposit. They'll pay you back next week.",
+  "weeklyIncomePounds": 120,
+  "costPounds": 10,
+  "bonusPounds": 0,
+  "choices": [
+    {
+      "label": "Lend the money",
+      "savePounds": 110,
+      "flavourText": "Good mate. Hope they pay you back."
+    },
+    {
+      "label": "Say you can't",
+      "savePounds": 120,
+      "flavourText": "Protecting your savings \u2014 fair enough."
+    }
+  ],
+  "duckEmotion": "thinking",
+  "duckLine": "Tough one...",
+  "difficulty": "medium",
+  "tags": [
+    "social",
+    "unexpected",
+    "lending"
+  ],
+  "ageRangeMin": 12,
+  "ageRangeMax": 18,
+  "currencyCode": "GBP",
+  "author": "content-team",
+  "notes": "Teaches lending risk without being preachy."
+}

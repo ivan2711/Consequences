@@ -1,0 +1,39 @@
+{
+  "id": "ef_normal_002",
+  "version": 1,
+  "type": "normal",
+  "title": "Quiet Week",
+  "description": "Nothing exciting happened. You have your usual \u00a3120 leftover.",
+  "weeklyIncomePounds": 120,
+  "costPounds": 0,
+  "bonusPounds": 0,
+  "choices": [
+    {
+      "label": "Save all \u00a3120",
+      "savePounds": 120,
+      "flavourText": "A calm week and a full save."
+    },
+    {
+      "label": "Save \u00a380",
+      "savePounds": 80,
+      "flavourText": "Most of it saved \u2014 solid."
+    },
+    {
+      "label": "Spend it all",
+      "savePounds": 0,
+      "flavourText": "It went quickly this week."
+    }
+  ],
+  "duckEmotion": "neutral",
+  "duckLine": "Steady week.",
+  "difficulty": "easy",
+  "tags": [
+    "save",
+    "routine"
+  ],
+  "ageRangeMin": 12,
+  "ageRangeMax": 18,
+  "currencyCode": "GBP",
+  "author": "content-team",
+  "notes": "Low-pressure baseline week."
+}

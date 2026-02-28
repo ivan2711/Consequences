@@ -26,9 +26,12 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Settings.unity
     guid: a48d3f6e4650b43cfa3d2a014688a106
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/ScenarioSpending.unity
     guid: 30ab9d568c1354bb7823499e8b6b5e71
+  - enabled: 1
+    path: Assets/Scenes/BankScene.unity
+    guid: 80cab8b62392e40d18ca5367c73848c4
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
   m_UseUCBPForAssetBundles: 0

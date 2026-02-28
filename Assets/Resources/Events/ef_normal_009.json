@@ -1,0 +1,40 @@
+{
+  "id": "ef_normal_009",
+  "version": 1,
+  "type": "normal",
+  "title": "Revision Week",
+  "description": "Exams coming up. You're staying in to study. \u00a3120 as normal.",
+  "weeklyIncomePounds": 120,
+  "costPounds": 0,
+  "bonusPounds": 0,
+  "choices": [
+    {
+      "label": "Save all \u00a3120",
+      "savePounds": 120,
+      "flavourText": "Focused on exams and savings."
+    },
+    {
+      "label": "Save \u00a380",
+      "savePounds": 80,
+      "flavourText": "Mostly saved \u2014 a few snacks needed."
+    },
+    {
+      "label": "Spend it all",
+      "savePounds": 0,
+      "flavourText": "Stress spending happened."
+    }
+  ],
+  "duckEmotion": "thinking",
+  "duckLine": "Study hard!",
+  "difficulty": "easy",
+  "tags": [
+    "save",
+    "routine",
+    "school"
+  ],
+  "ageRangeMin": 12,
+  "ageRangeMax": 18,
+  "currencyCode": "GBP",
+  "author": "content-team",
+  "notes": ""
+}

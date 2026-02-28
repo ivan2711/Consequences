@@ -1,0 +1,40 @@
+{
+  "id": "ef_bonus_002",
+  "version": 1,
+  "type": "bonus",
+  "title": "Car Boot Sale",
+  "description": "You sold some old clothes and games at a car boot sale and made \u00a340.",
+  "weeklyIncomePounds": 120,
+  "costPounds": 0,
+  "bonusPounds": 40,
+  "choices": [
+    {
+      "label": "Save all \u00a3160",
+      "savePounds": 160,
+      "flavourText": "Decluttered and saved \u2014 win-win."
+    },
+    {
+      "label": "Save \u00a380",
+      "savePounds": 80,
+      "flavourText": "Some saved, some spent."
+    },
+    {
+      "label": "Spend it all",
+      "savePounds": 0,
+      "flavourText": "Easy come, easy go."
+    }
+  ],
+  "duckEmotion": "happy",
+  "duckLine": "Nice haul!",
+  "difficulty": "easy",
+  "tags": [
+    "bonus",
+    "selling",
+    "declutter"
+  ],
+  "ageRangeMin": 12,
+  "ageRangeMax": 18,
+  "currencyCode": "GBP",
+  "author": "content-team",
+  "notes": "Entrepreneurial scenario \u2014 all ages."
+}

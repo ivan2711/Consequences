@@ -1,0 +1,40 @@
+{
+  "id": "ef_normal_003",
+  "version": 1,
+  "type": "normal",
+  "title": "End of Month",
+  "description": "It's the last week of the month. You've got \u00a3120 left as usual.",
+  "weeklyIncomePounds": 120,
+  "costPounds": 0,
+  "bonusPounds": 0,
+  "choices": [
+    {
+      "label": "Save all \u00a3120",
+      "savePounds": 120,
+      "flavourText": "Great finish to the month."
+    },
+    {
+      "label": "Save \u00a360",
+      "savePounds": 60,
+      "flavourText": "Half and half \u2014 fair enough."
+    },
+    {
+      "label": "Treat yourself",
+      "savePounds": 0,
+      "flavourText": "End-of-month splurge."
+    }
+  ],
+  "duckEmotion": "happy",
+  "duckLine": "Month's nearly done!",
+  "difficulty": "easy",
+  "tags": [
+    "save",
+    "routine",
+    "monthly"
+  ],
+  "ageRangeMin": 12,
+  "ageRangeMax": 18,
+  "currencyCode": "GBP",
+  "author": "content-team",
+  "notes": "End of month framing, same mechanics."
+}

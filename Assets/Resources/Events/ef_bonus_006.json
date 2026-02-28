@@ -1,0 +1,40 @@
+{
+  "id": "ef_bonus_006",
+  "version": 1,
+  "type": "bonus",
+  "title": "Returned Item Refund",
+  "description": "You returned a top that didn't fit and got \u00a322 back.",
+  "weeklyIncomePounds": 120,
+  "costPounds": 0,
+  "bonusPounds": 22,
+  "choices": [
+    {
+      "label": "Save all \u00a3142",
+      "savePounds": 142,
+      "flavourText": "Refund straight to savings."
+    },
+    {
+      "label": "Save \u00a371",
+      "savePounds": 71,
+      "flavourText": "Half of everything saved."
+    },
+    {
+      "label": "Buy something else",
+      "savePounds": 120,
+      "flavourText": "Swapped one purchase for another."
+    }
+  ],
+  "duckEmotion": "happy",
+  "duckLine": "Money back!",
+  "difficulty": "easy",
+  "tags": [
+    "refund",
+    "bonus",
+    "clothing"
+  ],
+  "ageRangeMin": 12,
+  "ageRangeMax": 18,
+  "currencyCode": "GBP",
+  "author": "content-team",
+  "notes": ""
+}

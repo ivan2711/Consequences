@@ -1,0 +1,39 @@
+{
+  "id": "ef_normal_010",
+  "version": 1,
+  "type": "normal",
+  "title": "Sunday Reset",
+  "description": "Weekend's over. Time to plan the week ahead with your \u00a3120.",
+  "weeklyIncomePounds": 120,
+  "costPounds": 0,
+  "bonusPounds": 0,
+  "choices": [
+    {
+      "label": "Save all \u00a3120",
+      "savePounds": 120,
+      "flavourText": "Planned and saved \u2014 sorted."
+    },
+    {
+      "label": "Save \u00a360",
+      "savePounds": 60,
+      "flavourText": "Half and half."
+    },
+    {
+      "label": "Spend it all",
+      "savePounds": 0,
+      "flavourText": "Plans didn't include saving."
+    }
+  ],
+  "duckEmotion": "neutral",
+  "duckLine": "Plan ahead!",
+  "difficulty": "easy",
+  "tags": [
+    "save",
+    "routine"
+  ],
+  "ageRangeMin": 12,
+  "ageRangeMax": 18,
+  "currencyCode": "GBP",
+  "author": "content-team",
+  "notes": ""
+}

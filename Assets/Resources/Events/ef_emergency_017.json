@@ -1,0 +1,35 @@
+{
+  "id": "ef_emergency_017",
+  "version": 1,
+  "type": "emergency",
+  "title": "Spilled on Laptop",
+  "description": "You spilled water on the family laptop. A keyboard cover to prevent future damage is \u00a310, but the repair bill is \u00a360.",
+  "weeklyIncomePounds": 120,
+  "costPounds": 60,
+  "bonusPounds": 0,
+  "choices": [
+    {
+      "label": "Pay for repair",
+      "savePounds": 60,
+      "flavourText": "Expensive lesson. It works again though."
+    },
+    {
+      "label": "Hope it dries out",
+      "savePounds": 120,
+      "flavourText": "Fingers crossed... put it in rice?"
+    }
+  ],
+  "duckEmotion": "shocked",
+  "duckLine": "Not the laptop!",
+  "difficulty": "hard",
+  "tags": [
+    "tech",
+    "household",
+    "unexpected"
+  ],
+  "ageRangeMin": 12,
+  "ageRangeMax": 18,
+  "currencyCode": "GBP",
+  "author": "content-team",
+  "notes": ""
+}

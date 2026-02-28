@@ -1,0 +1,35 @@
+{
+  "id": "ef_choice_003",
+  "version": 1,
+  "type": "choice",
+  "title": "Takeaway or Cook",
+  "description": "You're tired after school. A takeaway would be about \u00a312, or you could cook at home.",
+  "weeklyIncomePounds": 120,
+  "costPounds": 0,
+  "bonusPounds": 0,
+  "choices": [
+    {
+      "label": "Order takeaway",
+      "savePounds": 108,
+      "flavourText": "Quick and easy tonight."
+    },
+    {
+      "label": "Cook at home",
+      "savePounds": 120,
+      "flavourText": "Took a bit of effort but you saved."
+    }
+  ],
+  "duckEmotion": "thinking",
+  "duckLine": "What's for tea?",
+  "difficulty": "easy",
+  "tags": [
+    "food",
+    "impulse",
+    "daily"
+  ],
+  "ageRangeMin": 12,
+  "ageRangeMax": 18,
+  "currencyCode": "GBP",
+  "author": "content-team",
+  "notes": "Relatable daily choice."
+}

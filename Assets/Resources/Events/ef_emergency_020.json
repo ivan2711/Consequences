@@ -1,0 +1,35 @@
+{
+  "id": "ef_emergency_020",
+  "version": 1,
+  "type": "emergency",
+  "title": "Calculator Broke",
+  "description": "Your scientific calculator stopped working right before exam season. A new one is \u00a312.",
+  "weeklyIncomePounds": 120,
+  "costPounds": 12,
+  "bonusPounds": 0,
+  "choices": [
+    {
+      "label": "Buy a new one",
+      "savePounds": 108,
+      "flavourText": "Essential for exams \u2014 sorted."
+    },
+    {
+      "label": "Borrow one",
+      "savePounds": 120,
+      "flavourText": "Hope someone has a spare."
+    }
+  ],
+  "duckEmotion": "shocked",
+  "duckLine": "Not before exams!",
+  "difficulty": "easy",
+  "tags": [
+    "school",
+    "essentials",
+    "unexpected"
+  ],
+  "ageRangeMin": 12,
+  "ageRangeMax": 18,
+  "currencyCode": "GBP",
+  "author": "content-team",
+  "notes": ""
+}

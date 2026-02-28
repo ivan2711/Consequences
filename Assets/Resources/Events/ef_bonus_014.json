@@ -1,0 +1,41 @@
+{
+  "id": "ef_bonus_014",
+  "version": 1,
+  "type": "bonus",
+  "title": "Diwali Gift",
+  "description": "Your family gave you \u00a335 for Diwali.",
+  "weeklyIncomePounds": 120,
+  "costPounds": 0,
+  "bonusPounds": 35,
+  "choices": [
+    {
+      "label": "Save all \u00a3155",
+      "savePounds": 155,
+      "flavourText": "Bright festival, bright savings."
+    },
+    {
+      "label": "Save \u00a377",
+      "savePounds": 77,
+      "flavourText": "Some for sweets, rest for savings."
+    },
+    {
+      "label": "Spend the gift",
+      "savePounds": 120,
+      "flavourText": "Diwali treats \u2014 usual savings kept."
+    }
+  ],
+  "duckEmotion": "celebrating",
+  "duckLine": "Happy Diwali!",
+  "difficulty": "easy",
+  "tags": [
+    "family",
+    "gift",
+    "bonus",
+    "cultural"
+  ],
+  "ageRangeMin": 12,
+  "ageRangeMax": 18,
+  "currencyCode": "GBP",
+  "author": "content-team",
+  "notes": "Inclusive cultural event."
+}

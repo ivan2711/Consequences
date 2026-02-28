@@ -1,0 +1,40 @@
+{
+  "id": "ef_bonus_011",
+  "version": 1,
+  "type": "bonus",
+  "title": "Washing Cars",
+  "description": "You washed three cars on your street and earned \u00a330 total.",
+  "weeklyIncomePounds": 120,
+  "costPounds": 0,
+  "bonusPounds": 30,
+  "choices": [
+    {
+      "label": "Save all \u00a3150",
+      "savePounds": 150,
+      "flavourText": "Sudsy hands, full fund."
+    },
+    {
+      "label": "Save \u00a375",
+      "savePounds": 75,
+      "flavourText": "Half into savings."
+    },
+    {
+      "label": "Spend it all",
+      "savePounds": 0,
+      "flavourText": "Earned it, spent it."
+    }
+  ],
+  "duckEmotion": "excited",
+  "duckLine": "Sparkling!",
+  "difficulty": "easy",
+  "tags": [
+    "work",
+    "bonus",
+    "neighbourhood"
+  ],
+  "ageRangeMin": 12,
+  "ageRangeMax": 18,
+  "currencyCode": "GBP",
+  "author": "content-team",
+  "notes": ""
+}

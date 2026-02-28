@@ -4,7 +4,24 @@ using UnityEngine;
 
 public class BankAccountService : MonoBehaviour
 {
-    public static BankAccountService Instance { get; private set; }
+    private static BankAccountService _instance;
+
+    public static BankAccountService Instance
+    {
+        get
+        {
+            if (_instance == null)
+            {
+                _instance = FindObjectOfType<BankAccountService>();
+                if (_instance == null)
+                {
+                    var go = new GameObject("Services");
+                    _instance = go.AddComponent<BankAccountService>();
+                }
+            }
+            return _instance;
+        }
+    }
 
     [System.Serializable]
     public class Transaction
@@ -28,13 +45,13 @@ public class BankAccountService : MonoBehaviour
 
     private void Awake()
     {
-        if (Instance != null && Instance != this)
+        if (_instance != null && _instance != this)
         {
             Destroy(gameObject);
             return;
         }
 
-        Instance = this;
+        _instance = this;
         DontDestroyOnLoad(gameObject);
 
         if (PlayerPrefs.HasKey("BankBalance"))

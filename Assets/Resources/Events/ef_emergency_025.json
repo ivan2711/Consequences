@@ -1,0 +1,35 @@
+{
+  "id": "ef_emergency_025",
+  "version": 1,
+  "type": "emergency",
+  "title": "Dinner Money Short",
+  "description": "You're \u00a315 short on dinner money for the rest of the week.",
+  "weeklyIncomePounds": 120,
+  "costPounds": 15,
+  "bonusPounds": 0,
+  "choices": [
+    {
+      "label": "Top up dinner money",
+      "savePounds": 105,
+      "flavourText": "Hot meals sorted for the week."
+    },
+    {
+      "label": "Bring packed lunches",
+      "savePounds": 120,
+      "flavourText": "Sandwiches it is."
+    }
+  ],
+  "duckEmotion": "worried",
+  "duckLine": "Hungry days ahead?",
+  "difficulty": "easy",
+  "tags": [
+    "food",
+    "school",
+    "essentials"
+  ],
+  "ageRangeMin": 12,
+  "ageRangeMax": 18,
+  "currencyCode": "GBP",
+  "author": "content-team",
+  "notes": ""
+}

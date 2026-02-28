@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: ab1aaec16388248ecbdce23bfc9664f2
+guid: 0e06b757b6df9422387e8b50274b5d68
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -4253643731117847651
-    second: duck_bonus_0
+      213: 3822108714260272289
+    second: bonus_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -72,7 +72,7 @@ TextureImporter:
   platformSettings:
   - serializedVersion: 4
     buildTarget: DefaultTexturePlatform
-    maxTextureSize: 4096
+    maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
     textureCompression: 1
@@ -113,7 +113,7 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: duck_bonus_0
+      name: bonus_0
       rect:
         serializedVersion: 2
         x: 0
@@ -128,8 +128,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: d9b47a5309508f4c0800000000000000
-      internalID: -4253643731117847651
+      spriteID: 1a4986e00abda0530800000000000000
+      internalID: 3822108714260272289
       vertices: []
       indices: 
       edges: []
@@ -148,7 +148,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      duck_bonus_0: -4253643731117847651
+      bonus_0: 3822108714260272289
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
