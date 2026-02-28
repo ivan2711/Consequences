@@ -18,10 +18,14 @@ public class EmergencyFundController : MonoBehaviour
 
     [Header("Season Settings")]
     public int totalWeeks = 6;
-    public int weeklyIncome = 80;
-    public int weeklyCosts = 28;
-    public int goalAmount = 80;
-    public int progressBarMax = 80;
+    public int weeklyAvailable = 60;  // £100 income - £40 essentials
+    public int goalAmount = 120;
+    public int progressBarMax = 120;
+
+    [Header("Saving Tiers")]
+    public int tierSmall = 20;
+    public int tierBalanced = 30;
+    public int tierStrong = 40;
 
     [Header("Game State")]
     public int currentWeek = 0;
@@ -31,8 +35,9 @@ public class EmergencyFundController : MonoBehaviour
     private bool _wentIntoDebt = false;
     private int _totalOptionalSpend = 0;
     private int _totalSavedToFund = 0;
+    private int _weeklyLeftover = 0; // Available remaining after saving tier
 
-    // Week 6 crisis sub-phase (0 = travel prompt, 1 = social prompt)
+    // Week 6 crisis sub-phase (0 = travel, 1 = social)
     private int _crisisPhase = 0;
 
     // --- Inactivity tracking ---
@@ -58,6 +63,7 @@ public class EmergencyFundController : MonoBehaviour
         _wentIntoDebt = false;
         _totalOptionalSpend = 0;
         _totalSavedToFund = 0;
+        _weeklyLeftover = 0;
         _crisisPhase = 0;
 
         PlayerPrefs.SetInt("EmergencyFundBalance", 0);
@@ -100,7 +106,6 @@ public class EmergencyFundController : MonoBehaviour
         }
     }
 
-    // Called by tutorial when it finishes
     public void StartGameAfterTutorial()
     {
         if (duckReaction != null)
@@ -127,83 +132,104 @@ public class EmergencyFundController : MonoBehaviour
         if (roundCounterText != null)
             roundCounterText.text = "Week " + currentWeek + " of " + totalWeeks;
 
-        // Step 1: Income arrives
-        BankAccountService.Instance.Earn(weeklyIncome, "Week " + currentWeek + " income");
+        // Silent bank accounting (no visible animation)
+        BankAccountService.Instance.Earn(100, "Week " + currentWeek + " income");
+        BankAccountService.Instance.Spend(40, "Week " + currentWeek + " essentials", "Needs");
 
-        // Step 2: Mandatory costs
-        BankAccountService.Instance.Spend(weeklyCosts, "Week " + currentWeek + " living costs", "Needs");
+        UpdateUI();
+        ShowSavingTierPrompt();
+    }
+
+    // ==================== SAVING TIER (shown every week) ====================
+
+    void ShowSavingTierPrompt()
+    {
+        eventText.text = "WEEK " + currentWeek + "\n\n"
+            + "Available this week: \u00a3" + weeklyAvailable + "\n"
+            + "Emergency fund: \u00a3" + emergencyFundBalance + "\n\n"
+            + "How much will you save?";
+
+        if (duckReaction != null)
+        {
+            duckReaction.ShowReaction(DuckReaction.Emotion.Thinking, "Choose wisely!");
+            if (backgroundChanger != null) backgroundChanger.CheckAndChangeBackground("Choose wisely!");
+        }
+
+        ClearChoices();
+        CreateActionButton("Strong \u00a3" + tierStrong, new Color(0.2f, 0.9f, 0.3f), () => ProcessTier(tierStrong));
+        CreateActionButton("Balanced \u00a3" + tierBalanced, new Color(0.5f, 0.7f, 0.5f), () => ProcessTier(tierBalanced));
+        CreateActionButton("Small \u00a3" + tierSmall, new Color(0.6f, 0.7f, 0.9f), () => ProcessTier(tierSmall));
+    }
+
+    void ProcessTier(int tier)
+    {
+        _idleTimer = 0f;
+
+        // Deduct tier from available, add to fund
+        emergencyFundBalance += tier;
+        _totalSavedToFund += tier;
+        _weeklyLeftover = weeklyAvailable - tier;
+
+        // Move leftover to bank as disposable income
+        if (_weeklyLeftover > 0)
+            BankAccountService.Instance.Earn(_weeklyLeftover, "Week " + currentWeek + " leftover");
+
+        // Transfer tier conceptually (already in fund, deduct from bank's net)
+        BankAccountService.Instance.Spend(tier, "Week " + currentWeek + " emergency fund saving", "Emergency");
+
+        SaveEmergencyFund();
+
+        // Log tier choice to PlayerModelService
+        if (PlayerModelService.Instance != null)
+        {
+            Debug.Log("[EF] Week " + currentWeek + " tier: \u00a3" + tier);
+            PlayerModelService.Instance.RecordEmergencyFundRound(tier, tierStrong);
+        }
+
+        // Duck feedback on tier
+        if (duckReaction != null)
+        {
+            if (tier >= tierStrong)
+            {
+                duckReaction.ShowReaction(DuckReaction.Emotion.Celebrating, "Strong saver!");
+                if (backgroundChanger != null) backgroundChanger.CheckAndChangeBackground("Strong saver!");
+            }
+            else if (tier >= tierBalanced)
+            {
+                duckReaction.ShowReaction(DuckReaction.Emotion.Happy, "Balanced choice!");
+                if (backgroundChanger != null) backgroundChanger.CheckAndChangeBackground("Balanced choice!");
+            }
+            else
+            {
+                duckReaction.ShowReaction(DuckReaction.Emotion.Neutral, "Every bit counts.");
+                if (backgroundChanger != null) backgroundChanger.CheckAndChangeBackground("Every bit counts.");
+            }
+        }
 
         UpdateUI();
 
-        // Step 3: Fixed weekly event
+        // Check if this week has a follow-up event
         switch (currentWeek)
         {
-            case 1: ShowWeek1(); break;
-            case 2: ShowWeek2(); break;
-            case 3: ShowWeek3(); break;
-            case 4: ShowWeek4(); break;
-            case 5: ShowWeek5(); break;
-            case 6: _crisisPhase = 0; ShowWeek6(); break;
+            case 3: Invoke("ShowWeek3Event", 1.5f); break;
+            case 4: Invoke("ShowWeek4Event", 1.5f); break;
+            case 5: Invoke("ShowWeek5Event", 1.5f); break;
+            case 6: _crisisPhase = 0; Invoke("ShowWeek6Event", 1.5f); break;
+            default: ShowWeekFeedback("You saved \u00a3" + tier + " this week."); break;
         }
     }
 
-    // ==================== WEEK 1: Choose how much to put into emergency fund ====================
+    // ==================== WEEK 3: Minor emergency (£30) ====================
 
-    void ShowWeek1()
+    void ShowWeek3Event()
     {
-        float bank = BankAccountService.Instance.GetBalance();
-        eventText.text = "WEEK 1 — GETTING STARTED\n\n"
-            + "Income: +\u00a3" + weeklyIncome + "  Costs: -\u00a3" + weeklyCosts + "\n"
-            + "Bank: \u00a3" + bank.ToString("F0") + "\n\n"
-            + "How much will you put into your emergency fund?";
+        eventText.text = "EMERGENCY!\n\n"
+            + "Your phone screen cracked.\nRepair costs \u00a330.\n\n"
+            + "Emergency fund: \u00a3" + emergencyFundBalance;
 
         if (duckReaction != null)
         {
-            duckReaction.ShowReaction(DuckReaction.Emotion.Thinking, "Start saving early!");
-            if (backgroundChanger != null) backgroundChanger.CheckAndChangeBackground("Start saving early!");
-        }
-
-        ClearChoices();
-        CreateActionButton("Save \u00a350", new Color(0.2f, 0.9f, 0.3f), () => DepositToFund(50));
-        CreateActionButton("Save \u00a335", new Color(0.5f, 0.7f, 0.5f), () => DepositToFund(35));
-        CreateActionButton("Save \u00a320", new Color(0.6f, 0.7f, 0.9f), () => DepositToFund(20));
-        CreateActionButton("Save nothing", new Color(0.9f, 0.5f, 0.3f), () => DepositToFund(0));
-    }
-
-    // ==================== WEEK 2: Friends invite (£18) ====================
-
-    void ShowWeek2()
-    {
-        float bank = BankAccountService.Instance.GetBalance();
-        eventText.text = "WEEK 2 — FRIENDS INVITE\n\n"
-            + "Income: +\u00a3" + weeklyIncome + "  Costs: -\u00a3" + weeklyCosts + "\n"
-            + "Bank: \u00a3" + bank.ToString("F0") + "\n\n"
-            + "Your mates want to go out. It'll cost \u00a318.\nWill you go?";
-
-        if (duckReaction != null)
-        {
-            duckReaction.ShowReaction(DuckReaction.Emotion.Thinking, "Decide wisely...");
-            if (backgroundChanger != null) backgroundChanger.CheckAndChangeBackground("Decide wisely...");
-        }
-
-        ClearChoices();
-        CreateActionButton("Go out (\u00a318)", new Color(0.6f, 0.7f, 0.9f), () => HandleOptionalSpend(18, "Going out with friends", "Social"));
-        CreateActionButton("Stay in (free)", new Color(0.3f, 0.8f, 0.3f), () => HandleOptionalSkip("\u00a318 saved by staying in."));
-    }
-
-    // ==================== WEEK 3: Minor emergency (£25) ====================
-
-    void ShowWeek3()
-    {
-        float bank = BankAccountService.Instance.GetBalance();
-        eventText.text = "WEEK 3 — EMERGENCY!\n\n"
-            + "Income: +\u00a3" + weeklyIncome + "  Costs: -\u00a3" + weeklyCosts + "\n"
-            + "Bank: \u00a3" + bank.ToString("F0") + "  Fund: \u00a3" + emergencyFundBalance + "\n\n"
-            + "Your phone screen cracked! Repair costs \u00a325.";
-
-        if (duckReaction != null)
-        {
-            if (emergencyFundBalance >= 25)
+            if (emergencyFundBalance >= 30)
             {
                 duckReaction.ShowReaction(DuckReaction.Emotion.Thinking, "Use your fund!");
                 if (backgroundChanger != null) backgroundChanger.CheckAndChangeBackground("Use your fund!");
@@ -216,22 +242,19 @@ public class EmergencyFundController : MonoBehaviour
         }
 
         ClearChoices();
-        CreateActionButton("Pay \u00a325 repair", new Color(0.8f, 0.6f, 0.3f), () => HandleEmergency(25, "Phone screen repair"));
+        CreateActionButton("Pay \u00a330 repair", new Color(0.8f, 0.6f, 0.3f), () => HandleEmergency(30, "Phone screen repair"));
     }
 
-    // ==================== WEEK 4: Bonus +£30 then choice ====================
+    // ==================== WEEK 4: Bonus +£40 ====================
 
-    void ShowWeek4()
+    void ShowWeek4Event()
     {
-        // Add bonus to bank
-        BankAccountService.Instance.Earn(30, "Week 4 bonus earnings");
+        BankAccountService.Instance.Earn(40, "Week 4 bonus");
 
-        float bank = BankAccountService.Instance.GetBalance();
-        eventText.text = "WEEK 4 — BONUS!\n\n"
-            + "Income: +\u00a3" + weeklyIncome + "  Costs: -\u00a3" + weeklyCosts + "\n"
-            + "Plus a \u00a330 bonus!\n"
-            + "Bank: \u00a3" + bank.ToString("F0") + "  Fund: \u00a3" + emergencyFundBalance + "\n\n"
-            + "What will you do with the extra \u00a330?";
+        eventText.text = "BONUS!\n\n"
+            + "You earned an extra \u00a340 this week.\n\n"
+            + "Emergency fund: \u00a3" + emergencyFundBalance + "\n\n"
+            + "What will you do with it?";
 
         if (duckReaction != null)
         {
@@ -240,7 +263,23 @@ public class EmergencyFundController : MonoBehaviour
         }
 
         ClearChoices();
-        CreateActionButton("Add \u00a330 to fund", new Color(0.2f, 0.9f, 0.3f), () => DepositToFund(30));
+        CreateActionButton("Add \u00a340 to fund", new Color(0.2f, 0.9f, 0.3f), () =>
+        {
+            _idleTimer = 0f;
+            BankAccountService.Instance.Spend(40, "Bonus to emergency fund", "Emergency");
+            emergencyFundBalance += 40;
+            _totalSavedToFund += 40;
+            SaveEmergencyFund();
+
+            if (duckReaction != null)
+            {
+                duckReaction.ShowReaction(DuckReaction.Emotion.Celebrating, "Fund boosted!");
+                if (backgroundChanger != null) backgroundChanger.CheckAndChangeBackground("Fund boosted!");
+            }
+
+            UpdateUI();
+            ShowWeekFeedback("You added the \u00a340 bonus to your fund.");
+        });
         CreateActionButton("Keep in bank", new Color(0.6f, 0.7f, 0.9f), () =>
         {
             _idleTimer = 0f;
@@ -249,20 +288,19 @@ public class EmergencyFundController : MonoBehaviour
                 duckReaction.ShowReaction(DuckReaction.Emotion.Neutral, "Kept the bonus.");
                 if (backgroundChanger != null) backgroundChanger.CheckAndChangeBackground("Kept the bonus.");
             }
+
             UpdateUI();
-            ShowWeekFeedback("You kept the \u00a330 bonus in your bank.");
+            ShowWeekFeedback("You kept the \u00a340 bonus in your bank.");
         });
     }
 
-    // ==================== WEEK 5: Bigger emergency (£60) ====================
+    // ==================== WEEK 5: Larger emergency (£60) ====================
 
-    void ShowWeek5()
+    void ShowWeek5Event()
     {
-        float bank = BankAccountService.Instance.GetBalance();
-        eventText.text = "WEEK 5 — BIG EMERGENCY!\n\n"
-            + "Income: +\u00a3" + weeklyIncome + "  Costs: -\u00a3" + weeklyCosts + "\n"
-            + "Bank: \u00a3" + bank.ToString("F0") + "  Fund: \u00a3" + emergencyFundBalance + "\n\n"
-            + "Your laptop broke! Repair costs \u00a360.";
+        eventText.text = "BIG EMERGENCY!\n\n"
+            + "Your laptop broke.\nRepair costs \u00a360.\n\n"
+            + "Emergency fund: \u00a3" + emergencyFundBalance;
 
         if (duckReaction != null)
         {
@@ -282,17 +320,15 @@ public class EmergencyFundController : MonoBehaviour
         CreateActionButton("Pay \u00a360 repair", new Color(0.9f, 0.5f, 0.3f), () => HandleEmergency(60, "Laptop repair"));
     }
 
-    // ==================== WEEK 6: Crisis — two sequential prompts ====================
+    // ==================== WEEK 6: Crisis — £20 travel + £20 social ====================
 
-    void ShowWeek6()
+    void ShowWeek6Event()
     {
         if (_crisisPhase == 0)
         {
-            float bank = BankAccountService.Instance.GetBalance();
-            eventText.text = "WEEK 6 — CRISIS WEEK!\n\n"
-                + "Income: +\u00a3" + weeklyIncome + "  Costs: -\u00a3" + weeklyCosts + "\n"
-                + "Bank: \u00a3" + bank.ToString("F0") + "  Fund: \u00a3" + emergencyFundBalance + "\n\n"
-                + "Family event coming up. Travel costs \u00a320.\nWill you go?";
+            eventText.text = "CRISIS WEEK!\n\n"
+                + "Family event coming up.\nTravel costs \u00a320.\n\n"
+                + "Emergency fund: \u00a3" + emergencyFundBalance;
 
             if (duckReaction != null)
             {
@@ -306,10 +342,9 @@ public class EmergencyFundController : MonoBehaviour
         }
         else
         {
-            float bank = BankAccountService.Instance.GetBalance();
-            eventText.text = "WEEK 6 — CRISIS CONTINUES\n\n"
-                + "Bank: \u00a3" + bank.ToString("F0") + "  Fund: \u00a3" + emergencyFundBalance + "\n\n"
-                + "Friends invite you to a goodbye party. Cost: \u00a315.\nWill you go?";
+            eventText.text = "CRISIS CONTINUES\n\n"
+                + "Friends invite you out.\nCost: \u00a320.\n\n"
+                + "Emergency fund: \u00a3" + emergencyFundBalance;
 
             if (duckReaction != null)
             {
@@ -318,118 +353,12 @@ public class EmergencyFundController : MonoBehaviour
             }
 
             ClearChoices();
-            CreateActionButton("Go to party (\u00a315)", new Color(0.6f, 0.7f, 0.9f), () => HandleCrisisSocial(true));
+            CreateActionButton("Go out (\u00a320)", new Color(0.6f, 0.7f, 0.9f), () => HandleCrisisSocial(true));
             CreateActionButton("Stay home (free)", new Color(0.3f, 0.8f, 0.3f), () => HandleCrisisSocial(false));
         }
     }
 
-    // ==================== CHOICE HANDLERS ====================
-
-    void DepositToFund(int amount)
-    {
-        _idleTimer = 0f;
-
-        if (amount > 0)
-        {
-            float bank = BankAccountService.Instance.GetBalance();
-            int actual = Mathf.Min(amount, (int)bank);
-            if (actual > 0)
-            {
-                BankAccountService.Instance.Spend(actual, "Emergency fund deposit", "Emergency");
-                emergencyFundBalance += actual;
-                _totalSavedToFund += actual;
-                SaveEmergencyFund();
-            }
-
-            ShowFloatingMoney(actual);
-
-            if (duckReaction != null)
-            {
-                if (actual >= 50)
-                {
-                    duckReaction.ShowReaction(DuckReaction.Emotion.Celebrating, "Great start!");
-                    if (backgroundChanger != null) backgroundChanger.CheckAndChangeBackground("Great start!");
-                }
-                else if (actual >= 30)
-                {
-                    duckReaction.ShowReaction(DuckReaction.Emotion.Happy, "Good choice!");
-                    if (backgroundChanger != null) backgroundChanger.CheckAndChangeBackground("Good choice!");
-                }
-                else
-                {
-                    duckReaction.ShowReaction(DuckReaction.Emotion.Neutral, "Every bit helps.");
-                    if (backgroundChanger != null) backgroundChanger.CheckAndChangeBackground("Every bit helps.");
-                }
-            }
-
-            UpdateUI();
-            ShowWeekFeedback("You added \u00a3" + actual + " to your emergency fund.");
-        }
-        else
-        {
-            if (duckReaction != null)
-            {
-                duckReaction.ShowReaction(DuckReaction.Emotion.Worried, "No savings this week...");
-                if (backgroundChanger != null) backgroundChanger.CheckAndChangeBackground("No savings this week...");
-            }
-            UpdateUI();
-            ShowWeekFeedback("You didn't save anything this week.");
-        }
-    }
-
-    void HandleOptionalSpend(int cost, string description, string category)
-    {
-        _idleTimer = 0f;
-
-        float bank = BankAccountService.Instance.GetBalance();
-        if (bank >= cost)
-        {
-            BankAccountService.Instance.Spend(cost, description, category);
-            _totalOptionalSpend += cost;
-            ShowFloatingMoney(-cost);
-
-            if (duckReaction != null)
-            {
-                duckReaction.ShowReaction(DuckReaction.Emotion.Happy, "Had a good time!");
-                if (backgroundChanger != null) backgroundChanger.CheckAndChangeBackground("Had a good time!");
-            }
-
-            UpdateUI();
-            ShowWeekFeedback("You spent \u00a3" + cost + " going out.");
-        }
-        else
-        {
-            // Can't fully afford it — spend what's available, mark debt
-            int canPay = (int)bank;
-            if (canPay > 0)
-                BankAccountService.Instance.Spend(canPay, description, category);
-            _totalOptionalSpend += cost;
-            _wentIntoDebt = true;
-
-            if (duckReaction != null)
-            {
-                duckReaction.ShowReaction(DuckReaction.Emotion.Sad, "You couldn't quite afford that...");
-                if (backgroundChanger != null) backgroundChanger.CheckAndChangeBackground("You couldn't quite afford that...");
-            }
-
-            UpdateUI();
-            ShowWeekFeedback("You went out but couldn't fully afford it. You went into debt!");
-        }
-    }
-
-    void HandleOptionalSkip(string message)
-    {
-        _idleTimer = 0f;
-
-        if (duckReaction != null)
-        {
-            duckReaction.ShowReaction(DuckReaction.Emotion.Happy, "Saved your money!");
-            if (backgroundChanger != null) backgroundChanger.CheckAndChangeBackground("Saved your money!");
-        }
-
-        UpdateUI();
-        ShowWeekFeedback(message);
-    }
+    // ==================== EMERGENCY HANDLER ====================
 
     void HandleEmergency(int cost, string description)
     {
@@ -458,13 +387,13 @@ public class EmergencyFundController : MonoBehaviour
                     BankAccountService.Instance.Spend(fromBank, description, "Emergency");
                 int deficit = remaining - fromBank;
                 _wentIntoDebt = true;
-                result += "Paid \u00a3" + fromBank + " from bank.\n";
+                if (fromBank > 0)
+                    result += "Paid \u00a3" + fromBank + " from bank.\n";
                 result += "Couldn't cover \u00a3" + deficit + " — you went into debt!\n";
             }
         }
 
         SaveEmergencyFund();
-        ShowFloatingMoney(-cost);
 
         if (duckReaction != null)
         {
@@ -489,6 +418,8 @@ public class EmergencyFundController : MonoBehaviour
         ShowWeekFeedback(result);
     }
 
+    // ==================== CRISIS HANDLERS ====================
+
     void HandleCrisisTravel(bool pay)
     {
         _idleTimer = 0f;
@@ -500,7 +431,6 @@ public class EmergencyFundController : MonoBehaviour
             {
                 BankAccountService.Instance.Spend(20, "Family event travel", "Needs");
                 _totalOptionalSpend += 20;
-                ShowFloatingMoney(-20);
                 if (duckReaction != null)
                 {
                     duckReaction.ShowReaction(DuckReaction.Emotion.Neutral, "Family comes first.");
@@ -514,7 +444,6 @@ public class EmergencyFundController : MonoBehaviour
                     BankAccountService.Instance.Spend(canPay, "Family event travel", "Needs");
                 _totalOptionalSpend += 20;
                 _wentIntoDebt = true;
-                ShowFloatingMoney(-20);
                 if (duckReaction != null)
                 {
                     duckReaction.ShowReaction(DuckReaction.Emotion.Sad, "Tight budget...");
@@ -531,10 +460,9 @@ public class EmergencyFundController : MonoBehaviour
             }
         }
 
-        // Advance to second crisis prompt
         _crisisPhase = 1;
         UpdateUI();
-        Invoke("ShowWeek6", 1.5f);
+        Invoke("ShowWeek6Event", 1.5f);
     }
 
     void HandleCrisisSocial(bool go)
@@ -544,25 +472,23 @@ public class EmergencyFundController : MonoBehaviour
         if (go)
         {
             float bank = BankAccountService.Instance.GetBalance();
-            if (bank >= 15)
+            if (bank >= 20)
             {
-                BankAccountService.Instance.Spend(15, "Goodbye party", "Social");
-                _totalOptionalSpend += 15;
-                ShowFloatingMoney(-15);
+                BankAccountService.Instance.Spend(20, "Going out with friends", "Social");
+                _totalOptionalSpend += 20;
                 if (duckReaction != null)
                 {
-                    duckReaction.ShowReaction(DuckReaction.Emotion.Happy, "Great send-off!");
-                    if (backgroundChanger != null) backgroundChanger.CheckAndChangeBackground("Great send-off!");
+                    duckReaction.ShowReaction(DuckReaction.Emotion.Happy, "Great time out!");
+                    if (backgroundChanger != null) backgroundChanger.CheckAndChangeBackground("Great time out!");
                 }
             }
             else
             {
                 int canPay = (int)bank;
                 if (canPay > 0)
-                    BankAccountService.Instance.Spend(canPay, "Goodbye party", "Social");
-                _totalOptionalSpend += 15;
+                    BankAccountService.Instance.Spend(canPay, "Going out with friends", "Social");
+                _totalOptionalSpend += 20;
                 _wentIntoDebt = true;
-                ShowFloatingMoney(-15);
                 if (duckReaction != null)
                 {
                     duckReaction.ShowReaction(DuckReaction.Emotion.Sad, "Couldn't quite afford it...");
@@ -574,8 +500,8 @@ public class EmergencyFundController : MonoBehaviour
         {
             if (duckReaction != null)
             {
-                duckReaction.ShowReaction(DuckReaction.Emotion.Neutral, "Saved \u00a315.");
-                if (backgroundChanger != null) backgroundChanger.CheckAndChangeBackground("Saved \u00a315.");
+                duckReaction.ShowReaction(DuckReaction.Emotion.Neutral, "Saved \u00a320.");
+                if (backgroundChanger != null) backgroundChanger.CheckAndChangeBackground("Saved \u00a320.");
             }
         }
 
@@ -587,16 +513,13 @@ public class EmergencyFundController : MonoBehaviour
 
     void ShowWeekFeedback(string message)
     {
-        float bank = BankAccountService.Instance.GetBalance();
-        string summary = message + "\n\n"
-            + "Fund: \u00a3" + emergencyFundBalance + "  Bank: \u00a3" + bank.ToString("F0");
+        string summary = message + "\n\nEmergency fund: \u00a3" + emergencyFundBalance;
         if (_wentIntoDebt)
-            summary += "  (in debt)";
+            summary += "\n(in debt)";
 
         eventText.text = summary;
         ClearChoices();
 
-        // Show consequence panel for this week, then a Continue/Results button
         if (currentWeek >= totalWeeks)
         {
             CreateActionButton("See Your Results", new Color(0.9f, 0.7f, 0.2f), () =>
@@ -626,11 +549,8 @@ public class EmergencyFundController : MonoBehaviour
 
         int stars = CalculateStars();
 
-        // Build reflection summary
-        float bank = BankAccountService.Instance.GetBalance();
         string reflection = "SEASON COMPLETE!\n\n"
             + "Emergency fund: \u00a3" + emergencyFundBalance + "\n"
-            + "Bank balance: \u00a3" + bank.ToString("F0") + "\n"
             + "Total saved to fund: \u00a3" + _totalSavedToFund + "\n"
             + "Optional spending: \u00a3" + _totalOptionalSpend + "\n\n";
 
@@ -643,7 +563,6 @@ public class EmergencyFundController : MonoBehaviour
 
         eventText.text = reflection;
 
-        // Duck reaction based on outcome
         DuckReaction.Emotion duckEmotion;
         string duckLine;
         if (stars >= 3)
@@ -686,10 +605,6 @@ public class EmergencyFundController : MonoBehaviour
 
     int CalculateStars()
     {
-        // 3 stars: fund > 0 and no debt (managed emergencies well)
-        // 2 stars: no debt but fund depleted
-        // 1 star: went into debt but tried saving
-        // 0 stars: went into debt and never saved
         if (!_wentIntoDebt && emergencyFundBalance > 0) return 3;
         if (!_wentIntoDebt) return 2;
         if (_totalSavedToFund > 0) return 1;
@@ -698,12 +613,10 @@ public class EmergencyFundController : MonoBehaviour
 
     void ShowConsequencePanel()
     {
-        Debug.Log("Showing consequence panel...");
         int stars = CalculateStars();
 
         if (consequencePanel != null)
         {
-            Debug.Log("Consequence panel found! Stars: " + stars + ", Fund: " + emergencyFundBalance);
             consequencePanel.ShowConsequences(emergencyFundBalance, stars);
         }
         else
@@ -733,16 +646,6 @@ public class EmergencyFundController : MonoBehaviour
     {
         PlayerPrefs.SetInt("EmergencyFundBalance", emergencyFundBalance);
         PlayerPrefs.Save();
-    }
-
-    void ShowFloatingMoney(int amount)
-    {
-        FloatingMoneyText floatingMoney = FindObjectOfType<FloatingMoneyText>();
-        if (floatingMoney != null)
-        {
-            Vector3 screenCenter = new Vector3(Screen.width / 2, Screen.height / 2 + 100, 0);
-            floatingMoney.ShowMoneyChange(amount, screenCenter);
-        }
     }
 
     void ClearChoices()
@@ -790,6 +693,7 @@ public class EmergencyFundController : MonoBehaviour
         _wentIntoDebt = false;
         _totalOptionalSpend = 0;
         _totalSavedToFund = 0;
+        _weeklyLeftover = 0;
         _crisisPhase = 0;
 
         PlayerPrefs.SetInt("EmergencyFundBalance", 0);
@@ -838,7 +742,7 @@ public class EmergencyFundController : MonoBehaviour
         textRect.offsetMax = Vector2.zero;
 
         _reengageText = textGO.AddComponent<TextMeshProUGUI>();
-        _reengageText.text = "Need a hand?\nTake your time with this decision.";
+        _reengageText.text = "Take your time with this decision.";
         _reengageText.fontSize = 26f;
         _reengageText.color = Color.white;
         _reengageText.alignment = TextAlignmentOptions.Center;
@@ -898,10 +802,8 @@ public class EmergencyFundController : MonoBehaviour
 
         if (idleTrigger || streakTrigger)
         {
-            string reason = idleTrigger ? "idle" : "failStreak";
-            Debug.Log("[Reengage] Showing popup (reason=" + reason + ")");
             ShowReengagementPopup(idleTrigger
-                ? "Looks like you're thinking...\nTake your time!"
+                ? "Take your time.\nThere's no wrong answer!"
                 : "Tough stretch!\nSaving is hard — keep going!");
         }
     }
@@ -923,17 +825,15 @@ public class EmergencyFundController : MonoBehaviour
 
     void OnTakeHint()
     {
-        Debug.Log("[Reengage] Player asked for a hint");
         DismissReengagementPopup();
 
-        // Show contextual hint based on current week
         if (duckReaction != null)
         {
             string hint;
             switch (currentWeek)
             {
                 case 1: hint = "Saving more now means safety later!"; break;
-                case 2: hint = "Will you need that money later?"; break;
+                case 2: hint = "Saving more now means safety later!"; break;
                 case 3: hint = "This is why we save!"; break;
                 case 4: hint = "A bonus is a chance to build your fund."; break;
                 case 5: hint = "Big costs show why funds matter."; break;
@@ -947,7 +847,6 @@ public class EmergencyFundController : MonoBehaviour
 
     void OnKeepGoing()
     {
-        Debug.Log("[Reengage] Player chose 'Keep going'");
         DismissReengagementPopup();
     }
 }
