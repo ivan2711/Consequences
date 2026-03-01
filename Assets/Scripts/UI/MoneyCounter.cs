@@ -35,8 +35,8 @@ public void SetSpent(float amount, bool animate = true)
     {
         currentSpent = amount;
         targetFillAmount = Mathf.Clamp01(currentSpent / totalBudget);
-        
-        if (animate)
+
+        if (animate && !GameSettings.CalmMode)
         {
             StartCoroutine(AnimateToTarget());
         }
@@ -94,18 +94,23 @@ private void UpdateDisplay()
         if (budgetBarFill != null)
         {
             float percentage = currentSpent / totalBudget;
-            
-            if (percentage >= dangerThreshold)
+
+            if (GameSettings.CalmMode)
             {
-                budgetBarFill.color = dangerColor;
-            }
-            else if (percentage >= warningThreshold)
-            {
-                budgetBarFill.color = warningColor;
+                // Calm mode: stay on safe color, use gentle amber instead of red
+                if (percentage >= dangerThreshold)
+                    budgetBarFill.color = warningColor;
+                else
+                    budgetBarFill.color = safeColor;
             }
             else
             {
-                budgetBarFill.color = safeColor;
+                if (percentage >= dangerThreshold)
+                    budgetBarFill.color = dangerColor;
+                else if (percentage >= warningThreshold)
+                    budgetBarFill.color = warningColor;
+                else
+                    budgetBarFill.color = safeColor;
             }
         }
     }

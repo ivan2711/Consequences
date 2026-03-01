@@ -26,18 +26,27 @@ public class StarRating : MonoBehaviour
     
     private IEnumerator AnimateStars()
     {
+        bool calm = GameSettings.CalmMode;
+        float delay = calm ? 0.4f : animationDelay;
+
         for (int i = 0; i < stars.Length; i++)
         {
             if (stars[i] != null)
             {
-                // Set color
                 stars[i].color = i < currentRating ? filledColor : emptyColor;
-                
-                // Animate if filled
+
                 if (i < currentRating)
                 {
-                    yield return StartCoroutine(PunchScale(stars[i].transform));
-                    yield return new WaitForSeconds(animationDelay);
+                    if (calm)
+                    {
+                        // Gentle reveal: no punch, just a brief pause
+                        yield return new WaitForSeconds(delay);
+                    }
+                    else
+                    {
+                        yield return StartCoroutine(PunchScale(stars[i].transform));
+                        yield return new WaitForSeconds(delay);
+                    }
                 }
             }
         }

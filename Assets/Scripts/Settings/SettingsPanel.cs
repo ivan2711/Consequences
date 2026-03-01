@@ -115,6 +115,7 @@ namespace FinancialLiteracy.Settings
             {
                 SettingsManager.Instance.UpdateSettings(tempSettings);
             }
+            GameSettings.CalmMode = tempSettings.calmModeEnabled;
             ClosePanel();
         }
 

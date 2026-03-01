@@ -54,6 +54,9 @@ public class EmergencyFundController : MonoBehaviour
     private const float ReengageCooldownCalm = 120f;
     private const float ReengageIdleThreshold = 20f;
 
+    // Calm mode: longer transitions for breathing room
+    private float TransitionDelay => GameSettings.CalmMode ? 2.5f : 1.5f;
+
     // ==================== LIFECYCLE ====================
 
     void Start()
@@ -114,7 +117,7 @@ public class EmergencyFundController : MonoBehaviour
             if (backgroundChanger != null) backgroundChanger.CheckAndChangeBackground("Let's build an emergency fund!");
         }
 
-        Invoke("StartNewWeek", 1.5f);
+        Invoke("StartNewWeek", TransitionDelay);
     }
 
     // ==================== WEEKLY FLOW ====================
@@ -211,10 +214,10 @@ public class EmergencyFundController : MonoBehaviour
         // Check if this week has a follow-up event
         switch (currentWeek)
         {
-            case 3: Invoke("ShowWeek3Event", 1.5f); break;
-            case 4: Invoke("ShowWeek4Event", 1.5f); break;
-            case 5: Invoke("ShowWeek5Event", 1.5f); break;
-            case 6: _crisisPhase = 0; Invoke("ShowWeek6Event", 1.5f); break;
+            case 3: Invoke("ShowWeek3Event", TransitionDelay); break;
+            case 4: Invoke("ShowWeek4Event", TransitionDelay); break;
+            case 5: Invoke("ShowWeek5Event", TransitionDelay); break;
+            case 6: _crisisPhase = 0; Invoke("ShowWeek6Event", TransitionDelay); break;
             default: ShowWeekFeedback("You saved \u00a3" + tier + " this week."); break;
         }
     }
@@ -462,7 +465,7 @@ public class EmergencyFundController : MonoBehaviour
 
         _crisisPhase = 1;
         UpdateUI();
-        Invoke("ShowWeek6Event", 1.5f);
+        Invoke("ShowWeek6Event", TransitionDelay);
     }
 
     void HandleCrisisSocial(bool go)
@@ -708,7 +711,7 @@ public class EmergencyFundController : MonoBehaviour
             if (backgroundChanger != null) backgroundChanger.CheckAndChangeBackground("Let's try again!");
         }
 
-        Invoke("StartNewWeek", 1.5f);
+        Invoke("StartNewWeek", TransitionDelay);
     }
 
     // ==================== RE-ENGAGEMENT POPUP ====================

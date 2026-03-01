@@ -42,16 +42,17 @@ public class BankTransactionList : MonoBehaviour
             if (amountText != null)
             {
                 float abs = Mathf.Abs(tx.amountPounds);
+                bool calm = GameSettings.CalmMode;
 
                 if (tx.amountPounds < 0)
                 {
                     amountText.text = string.Format("-£{0:0.00}", abs);
-                    amountText.color = new Color(0.9f, 0.3f, 0.3f);
+                    amountText.color = calm ? new Color(0.7f, 0.5f, 0.4f) : new Color(0.9f, 0.3f, 0.3f);
                 }
                 else
                 {
                     amountText.text = string.Format("+£{0:0.00}", abs);
-                    amountText.color = new Color(0.3f, 0.8f, 0.3f);
+                    amountText.color = calm ? new Color(0.4f, 0.6f, 0.5f) : new Color(0.3f, 0.8f, 0.3f);
                 }
             }
 

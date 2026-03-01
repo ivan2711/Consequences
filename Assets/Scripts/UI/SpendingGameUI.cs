@@ -87,9 +87,12 @@ namespace FinancialLiteracy.UI
                 if (budgetBarFill != null)
                 {
                     budgetBarFill.fillAmount = budgetPercent;
-                    
-                    // Color code: green if under budget, red if over
-                    budgetBarFill.color = budgetPercent <= 1f ? Color.green : Color.red;
+
+                    // Color code: green if under budget; calm mode uses amber instead of red
+                    if (budgetPercent <= 1f)
+                        budgetBarFill.color = Color.green;
+                    else
+                        budgetBarFill.color = GameSettings.CalmMode ? new Color(0.9f, 0.7f, 0.2f) : Color.red;
                 }
                 
                 if (moneyMeterText != null)
@@ -105,7 +108,7 @@ namespace FinancialLiteracy.UI
 
         private System.Collections.IEnumerator AnimateFillAmount(Image fillImage, float targetAmount)
         {
-            float duration = 1f;
+            float duration = GameSettings.CalmMode ? 1.8f : 1f;
             float elapsed = 0f;
             float startAmount = 0f;
 

@@ -17,11 +17,15 @@ public class FloatingMoneyText : MonoBehaviour
     
     public void ShowMoneyChange(int amount, Vector3 worldPosition)
     {
+        // Calm mode: suppress floating money animations
+        if (GameSettings.CalmMode)
+            return;
+
         if (canvas == null)
         {
             canvas = FindObjectOfType<Canvas>();
         }
-        
+
         if (canvas == null) return;
         
         // Create floating text

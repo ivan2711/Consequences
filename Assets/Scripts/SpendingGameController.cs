@@ -111,7 +111,8 @@ int stars = CalculateStars(total, unnecessaryCount, necessaryCount);
             bool oneTreat = (unnecessaryCount == 1);
             bool overBudget = (total > weeklyBudgetPounds);
             bool tooManyTreats = (unnecessaryCount > 1);
-            
+            bool calm = GameSettings.CalmMode;
+
             // PERFECT
             if (allEssentials && oneTreat && withinBudget)
             {
@@ -133,26 +134,33 @@ int stars = CalculateStars(total, unnecessaryCount, necessaryCount);
             // OVER BUDGET
             else if (overBudget)
             {
-                duckReaction.ShowReaction(DuckReaction.Emotion.Shocked, "Over budget!");
-                if (backgroundChanger != null) backgroundChanger.CheckAndChangeBackground("Over budget!");
+                string msg = calm ? "A bit over — try removing a treat." : "Over budget!";
+                DuckReaction.Emotion emo = calm ? DuckReaction.Emotion.Thinking : DuckReaction.Emotion.Shocked;
+                duckReaction.ShowReaction(emo, msg);
+                if (backgroundChanger != null) backgroundChanger.CheckAndChangeBackground(msg);
             }
             // TOO MANY TREATS
             else if (tooManyTreats && withinBudget)
             {
-                duckReaction.ShowReaction(DuckReaction.Emotion.Worried, "Too many treats! *");
-                if (backgroundChanger != null) backgroundChanger.CheckAndChangeBackground("Too many treats! *");
+                string msg = calm ? "Try picking just one treat." : "Too many treats! *";
+                DuckReaction.Emotion emo = calm ? DuckReaction.Emotion.Thinking : DuckReaction.Emotion.Worried;
+                duckReaction.ShowReaction(emo, msg);
+                if (backgroundChanger != null) backgroundChanger.CheckAndChangeBackground(msg);
             }
             // MISSING ESSENTIALS
             else if (!allEssentials && withinBudget)
             {
-                duckReaction.ShowReaction(DuckReaction.Emotion.Sad, "Missing essentials!");
-                if (backgroundChanger != null) backgroundChanger.CheckAndChangeBackground("Missing essentials!");
+                string msg = calm ? "Don't forget the essentials!" : "Missing essentials!";
+                DuckReaction.Emotion emo = calm ? DuckReaction.Emotion.Neutral : DuckReaction.Emotion.Sad;
+                duckReaction.ShowReaction(emo, msg);
+                if (backgroundChanger != null) backgroundChanger.CheckAndChangeBackground(msg);
             }
             // DEFAULT
             else
             {
-                duckReaction.ShowReaction(DuckReaction.Emotion.Thinking, "Try again!");
-                if (backgroundChanger != null) backgroundChanger.CheckAndChangeBackground("Try again!");
+                string msg = calm ? "Give it another go!" : "Try again!";
+                duckReaction.ShowReaction(DuckReaction.Emotion.Thinking, msg);
+                if (backgroundChanger != null) backgroundChanger.CheckAndChangeBackground(msg);
             }
         }
 
@@ -299,18 +307,23 @@ public void OnItemToggled()
         if (duckReaction != null)
         {
             float remaining = weeklyBudgetPounds - total;
-            
+            bool calm = GameSettings.CalmMode;
+
             // PRIORITY 1: Over budget
             if (total > weeklyBudgetPounds)
             {
-                duckReaction.ShowReaction(DuckReaction.Emotion.Shocked, "TOO MUCH!");
-                if (backgroundChanger != null) backgroundChanger.CheckAndChangeBackground("TOO MUCH!");
+                string msg = calm ? "Try removing something." : "TOO MUCH!";
+                DuckReaction.Emotion emo = calm ? DuckReaction.Emotion.Thinking : DuckReaction.Emotion.Shocked;
+                duckReaction.ShowReaction(emo, msg);
+                if (backgroundChanger != null) backgroundChanger.CheckAndChangeBackground(msg);
             }
             // PRIORITY 2: Too many treats
             else if (treatsCount > 1)
             {
-                duckReaction.ShowReaction(DuckReaction.Emotion.Worried, "Too many treats!");
-                if (backgroundChanger != null) backgroundChanger.CheckAndChangeBackground("Too many treats!");
+                string msg = calm ? "Maybe fewer treats?" : "Too many treats!";
+                DuckReaction.Emotion emo = calm ? DuckReaction.Emotion.Thinking : DuckReaction.Emotion.Worried;
+                duckReaction.ShowReaction(emo, msg);
+                if (backgroundChanger != null) backgroundChanger.CheckAndChangeBackground(msg);
             }
             // PRIORITY 3: Close to budget
             else if (remaining <= 1.5f && total > 0)
@@ -354,24 +367,39 @@ private float CalculateCurrentTotal()
     
     private int CalculateStars(float total, int unnecessaryCount, int necessaryCount)
     {
+        if (GameSettings.CalmMode)
+        {
+            // Calm mode: more forgiving thresholds
+            // 3 stars: Within budget with at most 1 treat
+            if (total <= weeklyBudgetPounds && unnecessaryCount <= 1)
+                return 3;
+            // 2 stars: Within budget
+            if (total <= weeklyBudgetPounds)
+                return 2;
+            // 1 star: Only slightly over (up to £3)
+            if (total <= weeklyBudgetPounds + 3)
+                return 1;
+            return 0;
+        }
+
         // 3 stars: Perfect budget, only essentials
         if (total <= weeklyBudgetPounds && unnecessaryCount == 0 && necessaryCount >= 4)
         {
             return 3;
         }
-        
+
         // 2 stars: In budget, 1-2 treats
         if (total <= weeklyBudgetPounds && unnecessaryCount <= 2)
         {
             return 2;
         }
-        
+
         // 1 star: Slightly over budget OR too many treats
         if (total <= weeklyBudgetPounds + 2 || (unnecessaryCount >= 3 && total <= weeklyBudgetPounds))
         {
             return 1;
         }
-        
+
         // 0 stars: Way over budget or chose nothing
         return 0;
     }

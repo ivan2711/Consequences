@@ -53,6 +53,10 @@ public class DuckReactionBackgroundChanger : MonoBehaviour
     {
         if (backgroundImage == null || string.IsNullOrEmpty(message))
             return;
+
+        // Calm mode: keep background stable and predictable
+        if (GameSettings.CalmMode)
+            return;
         
         // Convert to lowercase for easier matching
         string msg = message.ToLower();

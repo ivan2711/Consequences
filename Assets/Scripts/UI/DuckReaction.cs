@@ -84,14 +84,21 @@ private void Start()
     
     public void ShowReaction(Emotion emotion, string message = "")
     {
+        // Calm mode: redirect negative emotions to Neutral
+        if (GameSettings.CalmMode)
+        {
+            if (emotion == Emotion.Shocked || emotion == Emotion.Sad || emotion == Emotion.Worried)
+                emotion = Emotion.Neutral;
+        }
+
         StopAllCoroutines();
         SetEmotionContent(emotion, message);
-        
+
         if (canvasGroup != null)
         {
             canvasGroup.alpha = 1f;
         }
-        
+
         StartCoroutine(BounceAnimation(emotion));
     }
     
@@ -186,9 +193,16 @@ private IEnumerator BounceAnimation(Emotion emotion)
         float bounceHeight = 10f;
         float bounceScale = 1.15f;
         float duration = 0.2f;
-        
+
+        // Calm mode: minimal animation
+        if (GameSettings.CalmMode)
+        {
+            bounceHeight = 3f;
+            bounceScale = 1.0f;
+            duration = 0.3f;
+        }
         // Special animations for certain emotions
-        if (emotion == Emotion.Celebrating || emotion == Emotion.Excited)
+        else if (emotion == Emotion.Celebrating || emotion == Emotion.Excited)
         {
             bounceHeight = 20f;
             bounceScale = 1.25f;
