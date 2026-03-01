@@ -85,19 +85,15 @@ void StartGame()
         // Mark tutorial as shown
         PlayerPrefs.SetInt(TUTORIAL_SHOWN_KEY, 1);
         PlayerPrefs.Save();
-        
+
         // Hide tutorial
         if (tutorialContainer != null)
         {
             tutorialContainer.SetActive(false);
         }
-        
-        // Tell the game controller to start the game
-        EmergencyFundController controller = FindObjectOfType<EmergencyFundController>();
-        if (controller != null)
-        {
-            controller.StartGameAfterTutorial();
-        }
+
+        // Note: Tutorial flow is now handled by EmergencyFundUIFlow.
+        // This script is kept for backwards compatibility but is no longer used.
     }
     
     // For testing - reset tutorial
