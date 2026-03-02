@@ -1,40 +1,20 @@
 {
   "id": "ef_normal_003",
-  "version": 1,
+  "version": 2,
   "type": "normal",
-  "title": "End of Month",
-  "description": "It's the last week of the month. You've got \u00a3120 left as usual.",
-  "weeklyIncomePounds": 120,
+  "title": "Uneventful Week",
+  "description": "A calm week with no surprises. Your fund is growing.",
+  "weeklyIncomePounds": 60,
   "costPounds": 0,
   "bonusPounds": 0,
   "choices": [
-    {
-      "label": "Save all \u00a3120",
-      "savePounds": 120,
-      "flavourText": "Great finish to the month."
-    },
-    {
-      "label": "Save \u00a360",
-      "savePounds": 60,
-      "flavourText": "Half and half \u2014 fair enough."
-    },
-    {
-      "label": "Treat yourself",
-      "savePounds": 0,
-      "flavourText": "End-of-month splurge."
-    }
+    { "label": "Great", "savePounds": 0, "flavourText": "Consistency is key." },
+    { "label": "Onwards", "savePounds": 0, "flavourText": "Every quiet week helps." }
   ],
   "duckEmotion": "happy",
-  "duckLine": "Month's nearly done!",
+  "duckLine": "No drama today!",
   "difficulty": "easy",
-  "tags": [
-    "save",
-    "routine",
-    "monthly"
-  ],
-  "ageRangeMin": 12,
-  "ageRangeMax": 18,
-  "currencyCode": "GBP",
-  "author": "content-team",
-  "notes": "End of month framing, same mechanics."
+  "tags": ["routine"],
+  "ageRangeMin": 12, "ageRangeMax": 18,
+  "currencyCode": "GBP", "author": "content-team", "notes": ""
 }

@@ -17,10 +17,20 @@ public class EmergencyFundController : MonoBehaviour
     public int weeklyIncome = 100;
     public int weeklyEssentials = 40;
     public int weeklyAvailable = 60;
-    public int emergencyFundGoal = 400;
+    public int emergencyFundGoal = 160;
     public int tierSmall = 20;
     public int tierBalanced = 30;
     public int tierStrong = 40;
+
+    // Week type progression: educational pacing from easy → hard
+    private static readonly string[] WeekEventTypes = {
+        "normal",      // Week 1: gentle start
+        "choice",      // Week 2: social decision
+        "emergency",   // Week 3: surprise cost
+        "bonus",       // Week 4: positive reward
+        "emergency",   // Week 5: bigger challenge
+        "crisis"       // Week 6: hardest
+    };
 
     // Game state
     private int currentWeek = 0;
@@ -28,8 +38,8 @@ public class EmergencyFundController : MonoBehaviour
     private bool _wentIntoDebt = false;
     private int _totalSaved = 0;
     private int _weeksPrepared = 0;
-    private int _crisisPhase = 0;
-    private string _pendingFeedback = "";
+    private EmergencyFundEvent _currentEvent = null;
+    private string _lastEventId = null;
 
     // Calm mode timing
     private float TransitionDelay => GameSettings.CalmMode ? 2.5f : 1.5f;
@@ -51,6 +61,11 @@ public class EmergencyFundController : MonoBehaviour
 
     void Start()
     {
+        Debug.Log("[EFController] Start. uiFlow=" + (uiFlow != null ? "OK" : "NULL"));
+
+        // Ensure EventLoader exists
+        var _ = EventLoader.Instance;
+
         ResetState();
         BuildReengagementPopup();
 
@@ -117,6 +132,7 @@ public class EmergencyFundController : MonoBehaviour
         uiFlow.OnTierChosen = ProcessTier;
         uiFlow.ShowSavingTier(currentWeek, weeklyAvailable, emergencyFundBalance, emergencyFundGoal);
 
+        SetBackground("decide");
         DuckSay(DuckReaction.Emotion.Thinking, "Choose wisely!");
     }
 
@@ -155,53 +171,113 @@ public class EmergencyFundController : MonoBehaviour
 
         RefreshHUD();
 
-        // Route to week event or straight to feedback
-        switch (currentWeek)
+        // Load random event from JSON for this week
+        Invoke("ShowWeekEvent", TransitionDelay);
+    }
+
+    // ==================== JSON-DRIVEN EVENTS ====================
+
+    void ShowWeekEvent()
+    {
+        string eventType = WeekEventTypes[currentWeek - 1];
+        _currentEvent = EventLoader.Instance.GetEvent(eventType, _lastEventId);
+
+        if (_currentEvent == null)
         {
-            case 3: Invoke("ShowWeek3Event", TransitionDelay); break;
-            case 4: Invoke("ShowWeek4Event", TransitionDelay); break;
-            case 5: Invoke("ShowWeek5Event", TransitionDelay); break;
-            case 6: _crisisPhase = 0; Invoke("ShowWeek6Event", TransitionDelay); break;
-            default:
-                // Weeks 1 & 2: no event, straight to feedback
-                if (emergencyFundBalance > 0) _weeksPrepared++;
-                ShowWeekFeedback("Saved \u00a3" + tier + ". Fund: \u00a3" + emergencyFundBalance);
+            // Fallback: no events of this type, skip to feedback
+            Debug.LogWarning("[EF] No event found for type: " + eventType);
+            if (emergencyFundBalance > 0) _weeksPrepared++;
+            ShowWeekFeedback("Quiet week. Fund: \u00a3" + emergencyFundBalance);
+            return;
+        }
+
+        _lastEventId = _currentEvent.id;
+        Debug.Log("[EF] Week " + currentWeek + " event: " + _currentEvent.id + " (" + _currentEvent.type + ")");
+
+        // Show duck emotion from JSON
+        DuckSay(ParseEmotion(_currentEvent.duckEmotion), _currentEvent.duckLine);
+
+        // Set background based on event category
+        switch (_currentEvent.type)
+        {
+            case "emergency":
+                SetBackground("emergency");
+                ShowEmergencyEvent();
+                break;
+            case "bonus":
+            case "lucky":
+                SetBackground("bonus");
+                ShowBonusEvent();
+                break;
+            case "crisis":
+                SetBackground("emergency");
+                ShowCrisisEvent();
+                break;
+            case "choice":
+                SetBackground("choice");
+                ShowChoiceEvent();
+                break;
+            default: // "normal"
+                SetBackground("payday");
+                ShowNormalEvent();
                 break;
         }
     }
 
-    // ==================== WEEK EVENTS ====================
-
-    void ShowWeek3Event()
+    // --- EMERGENCY: mandatory cost, fund-first ---
+    void ShowEmergencyEvent()
     {
-        uiFlow.OnChoiceA = () => HandleEmergency(30, "Phone repair");
-        uiFlow.ShowEvent(currentWeek, "Emergency!",
-            "Phone screen cracked.\nRepair: \u00a330\n\nFund: \u00a3" + emergencyFundBalance,
-            "Pay \u00a330", null);
+        int cost = _currentEvent.costPounds;
+        string body = _currentEvent.description + "\n\nFund: \u00a3" + emergencyFundBalance;
 
-        if (emergencyFundBalance >= 30)
-            DuckSay(DuckReaction.Emotion.Thinking, "Use your fund!");
-        else
-            DuckSay(DuckReaction.Emotion.Shocked, "Unexpected cost!");
+        string choiceA = _currentEvent.choices.Length > 0 ? _currentEvent.choices[0].label : "Pay \u00a3" + cost;
+        string choiceB = _currentEvent.choices.Length > 1 ? _currentEvent.choices[1].label : null;
+
+        uiFlow.OnChoiceA = () => HandleEmergency(cost, _currentEvent.title);
+        if (choiceB != null)
+        {
+            // Second choice = skip the cost (e.g. "Use it cracked")
+            uiFlow.OnChoiceB = () =>
+            {
+                _idleTimer = 0f;
+                string flavour = _currentEvent.choices[1].flavourText;
+                DuckSay(DuckReaction.Emotion.Neutral, flavour != null ? flavour : "Skipped.");
+                if (emergencyFundBalance > 0) _weeksPrepared++;
+                RefreshHUD();
+                ShowWeekFeedback(flavour != null ? flavour : "You decided to skip.");
+            };
+        }
+
+        uiFlow.ShowEvent(currentWeek, _currentEvent.title, body, choiceA, choiceB);
     }
 
-    void ShowWeek4Event()
+    // --- BONUS / LUCKY: extra money, choose to save or spend ---
+    void ShowBonusEvent()
     {
+        int bonus = _currentEvent.bonusPounds;
+
+        // Credit bonus to bank
         if (BankAccountService.Instance != null)
-            BankAccountService.Instance.Earn(40, "Week 4 bonus");
+            BankAccountService.Instance.Earn(bonus, _currentEvent.title);
+
+        string body = _currentEvent.description + "\n\nFund: \u00a3" + emergencyFundBalance;
+
+        string choiceA = _currentEvent.choices.Length > 0 ? _currentEvent.choices[0].label : "Add to fund";
+        string choiceB = _currentEvent.choices.Length > 1 ? _currentEvent.choices[1].label : "Keep in bank";
 
         uiFlow.OnChoiceA = () =>
         {
             _idleTimer = 0f;
             if (BankAccountService.Instance != null)
-                BankAccountService.Instance.Spend(40, "Bonus to fund", "Emergency");
-            emergencyFundBalance += 40;
-            _totalSaved += 40;
+                BankAccountService.Instance.Spend(bonus, "Bonus to fund", "Emergency");
+            emergencyFundBalance += bonus;
+            _totalSaved += bonus;
             SaveFund();
             DuckSay(DuckReaction.Emotion.Celebrating, "Fund boosted!");
             RefreshHUD();
             if (emergencyFundBalance > 0) _weeksPrepared++;
-            ShowWeekFeedback("Added \u00a340 bonus to fund!");
+            string flavour = _currentEvent.choices.Length > 0 ? _currentEvent.choices[0].flavourText : "Added to fund!";
+            ShowWeekFeedback(flavour);
         };
         uiFlow.OnChoiceB = () =>
         {
@@ -209,51 +285,87 @@ public class EmergencyFundController : MonoBehaviour
             DuckSay(DuckReaction.Emotion.Neutral, "Kept the bonus.");
             RefreshHUD();
             if (emergencyFundBalance > 0) _weeksPrepared++;
-            ShowWeekFeedback("Kept \u00a340 bonus in bank.");
+            string flavour = _currentEvent.choices.Length > 1 ? _currentEvent.choices[1].flavourText : "Kept in bank.";
+            ShowWeekFeedback(flavour);
         };
 
-        uiFlow.ShowEvent(currentWeek, "Bonus!",
-            "Extra \u00a340 this week!\n\nFund: \u00a3" + emergencyFundBalance,
-            "Add to fund", "Keep in bank");
-
-        DuckSay(DuckReaction.Emotion.Excited, "Bonus week!");
+        uiFlow.ShowEvent(currentWeek, _currentEvent.title, body, choiceA, choiceB);
     }
 
-    void ShowWeek5Event()
+    // --- CRISIS: mandatory cost from fund/bank ---
+    void ShowCrisisEvent()
     {
-        uiFlow.OnChoiceA = () => HandleEmergency(60, "Laptop repair");
-        uiFlow.ShowEvent(currentWeek, "Emergency!",
-            "Laptop broke.\nRepair: \u00a360\n\nFund: \u00a3" + emergencyFundBalance,
-            "Pay \u00a360", null);
+        int cost = _currentEvent.costPounds;
+        string body = _currentEvent.description + "\n\nFund: \u00a3" + emergencyFundBalance;
 
-        if (emergencyFundBalance >= 60)
-            DuckSay(DuckReaction.Emotion.Thinking, "Your fund can cover this!");
-        else
-            DuckSay(DuckReaction.Emotion.Worried, "This is a big one...");
+        string choiceA = _currentEvent.choices.Length > 0 ? _currentEvent.choices[0].label : "Pay \u00a3" + cost;
+        string choiceB = _currentEvent.choices.Length > 1 ? _currentEvent.choices[1].label : null;
+
+        uiFlow.OnChoiceA = () => HandleEmergency(cost, _currentEvent.title);
+        if (choiceB != null)
+        {
+            uiFlow.OnChoiceB = () =>
+            {
+                _idleTimer = 0f;
+                // savePounds on choice B = the partial cost for this option
+                int partialCost = _currentEvent.choices.Length > 1
+                    ? _currentEvent.choices[1].savePounds : 0;
+                if (partialCost > 0)
+                    HandleEmergency(partialCost, _currentEvent.title + " (partial)");
+                else
+                {
+                    string flavour = _currentEvent.choices[1].flavourText;
+                    DuckSay(DuckReaction.Emotion.Neutral, flavour != null ? flavour : "Managed it.");
+                    if (emergencyFundBalance > 0) _weeksPrepared++;
+                    RefreshHUD();
+                    ShowWeekFeedback(flavour != null ? flavour : "You got through it.");
+                }
+            };
+        }
+
+        uiFlow.ShowEvent(currentWeek, _currentEvent.title, body, choiceA, choiceB);
     }
 
-    void ShowWeek6Event()
+    // --- CHOICE: optional spend (social/lifestyle) ---
+    void ShowChoiceEvent()
     {
-        if (_crisisPhase == 0)
-        {
-            uiFlow.OnChoiceA = () => HandleCrisisTravel(true);
-            uiFlow.OnChoiceB = () => HandleCrisisTravel(false);
-            uiFlow.ShowEvent(currentWeek, "Crisis!",
-                "Family event coming up.\nTravel: \u00a320\n\nFund: \u00a3" + emergencyFundBalance,
-                "Pay \u00a320", "Skip trip");
+        int cost = _currentEvent.costPounds;
+        string body = _currentEvent.description + "\n\nFund: \u00a3" + emergencyFundBalance;
 
-            DuckSay(DuckReaction.Emotion.Worried, "Tough week ahead...");
-        }
-        else
-        {
-            uiFlow.OnChoiceA = () => HandleCrisisSocial(true);
-            uiFlow.OnChoiceB = () => HandleCrisisSocial(false);
-            uiFlow.ShowEvent(currentWeek, "Crisis!",
-                "Friends invite you out.\nCost: \u00a320\n\nFund: \u00a3" + emergencyFundBalance,
-                "Go (\u00a320)", "Stay home");
+        string choiceA = _currentEvent.choices.Length > 0 ? _currentEvent.choices[0].label : "Spend \u00a3" + cost;
+        string choiceB = _currentEvent.choices.Length > 1 ? _currentEvent.choices[1].label : "Skip";
 
-            DuckSay(DuckReaction.Emotion.Thinking, "One more decision...");
-        }
+        uiFlow.OnChoiceA = () => HandleEmergency(cost, _currentEvent.title);
+        uiFlow.OnChoiceB = () =>
+        {
+            _idleTimer = 0f;
+            string flavour = _currentEvent.choices.Length > 1 ? _currentEvent.choices[1].flavourText : "Saved the money.";
+            DuckSay(DuckReaction.Emotion.Neutral, flavour);
+            RefreshHUD();
+            if (emergencyFundBalance > 0) _weeksPrepared++;
+            ShowWeekFeedback(flavour);
+        };
+
+        uiFlow.ShowEvent(currentWeek, _currentEvent.title, body, choiceA, choiceB);
+    }
+
+    // --- NORMAL: no cost, quiet week ---
+    void ShowNormalEvent()
+    {
+        string body = _currentEvent.description + "\n\nFund: \u00a3" + emergencyFundBalance;
+
+        string flavour = (_currentEvent.choices != null && _currentEvent.choices.Length > 0)
+            ? _currentEvent.choices[0].flavourText : null;
+
+        uiFlow.OnChoiceA = () =>
+        {
+            _idleTimer = 0f;
+            DuckSay(DuckReaction.Emotion.Happy, flavour != null ? flavour : "Steady week!");
+            if (emergencyFundBalance > 0) _weeksPrepared++;
+            RefreshHUD();
+            ShowWeekFeedback(flavour != null ? flavour : "Quiet week. Fund: \u00a3" + emergencyFundBalance);
+        };
+        uiFlow.ShowEvent(currentWeek, _currentEvent.title, body, "Continue", null);
     }
 
     // ==================== EMERGENCY HANDLER ====================
@@ -291,7 +403,7 @@ public class EmergencyFundController : MonoBehaviour
 
         SaveFund();
 
-        // Duck reaction
+        // Duck reaction based on outcome
         if (coveredByFund >= cost)
             DuckSay(DuckReaction.Emotion.Celebrating, "Fund saved you!");
         else if (!_wentIntoDebt)
@@ -299,73 +411,18 @@ public class EmergencyFundController : MonoBehaviour
         else
             DuckSay(DuckReaction.Emotion.Sad, "You're in debt...");
 
+        // Use flavourText from JSON if available
+        if (_currentEvent != null && _currentEvent.choices.Length > 0
+            && !string.IsNullOrEmpty(_currentEvent.choices[0].flavourText))
+        {
+            result += "\n" + _currentEvent.choices[0].flavourText;
+        }
+
+        result += "\nFund: \u00a3" + emergencyFundBalance;
+
         if (emergencyFundBalance > 0) _weeksPrepared++;
         RefreshHUD();
         ShowWeekFeedback(result);
-    }
-
-    // ==================== CRISIS HANDLERS ====================
-
-    void HandleCrisisTravel(bool pay)
-    {
-        _idleTimer = 0f;
-
-        if (pay)
-        {
-            float bank = BankAccountService.Instance != null ? BankAccountService.Instance.GetBalance() : 0f;
-            if (bank >= 20)
-            {
-                BankAccountService.Instance.Spend(20, "Family event travel", "Needs");
-                DuckSay(DuckReaction.Emotion.Neutral, "Family comes first.");
-            }
-            else
-            {
-                int canPay = (int)bank;
-                if (canPay > 0 && BankAccountService.Instance != null)
-                    BankAccountService.Instance.Spend(canPay, "Family event travel", "Needs");
-                _wentIntoDebt = true;
-                DuckSay(DuckReaction.Emotion.Sad, "Tight budget...");
-            }
-        }
-        else
-        {
-            DuckSay(DuckReaction.Emotion.Sad, "Missed the family event...");
-        }
-
-        _crisisPhase = 1;
-        RefreshHUD();
-        Invoke("ShowWeek6Event", TransitionDelay);
-    }
-
-    void HandleCrisisSocial(bool go)
-    {
-        _idleTimer = 0f;
-
-        if (go)
-        {
-            float bank = BankAccountService.Instance != null ? BankAccountService.Instance.GetBalance() : 0f;
-            if (bank >= 20)
-            {
-                BankAccountService.Instance.Spend(20, "Going out with friends", "Social");
-                DuckSay(DuckReaction.Emotion.Happy, "Great time out!");
-            }
-            else
-            {
-                int canPay = (int)bank;
-                if (canPay > 0 && BankAccountService.Instance != null)
-                    BankAccountService.Instance.Spend(canPay, "Going out with friends", "Social");
-                _wentIntoDebt = true;
-                DuckSay(DuckReaction.Emotion.Sad, "Couldn't quite afford it...");
-            }
-        }
-        else
-        {
-            DuckSay(DuckReaction.Emotion.Neutral, "Saved \u00a320.");
-        }
-
-        if (emergencyFundBalance > 0) _weeksPrepared++;
-        RefreshHUD();
-        ShowWeekFeedback("End of the season!");
     }
 
     // ==================== FEEDBACK ====================
@@ -375,13 +432,9 @@ public class EmergencyFundController : MonoBehaviour
         string title = currentWeek >= totalWeeks ? "Week " + currentWeek + " Done!" : "Week " + currentWeek + " Complete";
 
         if (currentWeek >= totalWeeks)
-        {
             uiFlow.OnContinue = ShowFinalResults;
-        }
         else
-        {
             uiFlow.OnContinue = () => Invoke("StartNewWeek", TransitionDelay);
-        }
 
         uiFlow.ShowFeedback(title, message);
     }
@@ -400,15 +453,26 @@ public class EmergencyFundController : MonoBehaviour
         if (starRating != null)
             starRating.SetRating(stars);
 
-        // Duck celebration
         if (stars >= 3)
+        {
+            SetBackground("perfect");
             DuckSay(DuckReaction.Emotion.Celebrating, "Amazing season!");
+        }
         else if (stars >= 2)
+        {
+            SetBackground("perfect");
             DuckSay(DuckReaction.Emotion.Happy, "Well done!");
+        }
         else if (stars >= 1)
+        {
+            SetBackground("gameover");
             DuckSay(DuckReaction.Emotion.Neutral, "Room to improve!");
+        }
         else
+        {
+            SetBackground("gameover");
             DuckSay(DuckReaction.Emotion.Worried, "Try again!");
+        }
 
         string line1 = "Emergency fund saved: \u00a3" + emergencyFundBalance + " / \u00a3" + emergencyFundGoal;
         string line2 = "Weeks you stayed prepared: " + _weeksPrepared + " / " + totalWeeks;
@@ -428,10 +492,31 @@ public class EmergencyFundController : MonoBehaviour
 
     // ==================== HELPERS ====================
 
+    DuckReaction.Emotion ParseEmotion(string emotion)
+    {
+        if (string.IsNullOrEmpty(emotion)) return DuckReaction.Emotion.Neutral;
+        switch (emotion.ToLower())
+        {
+            case "happy": return DuckReaction.Emotion.Happy;
+            case "sad": return DuckReaction.Emotion.Sad;
+            case "excited": return DuckReaction.Emotion.Excited;
+            case "worried": return DuckReaction.Emotion.Worried;
+            case "thinking": return DuckReaction.Emotion.Thinking;
+            case "celebrating": return DuckReaction.Emotion.Celebrating;
+            case "shocked": return DuckReaction.Emotion.Shocked;
+            default: return DuckReaction.Emotion.Neutral;
+        }
+    }
+
     void RefreshHUD()
     {
         float bank = BankAccountService.Instance != null ? BankAccountService.Instance.GetBalance() : 0f;
         uiFlow.UpdateHUD(bank, emergencyFundBalance, emergencyFundGoal);
+
+        // Also refresh the BankHud prefab if it exists in the scene
+        BankHud bankHud = FindObjectOfType<BankHud>();
+        if (bankHud != null)
+            bankHud.Refresh();
     }
 
     void SaveFund()
@@ -443,10 +528,21 @@ public class EmergencyFundController : MonoBehaviour
     void DuckSay(DuckReaction.Emotion emotion, string message)
     {
         if (duckReaction != null)
-        {
             duckReaction.ShowReaction(emotion, message);
-            if (backgroundChanger != null)
-                backgroundChanger.CheckAndChangeBackground(message);
+    }
+
+    void SetBackground(string category)
+    {
+        if (backgroundChanger == null) return;
+        switch (category)
+        {
+            case "payday":    backgroundChanger.SetPayDay(); break;
+            case "decide":    backgroundChanger.SetDecideWisely(); break;
+            case "bonus":     backgroundChanger.SetBonusWeek(); break;
+            case "emergency": backgroundChanger.SetUseYourFund(); break;
+            case "choice":    backgroundChanger.SetTwoThings(); break;
+            case "gameover":  backgroundChanger.SetGameOver(); break;
+            case "perfect":   backgroundChanger.SetPerfect(); break;
         }
     }
 
@@ -457,7 +553,8 @@ public class EmergencyFundController : MonoBehaviour
         _wentIntoDebt = false;
         _totalSaved = 0;
         _weeksPrepared = 0;
-        _crisisPhase = 0;
+        _currentEvent = null;
+        _lastEventId = null;
 
         PlayerPrefs.SetInt("EmergencyFundBalance", 0);
         PlayerPrefs.Save();
@@ -471,6 +568,16 @@ public class EmergencyFundController : MonoBehaviour
         RefreshHUD();
         DuckSay(DuckReaction.Emotion.Neutral, "Let's try again!");
         Invoke("StartNewWeek", TransitionDelay);
+    }
+
+    [ContextMenu("Reset Everything (Tutorial + Game)")]
+    public void ResetEverything()
+    {
+        PlayerPrefs.DeleteKey("EmergencyTutorialSeen");
+        PlayerPrefs.DeleteKey("EmergencyFundTutorialShown");
+        PlayerPrefs.DeleteKey("EmergencyFundBalance");
+        PlayerPrefs.Save();
+        Debug.Log("[EF] Reset complete — tutorial will show on next play.");
     }
 
     // ==================== RE-ENGAGEMENT POPUP ====================
@@ -587,19 +694,8 @@ public class EmergencyFundController : MonoBehaviour
     void OnTakeHint()
     {
         DismissReengagementPopup();
-
-        string hint;
-        switch (currentWeek)
-        {
-            case 1: hint = "Saving more now means safety later!"; break;
-            case 2: hint = "Saving more now means safety later!"; break;
-            case 3: hint = "This is why we save!"; break;
-            case 4: hint = "A bonus is a chance to build your fund."; break;
-            case 5: hint = "Big costs show why funds matter."; break;
-            case 6: hint = "Tough week \u2014 choose carefully!"; break;
-            default: hint = "Think about what matters most."; break;
-        }
-        DuckSay(DuckReaction.Emotion.Thinking, hint);
+        DuckSay(DuckReaction.Emotion.Thinking,
+            _currentEvent != null ? _currentEvent.duckLine : "Think about what matters most.");
     }
 
     void OnKeepGoing()

@@ -1,35 +1,20 @@
 {
   "id": "ef_crisis_005",
-  "version": 1,
+  "version": 2,
   "type": "crisis",
-  "title": "Vet Bill and Broken Bag",
-  "description": "The family cat needs a vet visit \u2014 your share is \u00a325. Plus your school bag strap broke \u2014 a new bag is \u00a318.",
-  "weeklyIncomePounds": 120,
-  "costPounds": 43,
+  "title": "Stolen Bag",
+  "description": "Your bag was stolen with your lunch box and PE kit. Replacing them costs £30.",
+  "weeklyIncomePounds": 60,
+  "costPounds": 30,
   "bonusPounds": 0,
   "choices": [
-    {
-      "label": "Pay for both",
-      "savePounds": 77,
-      "flavourText": "Cat's healthy, bag's sorted."
-    },
-    {
-      "label": "Just the vet",
-      "savePounds": 95,
-      "flavourText": "Cat comes first. Bag can be taped up."
-    }
+    { "label": "Replace all (£30)", "savePounds": 30, "flavourText": "All kitted out again." },
+    { "label": "Just essentials (£15)", "savePounds": 15, "flavourText": "Got the basics covered." }
   ],
-  "duckEmotion": "worried",
-  "duckLine": "Poor kitty!",
-  "difficulty": "medium",
-  "tags": [
-    "animals",
-    "essentials",
-    "unexpected"
-  ],
-  "ageRangeMin": 12,
-  "ageRangeMax": 18,
-  "currencyCode": "GBP",
-  "author": "content-team",
-  "notes": ""
+  "duckEmotion": "shocked",
+  "duckLine": "That's awful!",
+  "difficulty": "hard",
+  "tags": ["theft", "school", "replacement"],
+  "ageRangeMin": 12, "ageRangeMax": 18,
+  "currencyCode": "GBP", "author": "content-team", "notes": ""
 }

@@ -1,39 +1,20 @@
 {
   "id": "ef_normal_001",
-  "version": 1,
+  "version": 2,
   "type": "normal",
-  "title": "Payday",
-  "description": "Another week done. You've got your usual leftover after bills.",
-  "weeklyIncomePounds": 120,
+  "title": "Quiet Week",
+  "description": "Nothing unexpected this week. Your savings sit safe.",
+  "weeklyIncomePounds": 60,
   "costPounds": 0,
   "bonusPounds": 0,
   "choices": [
-    {
-      "label": "Save all \u00a3120",
-      "savePounds": 120,
-      "flavourText": "Straight into the fund. Nice."
-    },
-    {
-      "label": "Save half \u00a360",
-      "savePounds": 60,
-      "flavourText": "Half saved, half for the week."
-    },
-    {
-      "label": "Spend it all",
-      "savePounds": 0,
-      "flavourText": "Nothing saved this time."
-    }
+    { "label": "Nice and steady", "savePounds": 0, "flavourText": "Sometimes boring is good." },
+    { "label": "Check my fund", "savePounds": 0, "flavourText": "Looking healthy so far." }
   ],
   "duckEmotion": "happy",
-  "duckLine": "Pay day!",
+  "duckLine": "Peaceful week!",
   "difficulty": "easy",
-  "tags": [
-    "save",
-    "routine"
-  ],
-  "ageRangeMin": 12,
-  "ageRangeMax": 18,
-  "currencyCode": "GBP",
-  "author": "content-team",
-  "notes": "Standard payday week \u2014 baseline scenario."
+  "tags": ["routine"],
+  "ageRangeMin": 12, "ageRangeMax": 18,
+  "currencyCode": "GBP", "author": "content-team", "notes": ""
 }

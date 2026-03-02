@@ -1,40 +1,20 @@
 {
   "id": "ef_bonus_003",
-  "version": 1,
+  "version": 2,
   "type": "bonus",
-  "title": "Grandparent's Visit",
-  "description": "Your nan came round and slipped you \u00a330. She said to spend it wisely.",
-  "weeklyIncomePounds": 120,
+  "title": "Found Money",
+  "description": "You found a £10 note in your coat pocket!",
+  "weeklyIncomePounds": 60,
   "costPounds": 0,
-  "bonusPounds": 30,
+  "bonusPounds": 10,
   "choices": [
-    {
-      "label": "Save all \u00a3150",
-      "savePounds": 150,
-      "flavourText": "Nan would be proud."
-    },
-    {
-      "label": "Save \u00a375",
-      "savePounds": 75,
-      "flavourText": "Half wisely spent, half wisely saved."
-    },
-    {
-      "label": "Spend the gift",
-      "savePounds": 120,
-      "flavourText": "You kept your usual savings at least."
-    }
+    { "label": "Add to fund", "savePounds": 0, "flavourText": "Straight into savings!" },
+    { "label": "Keep in bank", "savePounds": 0, "flavourText": "A nice little bonus." }
   ],
-  "duckEmotion": "happy",
-  "duckLine": "Thanks, Nan!",
+  "duckEmotion": "excited",
+  "duckLine": "Lucky find!",
   "difficulty": "easy",
-  "tags": [
-    "family",
-    "gift",
-    "bonus"
-  ],
-  "ageRangeMin": 12,
-  "ageRangeMax": 18,
-  "currencyCode": "GBP",
-  "author": "content-team",
-  "notes": "Family gift \u2014 culturally common UK scenario."
+  "tags": ["lucky", "bonus"],
+  "ageRangeMin": 12, "ageRangeMax": 18,
+  "currencyCode": "GBP", "author": "content-team", "notes": ""
 }

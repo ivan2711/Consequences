@@ -46,7 +46,12 @@ public class EmergencyFundUIFlow : MonoBehaviour
     [Header("HUD Panel")]
     public TextMeshProUGUI bankBalanceText;
     public TextMeshProUGUI emergencyFundText;
-    public Image progressBarFill;
+    public RectTransform progressBarFill;
+
+    [Header("Progress Panel (above whiteboard)")]
+    public GameObject progressPanel;
+    public TextMeshProUGUI progressText;
+    public RectTransform progressPanelBarFill;
 
     // Callbacks set by Controller
     [NonSerialized] public Action OnTutorialDone;
@@ -59,7 +64,7 @@ public class EmergencyFundUIFlow : MonoBehaviour
     private State currentState;
     private const string TUTORIAL_KEY = "EmergencyTutorialSeen";
 
-    void Start()
+    void Awake()
     {
         HideAll();
 
@@ -86,8 +91,12 @@ public class EmergencyFundUIFlow : MonoBehaviour
 
     public void ShowTutorial()
     {
+        Debug.Log("[UIFlow] ShowTutorial called. Key=" + PlayerPrefs.GetInt(TUTORIAL_KEY, 0)
+            + " tutorialPanel=" + (tutorialPanel != null ? "OK" : "NULL"));
+
         if (PlayerPrefs.GetInt(TUTORIAL_KEY, 0) == 1)
         {
+            Debug.Log("[UIFlow] Tutorial already seen, skipping.");
             OnTutorialDone?.Invoke();
             return;
         }
@@ -96,8 +105,10 @@ public class EmergencyFundUIFlow : MonoBehaviour
         HideAllPanels();
         SetActive(tutorialPanel, true);
 
-        SetText(tutorialTitleText, "Emergency Fund", 52);
-        SetText(tutorialBodyText, "Save a little each week so surprises don't turn into debt.\n\nGoal: \u00a3400", 30);
+        Debug.Log("[UIFlow] Tutorial panel active=" + (tutorialPanel != null && tutorialPanel.activeSelf));
+
+        SetText(tutorialTitleText, "Emergency Fund", 60);
+        SetText(tutorialBodyText, "Save a little each week so surprises don't turn into debt.\n\nGoal: \u00a3160", 38);
     }
 
     public void ShowSavingTier(int week, int available, int fund, int goal)
@@ -106,16 +117,17 @@ public class EmergencyFundUIFlow : MonoBehaviour
         HideAllPanels();
         SetActive(eventPanel, true);
 
-        SetText(weekText, "Week " + week + " of 6", 34);
-        SetText(availableText, "Available: \u00a3" + available, 30);
-        SetText(fundText, "Emergency fund: \u00a3" + fund, 30);
-        SetText(goalText, "Goal: \u00a3" + goal, 28);
-        SetText(eventTitleText, "How much will you save?", 42);
-        SetText(eventBodyText, "Choose your saving amount for this week.", 28);
+        SetText(weekText, "Week " + week + " of 6", 40);
+        SetText(eventTitleText, "How much will you save?", 52);
+        SetText(eventBodyText, "Choose your saving amount for this week.", 36);
+        HideText(availableText);
+        HideText(goalText);
 
         ShowButton(choiceAButton, choiceALabel, "Strong \u00a340", true);
         ShowButton(choiceBButton, choiceBLabel, "Balanced \u00a330", true);
         ShowButton(choiceCButton, choiceCLabel, "Small \u00a320", true);
+
+        LayoutButtons(true, true, true);
     }
 
     public void ShowEvent(int week, string title, string body, string choiceA, string choiceB)
@@ -124,13 +136,17 @@ public class EmergencyFundUIFlow : MonoBehaviour
         HideAllPanels();
         SetActive(eventPanel, true);
 
-        SetText(weekText, "Week " + week + " of 6", 34);
-        SetText(eventTitleText, title, 48);
-        SetText(eventBodyText, body, 30);
+        SetText(weekText, "Week " + week + " of 6", 40);
+        SetText(eventTitleText, title, 56);
+        SetText(eventBodyText, body, 38);
+        HideText(availableText);
+        HideText(goalText);
 
         ShowButton(choiceAButton, choiceALabel, choiceA, true);
         ShowButton(choiceBButton, choiceBLabel, choiceB, choiceB != null);
         ShowButton(choiceCButton, choiceCLabel, null, false);
+
+        LayoutButtons(choiceA != null, choiceB != null, false);
     }
 
     public void ShowFeedback(string title, string body)
@@ -142,8 +158,8 @@ public class EmergencyFundUIFlow : MonoBehaviour
         if (feedbackPanel != null)
             feedbackPanel.transform.SetAsLastSibling();
 
-        SetText(feedbackTitleText, title, 48);
-        SetText(feedbackBodyText, body, 30);
+        SetText(feedbackTitleText, title, 56);
+        SetText(feedbackBodyText, body, 38);
     }
 
     public void ShowFinal(string line1, string line2, string line3)
@@ -155,22 +171,32 @@ public class EmergencyFundUIFlow : MonoBehaviour
         if (finalPanel != null)
             finalPanel.transform.SetAsLastSibling();
 
-        SetText(finalTitleText, "Season Complete!", 52);
-        SetText(finalSummaryText, line1 + "\n\n" + line2 + "\n\n" + line3, 30);
+        SetText(finalTitleText, "Season Complete!", 60);
+        SetText(finalSummaryText, line1 + "\n\n" + line2 + "\n\n" + line3, 38);
     }
 
     public void UpdateHUD(float bankBalance, int fundBalance, int goal)
     {
-        SetActive(hudPanel, true);
+        SetActive(hudPanel, false);
 
+        // Update bank balance overlay
         if (bankBalanceText != null)
-            bankBalanceText.text = "Bank: \u00a3" + bankBalance.ToString("F0");
+            bankBalanceText.text = "Balance: \u00a3" + bankBalance.ToString("F0");
 
-        if (emergencyFundText != null)
-            emergencyFundText.text = "Fund: \u00a3" + fundBalance;
+        // Update fund text on event panel
+        if (fundText != null)
+            fundText.text = "Fund: \u00a3" + fundBalance;
 
-        if (progressBarFill != null)
-            progressBarFill.fillAmount = goal > 0 ? Mathf.Clamp01((float)fundBalance / goal) : 0f;
+        float fill = goal > 0 ? Mathf.Clamp01((float)fundBalance / goal) : 0f;
+
+        // Progress panel above whiteboard
+        SetActive(progressPanel, true);
+
+        if (progressText != null)
+            progressText.text = "\u00a3" + fundBalance + " / \u00a3" + goal;
+
+        if (progressPanelBarFill != null)
+            progressPanelBarFill.anchorMax = new Vector2(fill, 1f);
     }
 
     public void HideAll()
@@ -245,6 +271,12 @@ public class EmergencyFundUIFlow : MonoBehaviour
         if (text == null) return;
         text.text = value;
         text.fontSize = fontSize;
+        text.gameObject.SetActive(true);
+    }
+
+    void HideText(TextMeshProUGUI text)
+    {
+        if (text != null) text.gameObject.SetActive(false);
     }
 
     void ShowButton(Button btn, TextMeshProUGUI label, string text, bool visible)
@@ -257,8 +289,45 @@ public class EmergencyFundUIFlow : MonoBehaviour
         if (label != null && text != null)
         {
             label.text = text;
-            label.fontSize = 32;
+            label.fontSize = 40;
         }
+    }
+
+    // Position visible buttons in large touch zones: bottom-left, bottom-center, bottom-right
+    void LayoutButtons(bool showA, bool showB, bool showC)
+    {
+        int count = (showA ? 1 : 0) + (showB ? 1 : 0) + (showC ? 1 : 0);
+        if (count == 0) return;
+
+        float yMin = 0.02f;
+        float yMax = 0.16f;
+
+        if (count == 3)
+        {
+            SetButtonAnchors(choiceAButton, 0.02f, yMin, 0.30f, yMax);   // bottom-left
+            SetButtonAnchors(choiceBButton, 0.35f, yMin, 0.65f, yMax);   // bottom-center
+            SetButtonAnchors(choiceCButton, 0.70f, yMin, 0.98f, yMax);   // bottom-right
+        }
+        else if (count == 2)
+        {
+            SetButtonAnchors(choiceAButton, 0.02f, yMin, 0.42f, yMax);   // bottom-left
+            SetButtonAnchors(choiceBButton, 0.58f, yMin, 0.98f, yMax);   // bottom-right
+        }
+        else
+        {
+            SetButtonAnchors(choiceAButton, 0.15f, yMin, 0.85f, yMax);   // bottom-center
+        }
+    }
+
+    void SetButtonAnchors(Button btn, float xMin, float yMin, float xMax, float yMax)
+    {
+        if (btn == null) return;
+        RectTransform rt = btn.GetComponent<RectTransform>();
+        if (rt == null) return;
+        rt.anchorMin = new Vector2(xMin, yMin);
+        rt.anchorMax = new Vector2(xMax, yMax);
+        rt.offsetMin = Vector2.zero;
+        rt.offsetMax = Vector2.zero;
     }
 
     // For testing

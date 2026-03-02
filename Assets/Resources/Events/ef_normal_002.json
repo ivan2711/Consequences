@@ -1,39 +1,20 @@
 {
   "id": "ef_normal_002",
-  "version": 1,
+  "version": 2,
   "type": "normal",
-  "title": "Quiet Week",
-  "description": "Nothing exciting happened. You have your usual \u00a3120 leftover.",
-  "weeklyIncomePounds": 120,
+  "title": "Routine Week",
+  "description": "Bills paid, essentials sorted. Nothing unusual happened.",
+  "weeklyIncomePounds": 60,
   "costPounds": 0,
   "bonusPounds": 0,
   "choices": [
-    {
-      "label": "Save all \u00a3120",
-      "savePounds": 120,
-      "flavourText": "A calm week and a full save."
-    },
-    {
-      "label": "Save \u00a380",
-      "savePounds": 80,
-      "flavourText": "Most of it saved \u2014 solid."
-    },
-    {
-      "label": "Spend it all",
-      "savePounds": 0,
-      "flavourText": "It went quickly this week."
-    }
+    { "label": "All good", "savePounds": 0, "flavourText": "Steady progress this week." },
+    { "label": "Keep going", "savePounds": 0, "flavourText": "One step closer to the goal." }
   ],
-  "duckEmotion": "neutral",
-  "duckLine": "Steady week.",
+  "duckEmotion": "happy",
+  "duckLine": "Smooth sailing!",
   "difficulty": "easy",
-  "tags": [
-    "save",
-    "routine"
-  ],
-  "ageRangeMin": 12,
-  "ageRangeMax": 18,
-  "currencyCode": "GBP",
-  "author": "content-team",
-  "notes": "Low-pressure baseline week."
+  "tags": ["routine"],
+  "ageRangeMin": 12, "ageRangeMax": 18,
+  "currencyCode": "GBP", "author": "content-team", "notes": ""
 }

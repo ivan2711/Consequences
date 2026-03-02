@@ -1,35 +1,20 @@
 {
   "id": "ef_choice_001",
-  "version": 1,
+  "version": 2,
   "type": "choice",
   "title": "Cinema Night",
-  "description": "Your mates are going to the cinema. Tickets and snacks would cost about \u00a315.",
-  "weeklyIncomePounds": 120,
-  "costPounds": 0,
+  "description": "Your mates are going to the cinema. Tickets and snacks cost £12.",
+  "weeklyIncomePounds": 60,
+  "costPounds": 12,
   "bonusPounds": 0,
   "choices": [
-    {
-      "label": "Go to cinema",
-      "savePounds": 105,
-      "flavourText": "Good film, good company."
-    },
-    {
-      "label": "Stay in",
-      "savePounds": 120,
-      "flavourText": "You saved the full amount instead."
-    }
+    { "label": "Go (£12)", "savePounds": 0, "flavourText": "Good film, good company." },
+    { "label": "Stay in", "savePounds": 0, "flavourText": "Saved the money instead." }
   ],
   "duckEmotion": "thinking",
   "duckLine": "Popcorn or savings?",
   "difficulty": "easy",
-  "tags": [
-    "social",
-    "impulse",
-    "entertainment"
-  ],
-  "ageRangeMin": 12,
-  "ageRangeMax": 18,
-  "currencyCode": "GBP",
-  "author": "content-team",
-  "notes": "Low-cost social choice."
+  "tags": ["social", "entertainment"],
+  "ageRangeMin": 12, "ageRangeMax": 18,
+  "currencyCode": "GBP", "author": "content-team", "notes": ""
 }

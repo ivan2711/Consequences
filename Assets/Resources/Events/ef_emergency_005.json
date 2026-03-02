@@ -1,35 +1,20 @@
 {
   "id": "ef_emergency_005",
-  "version": 1,
+  "version": 2,
   "type": "emergency",
-  "title": "Broken Headphones",
-  "description": "Your headphones stopped working. A decent replacement pair is \u00a330.",
-  "weeklyIncomePounds": 120,
-  "costPounds": 30,
+  "title": "Headphones Broke",
+  "description": "Your headphones snapped. A decent replacement pair costs £18.",
+  "weeklyIncomePounds": 60,
+  "costPounds": 18,
   "bonusPounds": 0,
   "choices": [
-    {
-      "label": "Buy new ones",
-      "savePounds": 90,
-      "flavourText": "Music's back on."
-    },
-    {
-      "label": "Go without",
-      "savePounds": 120,
-      "flavourText": "Quiet commute for a while."
-    }
+    { "label": "Buy new (£18)", "savePounds": 0, "flavourText": "Music is back." },
+    { "label": "Go without", "savePounds": 0, "flavourText": "Silence for now." }
   ],
   "duckEmotion": "sad",
-  "duckLine": "No tunes?!",
+  "duckLine": "Not the headphones!",
   "difficulty": "medium",
-  "tags": [
-    "tech",
-    "repair",
-    "wants"
-  ],
-  "ageRangeMin": 12,
-  "ageRangeMax": 18,
-  "currencyCode": "GBP",
-  "author": "content-team",
-  "notes": "Borderline need/want \u2014 good for discussion."
+  "tags": ["tech", "replacement"],
+  "ageRangeMin": 12, "ageRangeMax": 18,
+  "currencyCode": "GBP", "author": "content-team", "notes": ""
 }

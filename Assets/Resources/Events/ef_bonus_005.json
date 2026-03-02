@@ -1,40 +1,20 @@
 {
   "id": "ef_bonus_005",
-  "version": 1,
+  "version": 2,
   "type": "bonus",
-  "title": "Tutoring Younger Kids",
-  "description": "You helped some Year 7s with maths and earned \u00a325 from their parents.",
-  "weeklyIncomePounds": 120,
+  "title": "Sold Old Stuff",
+  "description": "You sold some old books and games online for £15.",
+  "weeklyIncomePounds": 60,
   "costPounds": 0,
-  "bonusPounds": 25,
+  "bonusPounds": 15,
   "choices": [
-    {
-      "label": "Save all \u00a3145",
-      "savePounds": 145,
-      "flavourText": "Brain power = saving power."
-    },
-    {
-      "label": "Save \u00a372",
-      "savePounds": 72,
-      "flavourText": "Some for treats, rest for the fund."
-    },
-    {
-      "label": "Spend the extra",
-      "savePounds": 120,
-      "flavourText": "Teaching money went fast."
-    }
+    { "label": "Add to fund", "savePounds": 0, "flavourText": "Declutter and save!" },
+    { "label": "Keep in bank", "savePounds": 0, "flavourText": "Nice little earner." }
   ],
-  "duckEmotion": "excited",
-  "duckLine": "Smart and earning!",
+  "duckEmotion": "happy",
+  "duckLine": "One person's trash...",
   "difficulty": "easy",
-  "tags": [
-    "work",
-    "bonus",
-    "school"
-  ],
-  "ageRangeMin": 14,
-  "ageRangeMax": 18,
-  "currencyCode": "GBP",
-  "author": "content-team",
-  "notes": ""
+  "tags": ["selling", "bonus"],
+  "ageRangeMin": 12, "ageRangeMax": 18,
+  "currencyCode": "GBP", "author": "content-team", "notes": ""
 }

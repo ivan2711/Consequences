@@ -1,40 +1,20 @@
 {
   "id": "ef_bonus_001",
-  "version": 1,
+  "version": 2,
   "type": "bonus",
-  "title": "Extra Shifts",
-  "description": "You picked up extra shifts at your weekend job. That's an extra \u00a380 on top of your usual.",
-  "weeklyIncomePounds": 120,
+  "title": "Birthday Money",
+  "description": "Grandma sent you £20 for your birthday!",
+  "weeklyIncomePounds": 60,
   "costPounds": 0,
-  "bonusPounds": 80,
+  "bonusPounds": 20,
   "choices": [
-    {
-      "label": "Save all \u00a3200",
-      "savePounds": 200,
-      "flavourText": "Massive boost to your fund."
-    },
-    {
-      "label": "Save \u00a3100",
-      "savePounds": 100,
-      "flavourText": "Half saved, half enjoyed."
-    },
-    {
-      "label": "Spend the bonus",
-      "savePounds": 120,
-      "flavourText": "You saved your usual but spent the extra."
-    }
+    { "label": "Add to fund", "savePounds": 0, "flavourText": "Fund boosted!" },
+    { "label": "Keep in bank", "savePounds": 0, "flavourText": "Kept it for spending." }
   ],
-  "duckEmotion": "excited",
-  "duckLine": "Extra cash!",
+  "duckEmotion": "celebrating",
+  "duckLine": "Happy birthday!",
   "difficulty": "easy",
-  "tags": [
-    "work",
-    "bonus",
-    "save"
-  ],
-  "ageRangeMin": 14,
-  "ageRangeMax": 18,
-  "currencyCode": "GBP",
-  "author": "content-team",
-  "notes": "Part-time job bonus \u2014 age 14+ for realism."
+  "tags": ["gift", "bonus"],
+  "ageRangeMin": 12, "ageRangeMax": 18,
+  "currencyCode": "GBP", "author": "content-team", "notes": ""
 }

@@ -1,40 +1,20 @@
 {
   "id": "ef_bonus_004",
-  "version": 1,
+  "version": 2,
   "type": "bonus",
-  "title": "Dog Walking Money",
-  "description": "You walked the neighbour's dog all week. They gave you \u00a320.",
-  "weeklyIncomePounds": 120,
+  "title": "Extra Shift",
+  "description": "You picked up an extra shift at your weekend job. That's £25 extra.",
+  "weeklyIncomePounds": 60,
   "costPounds": 0,
-  "bonusPounds": 20,
+  "bonusPounds": 25,
   "choices": [
-    {
-      "label": "Save all \u00a3140",
-      "savePounds": 140,
-      "flavourText": "Good boy \u2014 and good saving."
-    },
-    {
-      "label": "Save \u00a370",
-      "savePounds": 70,
-      "flavourText": "Half for you, half for the fund."
-    },
-    {
-      "label": "Spend the extra",
-      "savePounds": 120,
-      "flavourText": "Dog money spent, regular savings kept."
-    }
+    { "label": "Add to fund", "savePounds": 0, "flavourText": "Big boost to savings!" },
+    { "label": "Keep in bank", "savePounds": 0, "flavourText": "Kept the extra for later." }
   ],
-  "duckEmotion": "happy",
-  "duckLine": "Woof woof!",
+  "duckEmotion": "celebrating",
+  "duckLine": "Extra cash!",
   "difficulty": "easy",
-  "tags": [
-    "work",
-    "bonus",
-    "animals"
-  ],
-  "ageRangeMin": 12,
-  "ageRangeMax": 18,
-  "currencyCode": "GBP",
-  "author": "content-team",
-  "notes": ""
+  "tags": ["work", "bonus"],
+  "ageRangeMin": 14, "ageRangeMax": 18,
+  "currencyCode": "GBP", "author": "content-team", "notes": ""
 }

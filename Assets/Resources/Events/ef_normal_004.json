@@ -1,39 +1,20 @@
 {
   "id": "ef_normal_004",
-  "version": 1,
+  "version": 2,
   "type": "normal",
-  "title": "Regular Week",
-  "description": "School, home, repeat. You've got your \u00a3120 \u2014 what's the plan?",
-  "weeklyIncomePounds": 120,
+  "title": "Chill Week",
+  "description": "Stayed in, cooked at home, and kept costs low.",
+  "weeklyIncomePounds": 60,
   "costPounds": 0,
   "bonusPounds": 0,
   "choices": [
-    {
-      "label": "Save everything",
-      "savePounds": 120,
-      "flavourText": "Discipline pays off."
-    },
-    {
-      "label": "Save \u00a340",
-      "savePounds": 40,
-      "flavourText": "A little bit adds up."
-    },
-    {
-      "label": "Spend it all",
-      "savePounds": 0,
-      "flavourText": "Maybe next week."
-    }
+    { "label": "Smart move", "savePounds": 0, "flavourText": "Homemade meals save money." },
+    { "label": "Next week", "savePounds": 0, "flavourText": "Quiet weeks build the habit." }
   ],
-  "duckEmotion": "neutral",
-  "duckLine": "Same old, same old.",
+  "duckEmotion": "happy",
+  "duckLine": "Saving energy too!",
   "difficulty": "easy",
-  "tags": [
-    "save",
-    "routine"
-  ],
-  "ageRangeMin": 12,
-  "ageRangeMax": 18,
-  "currencyCode": "GBP",
-  "author": "content-team",
-  "notes": "Standard week with a lower middle option."
+  "tags": ["routine", "frugal"],
+  "ageRangeMin": 12, "ageRangeMax": 18,
+  "currencyCode": "GBP", "author": "content-team", "notes": ""
 }

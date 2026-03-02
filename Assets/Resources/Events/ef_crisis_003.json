@@ -1,35 +1,20 @@
 {
   "id": "ef_crisis_003",
-  "version": 1,
+  "version": 2,
   "type": "crisis",
-  "title": "School Trip and New Shoes",
-  "description": "There's a \u00a330 school trip next week AND your trainers have holes. New trainers: \u00a335.",
-  "weeklyIncomePounds": 120,
-  "costPounds": 65,
+  "title": "Laptop Broke",
+  "description": "Your laptop stopped working. Repair costs £40.",
+  "weeklyIncomePounds": 60,
+  "costPounds": 40,
   "bonusPounds": 0,
   "choices": [
-    {
-      "label": "Pay for both",
-      "savePounds": 55,
-      "flavourText": "Tight week but both sorted."
-    },
-    {
-      "label": "Just the shoes",
-      "savePounds": 85,
-      "flavourText": "Shoes are essential \u2014 trip can wait."
-    }
+    { "label": "Repair it (£40)", "savePounds": 40, "flavourText": "Need it for coursework." },
+    { "label": "Use school PCs", "savePounds": 0, "flavourText": "Inconvenient but free." }
   ],
-  "duckEmotion": "worried",
-  "duckLine": "Priorities...",
+  "duckEmotion": "shocked",
+  "duckLine": "Not the laptop!",
   "difficulty": "hard",
-  "tags": [
-    "school",
-    "clothing",
-    "unexpected"
-  ],
-  "ageRangeMin": 12,
-  "ageRangeMax": 18,
-  "currencyCode": "GBP",
-  "author": "content-team",
-  "notes": ""
+  "tags": ["tech", "repair", "school"],
+  "ageRangeMin": 12, "ageRangeMax": 18,
+  "currencyCode": "GBP", "author": "content-team", "notes": ""
 }

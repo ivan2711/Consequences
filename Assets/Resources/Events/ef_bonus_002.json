@@ -1,40 +1,20 @@
 {
   "id": "ef_bonus_002",
-  "version": 1,
+  "version": 2,
   "type": "bonus",
-  "title": "Car Boot Sale",
-  "description": "You sold some old clothes and games at a car boot sale and made \u00a340.",
-  "weeklyIncomePounds": 120,
+  "title": "Car Wash Job",
+  "description": "You helped a neighbour wash their car and earned £10.",
+  "weeklyIncomePounds": 60,
   "costPounds": 0,
-  "bonusPounds": 40,
+  "bonusPounds": 10,
   "choices": [
-    {
-      "label": "Save all \u00a3160",
-      "savePounds": 160,
-      "flavourText": "Decluttered and saved \u2014 win-win."
-    },
-    {
-      "label": "Save \u00a380",
-      "savePounds": 80,
-      "flavourText": "Some saved, some spent."
-    },
-    {
-      "label": "Spend it all",
-      "savePounds": 0,
-      "flavourText": "Easy come, easy go."
-    }
+    { "label": "Add to fund", "savePounds": 0, "flavourText": "Every bit counts!" },
+    { "label": "Keep in bank", "savePounds": 0, "flavourText": "Pocket money earned." }
   ],
-  "duckEmotion": "happy",
-  "duckLine": "Nice haul!",
+  "duckEmotion": "excited",
+  "duckLine": "Hard work pays!",
   "difficulty": "easy",
-  "tags": [
-    "bonus",
-    "selling",
-    "declutter"
-  ],
-  "ageRangeMin": 12,
-  "ageRangeMax": 18,
-  "currencyCode": "GBP",
-  "author": "content-team",
-  "notes": "Entrepreneurial scenario \u2014 all ages."
+  "tags": ["work", "bonus"],
+  "ageRangeMin": 12, "ageRangeMax": 18,
+  "currencyCode": "GBP", "author": "content-team", "notes": ""
 }
