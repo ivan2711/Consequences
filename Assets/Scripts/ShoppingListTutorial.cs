@@ -8,11 +8,7 @@ public class ShoppingListTutorial : MonoBehaviour
     
     void Start()
     {
-        // Show tutorial on start
-        if (tutorialPanel != null)
-        {
-            tutorialPanel.SetActive(true);
-        }
+        // Don't auto-show — SpendingGameController.StartRound(1) handles showing the tutorial
     }
     
     public void CloseTutorial()
@@ -20,6 +16,14 @@ public class ShoppingListTutorial : MonoBehaviour
         if (tutorialPanel != null)
         {
             tutorialPanel.SetActive(false);
+        }
+    }
+
+    public void ShowTutorial()
+    {
+        if (tutorialPanel != null)
+        {
+            tutorialPanel.SetActive(true);
         }
     }
 }

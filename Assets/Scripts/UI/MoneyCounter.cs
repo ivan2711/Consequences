@@ -82,11 +82,11 @@ private void UpdateDisplay()
             // Show negative values when over budget
             if (remaining < 0)
             {
-                budgetText.text = $"Remaining: -£{Mathf.Abs(remaining):F2}";
+                budgetText.text = $"Remaining Budget: -£{Mathf.Abs(remaining):F2}";
             }
             else
             {
-                budgetText.text = $"Remaining: £{remaining:F2}";
+                budgetText.text = $"Remaining Budget: £{remaining:F2}";
             }
         }
         

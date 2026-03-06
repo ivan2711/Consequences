@@ -45,8 +45,17 @@ namespace FinancialLiteracy.UI
         public void ShowFeedbackPanel(string title, string message, string totalSpent)
         {
             if (feedbackPanel == null) return;
-            
+
             feedbackPanel.SetActive(true);
+            feedbackPanel.transform.SetAsLastSibling();
+
+            CanvasGroup cg = feedbackPanel.GetComponent<CanvasGroup>();
+            if (cg != null)
+            {
+                cg.alpha = 1f;
+                cg.blocksRaycasts = true;
+                cg.interactable = true;
+            }
             
             if (feedbackTitleText != null)
                 feedbackTitleText.text = title;

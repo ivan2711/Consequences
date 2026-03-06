@@ -18,6 +18,8 @@ public class DuckReaction : MonoBehaviour
     public TextMeshProUGUI duckMessage;
     public CanvasGroup canvasGroup;
     
+    private float _originalMessageFontSize = -1f;
+
     // Classic rubber duck colors
     private readonly Color rubberDuckYellow = new Color(1f, 0.85f, 0f);
     private readonly Color beakOrange = new Color(1f, 0.6f, 0f);
@@ -178,7 +180,10 @@ private void Start()
         // Update message
         if (duckMessage != null)
         {
+            if (_originalMessageFontSize < 0)
+                _originalMessageFontSize = duckMessage.fontSize;
             duckMessage.text = message;
+            duckMessage.fontSize = _originalMessageFontSize - 2;
         }
     }
     
