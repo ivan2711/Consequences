@@ -32,6 +32,7 @@ public class SpendingGameController : MonoBehaviour
     public GameObject feedbackPanel;
     public TMP_Text totalText;
     public TMP_Text feedbackText;
+    public TMP_Text scorecardText;
 
     [Header("Round UI")]
     public TextMeshProUGUI roundText;
@@ -68,12 +69,20 @@ public class SpendingGameController : MonoBehaviour
 
     private float[] _roundTotals = new float[3];
     private int[] _roundStars = new int[3];
+    private int[] _roundEssentials = new int[3];
+    private int[] _roundTreats = new int[3];
     private bool _hasLoggedThisRound = false;
     private bool _suppressToggleReaction = false;
     private bool _roundInProgress = false; // true while player is shopping, false after Check Out
     private int _roundsCompleted = 0; // only increments — used by AdvanceRound to determine next round
 
     // ==================== LIFECYCLE ====================
+
+    private void OnDestroy()
+    {
+        currentRound = 0;
+        _roundsCompleted = 0;
+    }
 
     private void Start()
     {
@@ -387,31 +396,31 @@ public class SpendingGameController : MonoBehaviour
         // Store round results
         _roundTotals[currentRound - 1] = total;
         _roundStars[currentRound - 1] = stars;
+        _roundEssentials[currentRound - 1] = necessaryCount;
+        _roundTreats[currentRound - 1] = unnecessaryCount;
         _roundsCompleted++;
+
+        // Show stars
+        if (starRating != null)
+        {
+            starRating.gameObject.SetActive(true);
+            starRating.SetRating(stars);
+        }
         Debug.Log("[Spending] Round " + currentRound + " completed. Total rounds completed: " + _roundsCompleted);
 
         // Duck reaction
         ShowDuckFeedback(total, unnecessaryCount, necessaryCount);
 
-        // Build feedback text
-        string feedback = BuildFeedback(total, unnecessaryCount, necessaryCount);
-
+        // Scorecard at top, commentary in body
+        if (scorecardText != null)
+            scorecardText.text = BuildScorecard(total, unnecessaryCount, necessaryCount);
         if (feedbackText != null)
-            feedbackText.text = feedback;
+            feedbackText.text = BuildCommentary(total, unnecessaryCount, necessaryCount);
 
         if (totalText != null)
         {
+            totalText.gameObject.SetActive(true);
             totalText.text = string.Format("Total: \u00a3{0:F2}", total);
-
-            // Nudge total text 10% up and 10% left
-            RectTransform trt = totalText.GetComponent<RectTransform>();
-            if (trt != null)
-            {
-                RectTransform parentRT = trt.parent as RectTransform;
-                float parentW = parentRT != null ? parentRT.rect.width : 0f;
-                float parentH = parentRT != null ? parentRT.rect.height : 0f;
-                trt.anchoredPosition += new Vector2(-parentW * 0.10f, parentH * 0.10f);
-            }
         }
 
         // Show feedback panel (NO consequence panel yet — save for final)
@@ -454,7 +463,7 @@ public class SpendingGameController : MonoBehaviour
         if (uiManager != null)
         {
             string title = total <= weeklyBudgetPounds ? "Good Job!" : "Over Budget";
-            uiManager.ShowFeedbackPanel(title, feedback, string.Format("Total: \u00a3{0:F2}", total));
+            uiManager.ShowFeedbackPanel(title, BuildCommentary(total, unnecessaryCount, necessaryCount), string.Format("Total: \u00a3{0:F2}", total));
         }
     }
 
@@ -525,38 +534,25 @@ public class SpendingGameController : MonoBehaviour
                 duckReaction.ShowReaction(DuckReaction.Emotion.Thinking, "Try again!");
         }
 
-        // Show consequence panel with combined results
-        if (consequencePanel != null)
-        {
-            consequencePanel.ShowFinalConsequences(totalSaved, totalOverspent, overallStars);
-        }
+        // Hide per-round text elements — ConsequencePanel handles the full breakdown
+        if (totalText != null)
+            totalText.gameObject.SetActive(false);
+        if (feedbackText != null)
+            feedbackText.gameObject.SetActive(false);
+        if (scorecardText != null)
+            scorecardText.gameObject.SetActive(false);
 
-        // Show summary in feedback text
-        string summary = "3-Week Summary\n\n";
+        // Show consequence panel with combined results
+        int roundsAllEssentials = 0;
+        int totalTreats = 0;
         for (int i = 0; i < TotalRounds; i++)
         {
-            string status = _roundTotals[i] <= RoundBudgets[i] ? "Under budget" : "Over budget";
-            float diff = Mathf.Abs(_roundTotals[i] - RoundBudgets[i]);
-            summary += RoundNames[i] + ": \u00a3" + _roundTotals[i].ToString("F2")
-                + " / \u00a3" + RoundBudgets[i].ToString("F2")
-                + " (" + status;
-            if (diff > 0.01f)
-                summary += " by \u00a3" + diff.ToString("F2");
-            summary += ")\n";
+            if (_roundEssentials[i] >= 4) roundsAllEssentials++;
+            totalTreats += _roundTreats[i];
         }
 
-        summary += "\n";
-        if (totalSaved > 0 && totalOverspent == 0)
-            summary += "You saved \u00a3" + totalSaved.ToString("F2") + " across all 3 weeks. Your family is in great shape!";
-        else if (totalSaved > 0 && totalOverspent > 0)
-            summary += "Saved \u00a3" + totalSaved.ToString("F2") + " but overspent \u00a3" + totalOverspent.ToString("F2") + " in other weeks. Try to stay under budget every week!";
-        else if (totalOverspent > 0)
-            summary += "Overspent \u00a3" + totalOverspent.ToString("F2") + " total. Remember, you can't spend money you don't have!";
-        else
-            summary += "You spent exactly your budget each week. Try saving a little for a rainy day!";
-
-        if (feedbackText != null)
-            feedbackText.text = summary;
+        if (consequencePanel != null)
+            consequencePanel.ShowFinalConsequences(totalSaved, totalOverspent, overallStars, roundsAllEssentials, totalTreats);
 
         if (roundText != null)
             roundText.text = "Season Complete!";
@@ -589,7 +585,7 @@ public class SpendingGameController : MonoBehaviour
         }
 
         if (uiManager != null)
-            uiManager.ShowFeedbackPanel("Season Complete!", summary, "");
+            uiManager.ShowFeedbackPanel("Season Complete!", "", "");
     }
 
     // ==================== DUCK FEEDBACK ====================
@@ -663,69 +659,95 @@ public class SpendingGameController : MonoBehaviour
 
     private int CalculateStars(float total, int unnecessaryCount, int necessaryCount)
     {
+        bool allEssentials = necessaryCount >= 4;
+        bool withinBudget = total <= weeklyBudgetPounds;
+
         if (GameSettings.CalmMode)
         {
-            if (total <= weeklyBudgetPounds && unnecessaryCount <= 1)
-                return 3;
-            if (total <= weeklyBudgetPounds)
-                return 2;
-            if (total <= weeklyBudgetPounds + 3)
-                return 1;
+            if (allEssentials && withinBudget) return 3;
+            if (allEssentials && total <= weeklyBudgetPounds + 2f) return 2;
+            if (necessaryCount >= 3 && withinBudget) return 1;
             return 0;
         }
 
-        if (total <= weeklyBudgetPounds && unnecessaryCount == 0 && necessaryCount >= 4)
-            return 3;
-        if (total <= weeklyBudgetPounds && unnecessaryCount <= 2)
-            return 2;
-        if (total <= weeklyBudgetPounds + 2 || (unnecessaryCount >= 3 && total <= weeklyBudgetPounds))
-            return 1;
+        // Essentials first: saving money while going hungry scores poorly
+        if (allEssentials && withinBudget && unnecessaryCount <= 1) return 3;
+        if (allEssentials && withinBudget) return 2;
+        if ((allEssentials && total <= weeklyBudgetPounds + 2f) ||
+            (necessaryCount >= 3 && withinBudget)) return 1;
         return 0;
     }
 
-    private string BuildFeedback(float total, int unnecessaryCount, int necessaryCount)
+    private string BuildScorecard(float total, int unnecessaryCount, int necessaryCount)
+    {
+        int missingEssentials = 4 - necessaryCount;
+        bool allEssentials = missingEssentials <= 0;
+        bool withinBudget = total <= weeklyBudgetPounds;
+        float remaining = weeklyBudgetPounds - total;
+        float over = total - weeklyBudgetPounds;
+
+        string header = "Round " + currentRound + " of " + TotalRounds
+                      + "  |  " + RoundNames[currentRound - 1]
+                      + "  |  Budget: \u00a3" + weeklyBudgetPounds.ToString("F2") + "\n";
+
+        string essLine = allEssentials
+            ? "Essentials: All 4 covered"
+            : "Essentials: " + necessaryCount + " / 4 covered";
+        string treatLine = unnecessaryCount == 0 ? "Treats: None"
+            : unnecessaryCount == 1              ? "Treats: 1"
+                                                 : "Treats: " + unnecessaryCount;
+        string budgetLine = withinBudget
+            ? string.Format("Budget: \u00a3{0:F2} spent  (saved \u00a3{1:F2})", total, remaining)
+            : string.Format("Budget: \u00a3{0:F2} spent  (over by \u00a3{1:F2})", total, over);
+
+        return header + essLine + "     " + treatLine + "     " + budgetLine;
+    }
+
+    private string BuildCommentary(float total, int unnecessaryCount, int necessaryCount)
     {
         if (total == 0)
-            return "Nothing in your basket!\n\nYour family needs essentials like milk, eggs, and vegetables to get through the week.";
+            return "Nothing in your basket! Your family needs essentials like milk, eggs, and vegetables.";
 
-        string header = "Round " + currentRound + ": " + RoundNames[currentRound - 1] + "\n";
-        float remaining = weeklyBudgetPounds - total;
         int missingEssentials = 4 - necessaryCount;
+        bool allEssentials = missingEssentials <= 0;
+        bool withinBudget = total <= weeklyBudgetPounds;
+        float remaining = weeklyBudgetPounds - total;
+        float over = total - weeklyBudgetPounds;
+        bool calm = GameSettings.CalmMode;
 
-        if (total <= weeklyBudgetPounds)
+        if (!allEssentials && !withinBudget)
         {
-            if (necessaryCount == 4 && unnecessaryCount == 0)
-                return header + string.Format(
-                    "Spent: \u00a3{0:F2} of \u00a3{1:F2}  (Saved: \u00a3{2:F2})\n\n" +
-                    "All essentials bought -- your family has everything they need this week. Saving the rest is a smart choice.",
-                    total, weeklyBudgetPounds, remaining);
-            if (necessaryCount == 4 && unnecessaryCount == 1)
-                return header + string.Format(
-                    "Spent: \u00a3{0:F2} of \u00a3{1:F2}\n\n" +
-                    "All essentials plus one treat -- great balance! Your family is fed and you stayed within budget.",
-                    total, weeklyBudgetPounds);
-            if (unnecessaryCount > 1)
-                return header + string.Format(
-                    "Spent: \u00a3{0:F2} of \u00a3{1:F2}\n\n" +
-                    "You picked {2} treats. Try to stick to just one -- treats are fun but essentials come first.",
-                    total, weeklyBudgetPounds, unnecessaryCount);
-            if (missingEssentials > 0)
-                return header + string.Format(
-                    "Spent: \u00a3{0:F2} of \u00a3{1:F2}\n\n" +
-                    "You're missing {2} essential(s). Without basics like milk, eggs, or rice your family won't have enough food this week.",
-                    total, weeklyBudgetPounds, missingEssentials);
+            return missingEssentials == 1
+                ? "Missing 1 essential and over budget. Swap a treat for that last item to sort both problems."
+                : "Missing " + missingEssentials + " essentials and over budget. Focus on the basics first.";
         }
 
-        float over = total - weeklyBudgetPounds;
-        if (missingEssentials > 0)
-            return header + string.Format(
-                "Spent: \u00a3{0:F2} of \u00a3{1:F2}\n\n" +
-                "Over budget by \u00a3{2:F2} and missing {3} essential(s). Focus on what your family needs before adding treats.",
-                total, weeklyBudgetPounds, over, missingEssentials);
-        return header + string.Format(
-            "Spent: \u00a3{0:F2} of \u00a3{1:F2}\n\n" +
-            "Over budget by \u00a3{2:F2}! You can't spend more than you have. Try removing some treats to get back on track.",
-            total, weeklyBudgetPounds, over);
+        if (!allEssentials)
+        {
+            if (missingEssentials == 1)
+                return calm
+                    ? "Almost there \u2014 just 1 essential missing. Try to grab all 4 next time."
+                    : "So close! Just 1 essential short. Swap a treat for it and you\u2019d have a perfect week.";
+            return calm
+                ? "Missing " + missingEssentials + " essentials. Essentials keep your family healthy \u2014 prioritise those first."
+                : "Missing " + missingEssentials + " essentials. Without the basics your family won\u2019t have enough \u2014 add those before treats.";
+        }
+
+        if (!withinBudget)
+            return calm
+                ? "All essentials covered, but a little over budget. Try removing a treat."
+                : "All the essentials are there, but over budget by \u00a3" + over.ToString("F2") + ". "
+                  + (unnecessaryCount > 0 ? "Remove a treat to get back on track." : "Check what pushed you over.");
+
+        if (unnecessaryCount > 2)
+            return calm
+                ? "Within budget, but quite a few treats. Try swapping one for savings."
+                : unnecessaryCount + " treats is a lot. You\u2019re within budget, but one treat is plenty \u2014 the rest is wasted money.";
+
+        if (unnecessaryCount == 1)
+            return "All essentials, one treat, within budget \u2014 great balance!";
+
+        return string.Format("All 4 essentials and \u00a3{0:F2} saved. Excellent week!", remaining);
     }
 
     // ==================== LEGACY / PUBLIC ====================
@@ -763,6 +785,8 @@ public class SpendingGameController : MonoBehaviour
         _roundsCompleted = 0;
         _roundTotals = new float[3];
         _roundStars = new int[3];
+        _roundEssentials = new int[3];
+        _roundTreats = new int[3];
         _hasLoggedThisRound = false;
 
         _suppressToggleReaction = true;
@@ -786,6 +810,16 @@ public class SpendingGameController : MonoBehaviour
 
         if (feedbackPanel != null)
             feedbackPanel.SetActive(false);
+
+        // Hide consequence panel and re-enable text elements hidden during final view
+        if (consequencePanel != null)
+            consequencePanel.gameObject.SetActive(false);
+        if (feedbackText != null)
+            feedbackText.gameObject.SetActive(true);
+        if (scorecardText != null)
+            scorecardText.gameObject.SetActive(true);
+        if (totalText != null)
+            totalText.gameObject.SetActive(true);
 
         StartRound(1);
         Debug.Log("[Spending] Game reset!");
@@ -813,9 +847,12 @@ public class SpendingGameController : MonoBehaviour
                 string n = t.gameObject.name.ToLower();
                 if (n.Contains("title") && !n.Contains("star"))
                 {
-                    t.color = new Color(1f, 0.85f, 0.2f);
-                    t.fontSize = 44;
-                    t.fontStyle = FontStyles.Bold;
+                    t.color = Color.white;
+                    t.fontSize = 36;
+                    t.fontStyle = FontStyles.Normal;
+                    t.alignment = TextAlignmentOptions.TopLeft;
+                    if (scorecardText == null)
+                        scorecardText = t;
                 }
                 else if (n.Contains("message") || (n.Contains("feedback") && !n.Contains("title")))
                 {
@@ -852,10 +889,13 @@ public class SpendingGameController : MonoBehaviour
 
             EnlargePanelButtons(btns);
 
-            // Hide StarRatingPanel — stars not used
-            Transform starPanel = feedbackPanel.transform.Find("StarRatingPanel");
-            if (starPanel != null)
-                starPanel.gameObject.SetActive(false);
+            // Auto-wire starRating if not set in Inspector
+            if (starRating == null)
+            {
+                Transform starPanel = feedbackPanel.transform.Find("StarRatingPanel");
+                if (starPanel != null)
+                    starRating = starPanel.GetComponent<StarRating>();
+            }
 
             Debug.Log("[Spending] FeedbackPanel setup done. feedbackText=" + (feedbackText != null) + " totalText=" + (totalText != null));
         }

@@ -127,81 +127,123 @@ public void ShowConsequences(float totalSpent, float budget, float saved, bool h
         }
     }
 
-    public void ShowFinalConsequences(float totalSaved, float totalOverspent, int overallStars)
+    public void ShowFinalConsequences(float totalSaved, float totalOverspent, int overallStars,
+                                       int roundsAllEssentials = 3, int totalTreats = 0)
     {
         bool calm = GameSettings.CalmMode;
-        bool netPositive = totalSaved > totalOverspent;
-        float netAmount = netPositive ? totalSaved - totalOverspent : totalOverspent - totalSaved;
+        bool fedAllRounds = roundsAllEssentials == 3;
+        bool withinBudgetOverall = totalOverspent == 0f;
+        float monthlySavings = totalSaved * 4f / 3f;
+        float monthlyDebt = totalOverspent * 4f / 3f;
 
         // Ensure panel background is solid
         Image panelBg = GetComponent<Image>();
         if (panelBg != null)
             panelBg.color = new Color(0.10f, 0.12f, 0.20f, 1f);
 
-        // Title
+        // Title — driven by essentials coverage first, then overall stars
         if (titleText != null)
         {
             titleText.fontSize = 44;
             titleText.fontStyle = FontStyles.Bold;
-            if (calm)
+            if (!fedAllRounds && overallStars <= 1)
             {
-                titleText.text = "Your 3-Week Journey";
-                titleText.color = goodColor;
+                titleText.text = calm ? "Let's Try Again" : "Essentials Missed";
+                titleText.color = badColor;
             }
-            else
+            else if (!fedAllRounds)
             {
-                titleText.text = netPositive ? "Great Financial Habits!" : "Financial Consequences";
-                titleText.color = netPositive ? goodColor : badColor;
+                titleText.text = calm ? "Room to Improve" : "Needs Improvement";
+                titleText.color = Color.yellow;
             }
+            else if (overallStars >= 3) { titleText.text = calm ? "Your 3-Week Journey" : "Excellent Shopping!"; titleText.color = goodColor; }
+            else if (overallStars == 2) { titleText.text = calm ? "Your 3-Week Journey" : "Good Effort!";        titleText.color = goodColor; }
+            else if (overallStars == 1) { titleText.text = calm ? "Room to Improve"     : "Some Issues";         titleText.color = Color.yellow; }
+            else                        { titleText.text = calm ? "Let's Try Again"      : "Needs Work";          titleText.color = badColor; }
         }
 
-        // Future projection based on 3 weeks combined
+        // Scorecard + projection
         if (futureText != null)
         {
-            futureText.fontSize = 44;
+            futureText.fontSize = 38;
             futureText.color = Color.white;
-            string future = "";
 
-            if (netPositive && totalSaved > 0)
-            {
-                float monthlySavings = totalSaved * 4f / 3f; // weekly average × 4
-                future = "<b>Over 3 Weeks:</b>\n\n";
-                future += $"You saved \u00a3{totalSaved:F2} total!\n\n";
-                future += "<b>At This Rate (1 Year):</b>\n";
-                future += $"Potential Savings: \u00a3{(monthlySavings * 12):F2}\n";
-                future += "That could buy something amazing!";
-            }
-            else if (totalOverspent > 0)
-            {
-                float monthlyDebt = totalOverspent * 4f / 3f;
-                if (calm)
-                {
-                    future = "<b>Over 3 Weeks:</b>\n\n";
-                    future += $"You overspent by \u00a3{totalOverspent:F2}.\n";
-                    future += "That's okay \u2014 now you know!\n\n";
-                    future += "<b>Next Time:</b>\n";
-                    future += "Try sticking to essentials first.\n";
-                    future += "Small changes add up!";
-                }
-                else
-                {
-                    future = "<b>Over 3 Weeks:</b>\n\n";
-                    future += $"Overspent: \u00a3{totalOverspent:F2}\n\n";
-                    future += "<b>At This Rate (1 Year):</b>\n";
-                    future += $"Potential Debt: \u00a3{(monthlyDebt * 12):F2}\n";
-                    future += "That adds up quickly!";
-                }
-            }
+            string good  = "<color=#88FF88>";
+            string bad   = "<color=#FF8888>";
+            string warn  = "<color=#FFDD44>";
+            string end   = "</color>";
+
+            float avgTreats = totalTreats / 3f;
+            bool overTreated = avgTreats > 2f;
+            bool modTreated  = avgTreats > 1f;
+
+            // --- Criterion 1: Essentials ---
+            string essLine = fedAllRounds
+                ? $"{good}Essentials: All 4 covered every week{end}"
+                : $"{bad}Essentials: Only {roundsAllEssentials}/3 weeks fully covered{end}";
+
+            // --- Criterion 2: Treats ---
+            string treatLine;
+            if (avgTreats <= 1f)
+                treatLine = $"{good}Treats: Well balanced ({totalTreats} total){end}";
+            else if (avgTreats <= 2f)
+                treatLine = $"{warn}Treats: A few too many ({totalTreats} total) \u2014 try cutting back{end}";
             else
+                treatLine = $"{bad}Treats: Too many ({totalTreats} total) \u2014 they eat into your budget{end}";
+
+            // --- Criterion 3: Budget ---
+            string budgetLine;
+            if (withinBudgetOverall && totalSaved > 0)
+                budgetLine = $"{good}Budget: Within budget all 3 weeks, saved \u00a3{totalSaved:F2}{end}";
+            else if (withinBudgetOverall)
+                budgetLine = $"{good}Budget: Within budget every week{end}";
+            else if (totalOverspent > 0 && totalSaved > 0)
+                budgetLine = $"{warn}Budget: Overspent \u00a3{totalOverspent:F2} some weeks, saved \u00a3{totalSaved:F2} others{end}";
+            else
+                budgetLine = $"{bad}Budget: Overspent \u00a3{totalOverspent:F2} across 3 weeks{end}";
+
+            // --- Narrative consequence (all criteria combined) ---
+            string narrative;
+            if (!fedAllRounds && totalOverspent > 0)
+                narrative = calm
+                    ? "Some essentials were missed and you went over budget. Focus on needs first, then see what's left."
+                    : "Missing essentials AND overspending is a serious problem. Essentials come before treats — always.";
+            else if (!fedAllRounds && overTreated)
+                narrative = calm
+                    ? "Some essentials were skipped while spending on treats. Swap a treat for a need first."
+                    : "Spending on treats while skipping essentials gets priorities backwards. Needs before wants.";
+            else if (!fedAllRounds)
+                narrative = calm
+                    ? "You stayed in budget, but skipped some essentials. Saving only works if basic needs are met first."
+                    : "Cutting essentials to save money isn't a win — your household still needs those basics every week.";
+            else if (fedAllRounds && totalOverspent > 0 && overTreated)
+                narrative = calm
+                    ? "Essentials covered, but treats pushed you over budget. Picking one treat per week keeps things balanced."
+                    : "All essentials covered, but too many treats pushed you into debt. Stick to one treat and keep the rest.";
+            else if (fedAllRounds && totalOverspent > 0)
+                narrative = calm
+                    ? "Essentials covered every week, but you went a little over budget. You're close \u2014 a small swap would fix it."
+                    : "Essentials covered but over budget. Check what tipped you over and cut there next time.";
+            else if (fedAllRounds && totalSaved == 0f)
+                narrative = calm
+                    ? "Essentials covered and no debt \u2014 that's a solid start. Even \u00a31 saved each week adds up over time."
+                    : "All essentials covered and no debt. Try setting aside a small amount each week \u2014 it builds up fast.";
+            else
+                narrative = calm
+                    ? "Well done \u2014 all essentials covered and money saved. That's exactly what good budgeting looks like."
+                    : "Essentials covered, under budget, and money saved. That's genuine financial progress.";
+
+            // --- Projection (standard mode only) ---
+            string projection = "";
+            if (!calm)
             {
-                future = "<b>Over 3 Weeks:</b>\n\n";
-                future += "You broke even \u2014 spent exactly your budget.\n\n";
-                future += calm
-                    ? "Even \u00a31 saved each week adds up!"
-                    : "Try saving a little next time!";
+                if (totalSaved > 0 && totalOverspent == 0f)
+                    projection = $"\n<b>At this rate (1 year):</b>\nPotential savings: \u00a3{(monthlySavings * 12):F2}";
+                else if (totalOverspent > 0 && totalSaved == 0f)
+                    projection = $"\n<b>At this rate (1 year):</b>\nPotential debt: \u00a3{(monthlyDebt * 12):F2}";
             }
 
-            futureText.text = future;
+            futureText.text = $"<b>3-Week Scorecard:</b>\n\n{essLine}\n{treatLine}\n{budgetLine}\n\n{narrative}{projection}";
         }
 
         // Savings bar

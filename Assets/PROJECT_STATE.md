@@ -1,5 +1,5 @@
 # Consequences — Project State
-> Last updated: 2026-03-15
+> Last updated: 2026-03-16
 > Author: Ivan Murtov | UCL CS | Supervised by Prof. Dean Mohamedally | Client: MotionInput Games Ltd
 
 ---
@@ -11,15 +11,18 @@
 **Mini-game 1 — Spending Game (Shopping List)**
 - 3 rounds, weekly grocery budget (Round 1: £8.50, Round 2: £7.50 tight, Round 3: £12.00 payday)
 - 8 base items + 5 extras in round 3; player toggles what to buy (needs vs wants)
-- End-of-round: feedback panel → consequence panel (1-month / 1-year projection) → star rating
-- 3 stars = saved money + no debt; 2 = no debt; 1 = any savings; 0 = otherwise
+- End-of-round: feedback panel → star rating
+- Final: ConsequencePanel shows 3-week scorecard (essentials / treats / budget) with narrative
+- 3 stars = saved money + all essentials; 2 = no debt; 1 = any savings; 0 = otherwise
+- Records to PlayerModelService each round
 
 **Mini-game 2 — Emergency Fund (6 Weeks)**
 - Each week: £100 income − £40 essentials = £60 available; player picks saving tier (£20 / £30 / £40)
 - Random JSON event each week (type driven by week number): normal, choice, bonus, emergency, crisis, lucky
 - Emergency/crisis costs: fund covers first, bank covers remainder, debt if insufficient
-- End: 4-panel consequence screen + star rating (same logic as above)
+- End: consequence screen + star rating
 - Week progression: 1=normal, 2=choice, 3=emergency, 4=bonus, 5=emergency, 6=crisis
+- Records to PlayerModelService each week + on final
 
 ---
 
@@ -30,8 +33,6 @@
 | Home.unity | 0 | ✅ In build |
 | GameChoice.unity | 1 | ✅ In build |
 | Spending.unity | 2 | ✅ In build |
-| Progress.unity | 4 | ✅ In build |
-| Settings.unity | 5 | ✅ In build |
 | EmergencyFund.unity | 3 | ✅ In build |
 | Progress.unity | 4 | ✅ In build |
 | Settings.unity | 5 | ✅ In build |
@@ -45,8 +46,8 @@
 
 | Script | Role |
 |---|---|
-| `Core/BankAccountService.cs` | Global bank account. Balance starts £500, saved to PlayerPrefs. API: `GetBalance()`, `Spend()`, `Earn()`, `GetRecentTransactions()` |
-| `Core/PlayerModelService.cs` | Tracks player engagement (OK / Frustrated / Bored). Records spending/fund rounds, inactivity, streaks, overspend count, treat ratio. API: `RecordSpendingRound()`, `RecordEmergencyFundRound()`, `GetEngagementState()`, `ResetAll()` |
+| `Core/BankAccountService.cs` | Two separate balances: `balancePounds` (Spending game, default £500) and `emergencyBalancePounds` (Emergency Fund, default £500). Each has its own PlayerPrefs key and API: `GetBalance/Spend/Earn` for spending; `GetEmergencyBalance/SpendEmergency/EarnEmergency/ResetEmergencyBalance` for EF |
+| `Core/PlayerModelService.cs` | Tracks player engagement (OK / Frustrated / Bored). Records spending/fund rounds, inactivity, streaks, overspend count, treat ratio. Persisted via PlayerPrefs. API: `RecordSpendingRound()`, `RecordEmergencyFundRound()`, `RecordInactivity()`, `GetEngagementState()`, `ResetAll()` |
 | `Data/EventLoader.cs` | Loads all JSON events from `Resources/Events/`. Groups by type. Smart selection: no-repeat, difficulty-filtered, shuffled pools. API: `GetEvent(type)`, `GetEasyEvent()`, `GetEventByDifficulty()` |
 | `Settings/SettingsManager.cs` | Loads/saves settings JSON to PlayerPrefs. Broadcasts `OnSettingsChanged`. API: `GetSettings()`, `UpdateSettings()` |
 | `Settings/ThemeManager.cs` | Applies theme (Standard / Calm / HighContrast) to all `IThemedElement` components on settings change |
@@ -56,24 +57,30 @@
 
 | Script | Role |
 |---|---|
-| `SpendingGameController.cs` (~500 lines) | Manages 3-round shopping loop. Talks to BankAccountService, PlayerModelService, DuckReaction, ConsequencePanel, StarRating |
-| `EmergencyFundController.cs` (~705 lines) | Manages 6-week fund loop. Uses EmergencyFundUIFlow for panels, EventLoader for events, DuckReaction. Has 60s inactivity timer → re-engagement popup |
+| `SpendingGameController.cs` | Manages 3-round shopping loop. `OnDestroy` resets round counters. Calls `BankAccountService.Spend()` (spending balance), `PlayerModelService.RecordSpendingRound()`, `ConsequencePanel.ShowFinalConsequences()` |
+| `EmergencyFundController.cs` | Manages 6-week fund loop. `OnDestroy` calls `ResetState()` which resets week counter and resets emergency balance to £500. Calls `BankAccountService` emergency variants only. Calls `PlayerModelService.RecordEmergencyFundRound()` per week + final, `RecordInactivity()` on idle |
 
 ### UI Components
 
 | Script | Role |
 |---|---|
-| `UI/EmergencyFundUIFlow.cs` | State machine for Emergency Fund panels: Tutorial → SavingTier → Event → Feedback → Final. Wires callbacks to controller |
+| `UI/EmergencyFundUIFlow.cs` | State machine for Emergency Fund panels: Tutorial → SavingTier → Event → Feedback → Final. `progressPanel` is inactive by default (activated by `UpdateHUD` when game runs). Wires callbacks to controller |
 | `UI/SpendingGameUI.cs` | Manages Shopping List panels (shopping / feedback / consequence) |
 | `UI/MoneyCounter.cs` | Budget bar + spend display. Colors: green (safe) / yellow (70%) / red (90%). Calm mode: no animation |
-| `UI/ConsequencePanel.cs` | Projects 1-month and 1-year futures from current savings/debt rate |
+| `UI/ConsequencePanel.cs` | Final consequences screen. `ShowFinalConsequences()` evaluates 3 criteria: essentials coverage (fedAllRounds), treat count, and budget. Title prioritises essentials first. 7-case narrative covers all combinations. Calm mode: encouraging language |
 | `EmergencyFundConsequencePanel.cs` | 4-panel end-screen: fund total → goal explanation → 8-month simulation → lesson |
 | `UI/DuckReaction.cs` | Rubber duck mascot. 8 emotions (Happy, Sad, Excited, Worried, Thinking, Celebrating, Shocked, Neutral), each with color tint + bounce. Calm mode: minimal bounce, negative emotions → Neutral |
 | `DuckReactionBackgroundChanger.cs` | Swaps background based on duck trigger string (payday/emergency/bonus/etc). Disabled in Calm mode |
-| `UI/StarRating.cs` | 0–3 star display with punch animation. Calm mode: gentle reveal |
-| `UI/BankHud.cs` | Shows current bank balance |
+| `UI/StarRating.cs` | 0–3 star display. Uses ★/☆ TMP text fallback if no sprites assigned. Calm mode: gentle reveal, no punch scale |
+| `UI/BankHud.cs` | Shows current spending balance (uses `GetBalance()`) |
 | `UI/BankTransactionList.cs` | Scrollable list of last 10 transactions |
 | `UI/FloatingMoneyText.cs` | Animated floating £ text on money change. Disabled in Calm mode |
+
+### Debug
+
+| Script | Role |
+|---|---|
+| `Debug/DebugOverlay.cs` | Press **D** in play mode to toggle. Shows: engagement state, overspend count, treat avg, streaks, idle count, spending balance, emergency balance, current scene. Present in Home.unity (persists via DontDestroyOnLoad) and EmergencyFund.unity |
 
 ### Settings & Theming
 
@@ -94,10 +101,9 @@
 
 | Script | Role |
 |---|---|
-| `SceneLoader.cs` / `LoadScene.cs` | Generic scene load helpers |
+| `SceneLoader.cs` / `LoadScene.cs` | Generic scene load helpers (LoadHome, LoadSpending, LoadGameChoice, etc.) |
 | `LoadEmergencyFundGame.cs` | Loads EmergencyFund scene |
 | `CredentialsPanel.cs` | Credits overlay |
-| `DebugOverlay.cs` | Debug info panel (press D to toggle) |
 | `ShoppingListTutorial.cs` / `EmergencyFundTutorial.cs` | Tutorial panels (latter may be legacy) |
 | `Editor/ApplyRoundedCorners.cs` | Editor tool: applies RoundedRect sprite to UI Images |
 
@@ -114,20 +120,20 @@ Home → GameChoice → [Spending OR Emergency Fund]
 SPENDING GAME:
   SpendingGameController
     ├─ SpendingGameUI (panel management)
-    ├─ BankAccountService.Spend() per item toggle
-    ├─ ConsequencePanel (end of round projection)
-    ├─ PlayerModelService.RecordSpendingRound()
+    ├─ BankAccountService.Spend() — spending balance only
+    ├─ ConsequencePanel.ShowFinalConsequences(totalSaved, totalOverspent, stars, roundsAllEssentials, totalTreats)
+    ├─ PlayerModelService.RecordSpendingRound() — per round
     ├─ DuckReaction (emotional feedback)
-    └─ StarRating (final display)
+    └─ StarRating (per round + final)
 
 EMERGENCY FUND:
   EmergencyFundController
     ├─ EmergencyFundUIFlow (state machine)
     ├─ EventLoader.GetEvent(weekType)
-    ├─ BankAccountService.Spend() / Earn()
-    ├─ PlayerModelService.RecordEmergencyFundRound()
+    ├─ BankAccountService.SpendEmergency() / EarnEmergency() — emergency balance only
+    ├─ PlayerModelService.RecordEmergencyFundRound() — per week + final
+    ├─ PlayerModelService.RecordInactivity() — on 60s idle
     ├─ DuckReaction
-    ├─ EmergencyFundConsequencePanel (end screen)
     └─ StarRating
 
 SETTINGS:
@@ -170,11 +176,18 @@ Calm Mode is checked throughout. When ON:
 
 | Key | Type | Notes |
 |---|---|---|
-| `BankBalance` | float | Current bank balance (default 500) |
-| `EmergencyFundBalance` | float | Current fund balance |
+| `BankBalance` | float | Spending game balance (default 500) |
+| `EmergencyBankBalance` | float | Emergency Fund bank balance (default 500, reset on EF scene unload) |
+| `EmergencyFundBalance` | int | Emergency Fund pot balance (reset on EF scene unload) |
 | `Settings` | string (JSON) | Full SettingsData serialized |
 | `ShoppingTutorialShown` | int | Tutorial flag |
-| `EmergencyFundTutorialShown` | int | Tutorial flag |
+| `EmergencyTutorialSeen` | int | EF tutorial flag (key used in EmergencyFundUIFlow) |
+| `PM_OverspendCount` | int | PlayerModel: overspend count |
+| `PM_TreatRatioAvg` | float | PlayerModel: rolling average treat ratio |
+| `PM_InactivityCount` | int | PlayerModel: idle trigger count |
+| `PM_FailedStreak` | int | PlayerModel: consecutive failed rounds |
+| `PM_SuccessStreak` | int | PlayerModel: consecutive successful rounds |
+| `PM_TreatRoundCount` | int | PlayerModel: rounds used in treat avg calculation |
 
 ---
 
@@ -202,7 +215,7 @@ Calm Mode is checked throughout. When ON:
 
 - **Engine:** Unity (recent LTS), 2D
 - **UI:** TextMeshPro
-- **Input:** Old + New Input Systems both enabled
+- **Input:** Old + New Input Systems both enabled (`activeInputHandler: 2`)
 - **Events:** JSON files in `Resources/Events/`
 - **Persistence:** PlayerPrefs
 - **Total Scripts:** ~40 C# + editor tools

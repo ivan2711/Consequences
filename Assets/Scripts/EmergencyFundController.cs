@@ -73,6 +73,11 @@ public class EmergencyFundController : MonoBehaviour
         uiFlow.ShowTutorial();
     }
 
+    void OnDestroy()
+    {
+        ResetState();
+    }
+
     void Update()
     {
         bool hasInput = Input.anyKeyDown || Input.GetMouseButtonDown(0) || Input.GetMouseButtonDown(1)
@@ -119,11 +124,11 @@ public class EmergencyFundController : MonoBehaviour
             return;
         }
 
-        // Bank accounting (silent)
+        // Emergency bank accounting (silent — uses separate emergency balance)
         if (BankAccountService.Instance != null)
         {
-            BankAccountService.Instance.Earn(weeklyIncome, "Week " + currentWeek + " income");
-            BankAccountService.Instance.Spend(weeklyEssentials, "Week " + currentWeek + " essentials", "Needs");
+            BankAccountService.Instance.EarnEmergency(weeklyIncome, "Week " + currentWeek + " income");
+            BankAccountService.Instance.SpendEmergency(weeklyEssentials, "Week " + currentWeek + " essentials", "Needs");
         }
 
         RefreshHUD();
@@ -145,12 +150,12 @@ public class EmergencyFundController : MonoBehaviour
         _totalSaved += tier;
 
         if (BankAccountService.Instance != null)
-            BankAccountService.Instance.Spend(tier, "Emergency fund deposit", "Emergency");
+            BankAccountService.Instance.SpendEmergency(tier, "Emergency fund deposit", "Emergency");
 
-        // Leftover stays in bank
+        // Leftover stays in emergency bank
         int leftover = weeklyAvailable - tier;
         if (leftover > 0 && BankAccountService.Instance != null)
-            BankAccountService.Instance.Earn(leftover, "Week " + currentWeek + " leftover");
+            BankAccountService.Instance.EarnEmergency(leftover, "Week " + currentWeek + " leftover");
 
         SaveFund();
 
@@ -256,9 +261,9 @@ public class EmergencyFundController : MonoBehaviour
     {
         int bonus = _currentEvent.bonusPounds;
 
-        // Credit bonus to bank
+        // Credit bonus to emergency bank
         if (BankAccountService.Instance != null)
-            BankAccountService.Instance.Earn(bonus, _currentEvent.title);
+            BankAccountService.Instance.EarnEmergency(bonus, _currentEvent.title);
 
         string body = _currentEvent.description + "\n\nFund: \u00a3" + emergencyFundBalance;
 
@@ -269,7 +274,7 @@ public class EmergencyFundController : MonoBehaviour
         {
             _idleTimer = 0f;
             if (BankAccountService.Instance != null)
-                BankAccountService.Instance.Spend(bonus, "Bonus to fund", "Emergency");
+                BankAccountService.Instance.SpendEmergency(bonus, "Bonus to fund", "Emergency");
             emergencyFundBalance += bonus;
             _totalSaved += bonus;
             SaveFund();
@@ -384,17 +389,17 @@ public class EmergencyFundController : MonoBehaviour
 
         if (remaining > 0)
         {
-            float bank = BankAccountService.Instance != null ? BankAccountService.Instance.GetBalance() : 0f;
+            float bank = BankAccountService.Instance != null ? BankAccountService.Instance.GetEmergencyBalance() : 0f;
             if (bank >= remaining)
             {
-                BankAccountService.Instance.Spend(remaining, description, "Emergency");
+                BankAccountService.Instance.SpendEmergency(remaining, description, "Emergency");
                 result += " Bank paid \u00a3" + remaining + ".";
             }
             else
             {
                 int fromBank = (int)bank;
                 if (fromBank > 0 && BankAccountService.Instance != null)
-                    BankAccountService.Instance.Spend(fromBank, description, "Emergency");
+                    BankAccountService.Instance.SpendEmergency(fromBank, description, "Emergency");
                 int deficit = remaining - fromBank;
                 _wentIntoDebt = true;
                 result += " Short \u00a3" + deficit + " \u2014 debt!";
@@ -510,7 +515,7 @@ public class EmergencyFundController : MonoBehaviour
 
     void RefreshHUD()
     {
-        float bank = BankAccountService.Instance != null ? BankAccountService.Instance.GetBalance() : 0f;
+        float bank = BankAccountService.Instance != null ? BankAccountService.Instance.GetEmergencyBalance() : 0f;
         uiFlow.UpdateHUD(bank, emergencyFundBalance, emergencyFundGoal);
 
         // Also refresh the BankHud prefab if it exists in the scene
@@ -558,6 +563,10 @@ public class EmergencyFundController : MonoBehaviour
 
         PlayerPrefs.SetInt("EmergencyFundBalance", 0);
         PlayerPrefs.Save();
+
+        // Reset emergency bank balance to starting amount
+        if (BankAccountService.Instance != null)
+            BankAccountService.Instance.ResetEmergencyBalance(500f);
     }
 
     // ==================== RESTART ====================

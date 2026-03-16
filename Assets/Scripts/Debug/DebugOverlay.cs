@@ -83,13 +83,19 @@ public class DebugOverlay : MonoBehaviour
             return;
         }
 
+        var bank = BankAccountService.Instance;
+        string bankStr     = bank != null ? "£" + bank.GetBalance().ToString("F2") : "n/a";
+        string emergStr    = bank != null ? "£" + bank.GetEmergencyBalance().ToString("F2") : "n/a";
+        string scene       = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
+
         _text.text =
-            $"<b>--- Debug Overlay ---</b>\n" +
-            $"State: <b>{pm.GetEngagementState()}</b>\n" +
+            $"<b>--- Debug Overlay [{scene}] ---</b>\n" +
+            $"State:      <b>{pm.GetEngagementState()}</b>\n" +
             $"Overspends: {pm.overspendCount}\n" +
             $"Treat Avg:  {pm.treatRatioAvg:F2}\n" +
             $"Streak:     {pm.failedRoundsStreak}F / {pm.successStreak}S\n" +
             $"Idle Count: {pm.inactivityCount}\n" +
-            $"Bank: {(BankAccountService.Instance != null ? "£" + BankAccountService.Instance.GetBalance().ToString("F2") : "n/a")}";
+            $"Spending £: {bankStr}\n" +
+            $"Emergency £:{emergStr}";
     }
 }
