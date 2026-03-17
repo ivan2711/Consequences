@@ -82,6 +82,10 @@ public class SpendingGameController : MonoBehaviour
     {
         currentRound = 0;
         _roundsCompleted = 0;
+
+        // Destroy dynamically created RoundText so it doesn't leak across scenes
+        if (roundText != null && roundText.gameObject != null)
+            Destroy(roundText.gameObject);
     }
 
     private void Start()
@@ -400,12 +404,9 @@ public class SpendingGameController : MonoBehaviour
         _roundTreats[currentRound - 1] = unnecessaryCount;
         _roundsCompleted++;
 
-        // Show stars
+        // Stars hidden for now
         if (starRating != null)
-        {
-            starRating.gameObject.SetActive(true);
-            starRating.SetRating(stars);
-        }
+            starRating.gameObject.SetActive(false);
         Debug.Log("[Spending] Round " + currentRound + " completed. Total rounds completed: " + _roundsCompleted);
 
         // Duck reaction
@@ -570,18 +571,13 @@ public class SpendingGameController : MonoBehaviour
                 cg.interactable = true;
             }
 
-            // Update button text and re-wire to ResetGame for replay
+            // Hide old buttons
             Button[] btns = feedbackPanel.GetComponentsInChildren<Button>(true);
             foreach (Button btn in btns)
-            {
-                TMP_Text btnLabel = btn.GetComponentInChildren<TMP_Text>(true);
-                if (btnLabel != null)
-                    btnLabel.text = "Play Again";
+                btn.gameObject.SetActive(false);
 
-                btn.onClick.RemoveAllListeners();
-                btn.onClick.AddListener(ResetGame);
-            }
-            EnlargePanelButtons(btns);
+            // Add Home + Play Again buttons
+            EndGameButtons.Create(feedbackPanel.transform, ResetGame, 0f);
         }
 
         if (uiManager != null)
@@ -1190,9 +1186,19 @@ public class SpendingGameController : MonoBehaviour
 
     void CreateRoundText()
     {
-        // Create round text near the top of the canvas
+        // Create round text near the top of the scene canvas (avoid DontDestroyOnLoad canvases)
         Canvas canvas = GetComponentInParent<Canvas>();
-        if (canvas == null) canvas = FindObjectOfType<Canvas>();
+        if (canvas == null)
+        {
+            foreach (var c in FindObjectsOfType<Canvas>())
+            {
+                if (c.gameObject.scene == gameObject.scene)
+                {
+                    canvas = c;
+                    break;
+                }
+            }
+        }
         if (canvas == null) return;
 
         GameObject go = new GameObject("RoundText");

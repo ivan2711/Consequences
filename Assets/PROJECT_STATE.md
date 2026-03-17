@@ -199,7 +199,18 @@ Calm Mode is checked throughout. When ON:
 
 ---
 
-## Known Issues / To-Do
+## Known Bugs (2026-03-16)
+
+| # | Bug | Notes |
+|---|---|---|
+| 1 | Duck mascot grows unboundedly on rapid button clicks | Pop animation stacks when button is clicked fast — duck scales out of scene |
+| 2 | Back button navigates incorrectly | E.g. Settings → Back goes to GameChoice instead of Home. Back behavior inconsistent across scenes |
+| 3 | No option to go home or replay after finishing a game | Game ends on consequence screen with no navigation |
+| 4 | Progress page is completely missing | Scene exists in build (index 4) but has no content/functionality |
+| 5 | Calm Mode doesn't work | Toggle exists but effects not applying |
+| 6 | Inactivity detection not triggering hints | Feature was built (PlayerModelService.RecordInactivity) but hints/prompts not firing |
+
+## Other To-Do
 
 | Priority | Issue |
 |---|---|
@@ -207,7 +218,8 @@ Calm Mode is checked throughout. When ON:
 | 🟡 Verify | ThemeConfig ScriptableObject assets exist (StandardTheme.asset, CalmTheme.asset, HighContrastTheme.asset) |
 | 🟡 Verify | Audio assets wired up (settings framework exists, assets unclear) |
 | 🟠 Test | Touch input (mobile/tablet) not confirmed tested |
-| 🟠 Test | Progress scene functionality unclear |
+| 🔴 Feature | Speech synthesis / TTS integration |
+| 🔴 Feature | Internationalization (move strings to JSON) |
 
 ---
 

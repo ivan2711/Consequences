@@ -198,29 +198,29 @@ void ShowBridgePanel(int stars)
             if (panel1 != null) panel1.SetActive(false);
             if (panel2 != null) panel2.SetActive(false);
             if (panel3 != null) panel3.SetActive(true);
-            
+
             if (panel3LessonText != null)
             {
-                panel3LessonText.text = 
-                    "💡 WHAT YOU LEARNED\n\n" +
+                panel3LessonText.text =
+                    "WHAT YOU LEARNED\n\n" +
                     "Emergency Fund = PROTECTION\n\n" +
                     "The Cycle:\n" +
-                    "1️⃣ BUILD IT (save weekly)\n" +
-                    "2️⃣ USE IT (emergencies happen)\n" +
-                    "3️⃣ REBUILD IT (keep saving)\n" +
-                    "4️⃣ STAY PROTECTED (repeat!)\n\n" +
-                    "Over 8 months you:\n" +
-                    "✅ Saved £1,500 total\n" +
-                    "✅ Handled 3 emergencies (£320)\n" +
-                    "✅ Never borrowed money\n" +
-                    "✅ Never stressed about surprises\n\n" +
+                    "1. BUILD IT (save weekly)\n" +
+                    "2. USE IT (emergencies happen)\n" +
+                    "3. REBUILD IT (keep saving)\n" +
+                    "4. STAY PROTECTED (repeat!)\n\n" +
                     "YOUR RULES:\n" +
-                    "• Save until 3-6 months covered\n" +
-                    "• Use ONLY for emergencies\n" +
-                    "• Rebuild after each use\n" +
-                    "• Never go into debt!\n\n" +
-                    "This is financial security! 🌟";
+                    "- Save until 3-6 months covered\n" +
+                    "- Use ONLY for emergencies\n" +
+                    "- Rebuild after each use\n" +
+                    "- Never go into debt!";
             }
+
+            // Hide existing Play Again button and add Home + Play Again
+            if (panel3PlayAgainButton != null)
+                panel3PlayAgainButton.gameObject.SetActive(false);
+
+            EndGameButtons.Create(panel3.transform, PlayAgain);
         }
         
         void PlayAgain()

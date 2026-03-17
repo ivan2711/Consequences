@@ -41,7 +41,7 @@ public class BankAccountService : MonoBehaviour
     }
 
     private float balancePounds = 500f;
-    private float emergencyBalancePounds = 500f;
+    private float emergencyBalancePounds = 0f;
     private List<Transaction> transactions = new List<Transaction>();
     private List<Transaction> emergencyTransactions = new List<Transaction>();
 
@@ -60,7 +60,7 @@ public class BankAccountService : MonoBehaviour
             ? PlayerPrefs.GetFloat("BankBalance") : 500f;
 
         emergencyBalancePounds = PlayerPrefs.HasKey("EmergencyBankBalance")
-            ? PlayerPrefs.GetFloat("EmergencyBankBalance") : 500f;
+            ? PlayerPrefs.GetFloat("EmergencyBankBalance") : 0f;
     }
 
     public float GetBalance()
@@ -103,8 +103,14 @@ public class BankAccountService : MonoBehaviour
     public List<Transaction> GetRecentTransactions(int count)
     {
         if (count <= 0) return new List<Transaction>();
-        int start = Mathf.Max(0, transactions.Count - count);
-        return transactions.GetRange(start, transactions.Count - start);
+
+        // Merge spending and emergency transactions
+        var all = new List<Transaction>(transactions);
+        all.AddRange(emergencyTransactions);
+        all.Sort((a, b) => a.timestamp.CompareTo(b.timestamp));
+
+        int start = Mathf.Max(0, all.Count - count);
+        return all.GetRange(start, all.Count - start);
     }
 
     // ── Emergency account (separate from spending game balance) ──
@@ -113,12 +119,13 @@ public class BankAccountService : MonoBehaviour
 
     public bool SpendEmergency(float amount, string description, string category)
     {
-        if (amount <= 0f || amount > emergencyBalancePounds) return false;
-        emergencyBalancePounds -= amount;
+        if (amount <= 0f) return false;
+        float actual = Mathf.Min(amount, emergencyBalancePounds);
+        emergencyBalancePounds -= actual;
         emergencyTransactions.Add(new Transaction(description, -amount, DateTime.Now, category));
         PlayerPrefs.SetFloat("EmergencyBankBalance", emergencyBalancePounds);
         PlayerPrefs.Save();
-        return true;
+        return actual >= amount;
     }
 
     public void EarnEmergency(float amount, string description)
@@ -130,7 +137,7 @@ public class BankAccountService : MonoBehaviour
         PlayerPrefs.Save();
     }
 
-    public void ResetEmergencyBalance(float startingAmount = 500f)
+    public void ResetEmergencyBalance(float startingAmount = 0f)
     {
         emergencyBalancePounds = startingAmount;
         emergencyTransactions.Clear();

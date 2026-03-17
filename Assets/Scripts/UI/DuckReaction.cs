@@ -43,7 +43,14 @@ public class DuckReaction : MonoBehaviour
         Neutral
     }
     
-private void Start()
+private void Awake()
+    {
+        originalScale = transform.localScale;
+        originalPosition = transform.localPosition;
+        hasStoredOriginals = true;
+    }
+
+    private void Start()
     {
         string sceneName = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
 
@@ -190,37 +197,39 @@ private void Start()
 private IEnumerator BounceAnimation(Emotion emotion)
     {
         Transform duckTransform = transform;
+
+        // Always reset to originals before animating
+        Vector3 startScale = originalScale;
+        Vector3 startPos = originalPosition;
+        duckTransform.localScale = startScale;
+        duckTransform.localPosition = startPos;
         
-        // Use stored originals, fallback to current if not stored yet
-        Vector3 startScale = hasStoredOriginals ? originalScale : duckTransform.localScale;
-        Vector3 startPos = hasStoredOriginals ? originalPosition : duckTransform.localPosition;
-        
-        float bounceHeight = 10f;
-        float bounceScale = 1.15f;
-        float duration = 0.2f;
+        float bounceHeight = 4f;
+        float bounceScale = 1.05f;
+        float duration = 0.15f;
 
         // Calm mode: minimal animation
         if (GameSettings.CalmMode)
         {
-            bounceHeight = 3f;
+            bounceHeight = 2f;
             bounceScale = 1.0f;
-            duration = 0.3f;
+            duration = 0.2f;
         }
         // Special animations for certain emotions
         else if (emotion == Emotion.Celebrating || emotion == Emotion.Excited)
         {
-            bounceHeight = 20f;
-            bounceScale = 1.25f;
+            bounceHeight = 8f;
+            bounceScale = 1.1f;
         }
         else if (emotion == Emotion.Shocked)
         {
-            bounceHeight = 15f;
-            bounceScale = 1.2f;
+            bounceHeight = 6f;
+            bounceScale = 1.08f;
         }
         else if (emotion == Emotion.Sad)
         {
-            bounceHeight = 5f;
-            bounceScale = 0.95f;
+            bounceHeight = 3f;
+            bounceScale = 0.97f;
         }
         
         float elapsed = 0f;

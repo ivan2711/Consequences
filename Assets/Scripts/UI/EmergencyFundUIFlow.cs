@@ -94,12 +94,7 @@ public class EmergencyFundUIFlow : MonoBehaviour
         Debug.Log("[UIFlow] ShowTutorial called. Key=" + PlayerPrefs.GetInt(TUTORIAL_KEY, 0)
             + " tutorialPanel=" + (tutorialPanel != null ? "OK" : "NULL"));
 
-        if (PlayerPrefs.GetInt(TUTORIAL_KEY, 0) == 1)
-        {
-            Debug.Log("[UIFlow] Tutorial already seen, skipping.");
-            OnTutorialDone?.Invoke();
-            return;
-        }
+        // Always show tutorial when starting the game
 
         currentState = State.Tutorial;
         HideAllPanels();
@@ -108,7 +103,9 @@ public class EmergencyFundUIFlow : MonoBehaviour
         Debug.Log("[UIFlow] Tutorial panel active=" + (tutorialPanel != null && tutorialPanel.activeSelf));
 
         SetText(tutorialTitleText, "Emergency Fund", 60);
-        SetText(tutorialBodyText, "Save a little each week so surprises don't turn into debt.\n\nGoal: \u00a3160", 38);
+        SetText(tutorialBodyText, "Save a little each week so surprises don't turn into debt.\n\nGoal: \u00a3160", 46);
+        if (tutorialBodyText != null)
+            tutorialBodyText.fontStyle = TMPro.FontStyles.Bold;
     }
 
     public void ShowSavingTier(int week, int available, int fund, int goal)
@@ -160,6 +157,7 @@ public class EmergencyFundUIFlow : MonoBehaviour
 
         SetText(feedbackTitleText, title, 56);
         SetText(feedbackBodyText, body, 38);
+        if (continueButton != null) continueButton.interactable = true;
     }
 
     public void ShowFinal(string line1, string line2, string line3)
@@ -173,15 +171,21 @@ public class EmergencyFundUIFlow : MonoBehaviour
 
         SetText(finalTitleText, "Season Complete!", 60);
         SetText(finalSummaryText, line1 + "\n\n" + line2 + "\n\n" + line3, 38);
+
+        // Hide default finish button and add Home + Play Again
+        if (finishButton != null)
+            finishButton.gameObject.SetActive(false);
+
+        EndGameButtons.Create(finalPanel.transform, () => OnFinish?.Invoke());
     }
 
     public void UpdateHUD(float bankBalance, int fundBalance, int goal)
     {
         SetActive(hudPanel, false);
 
-        // Update bank balance overlay
+        // Hide bankBalanceText (no longer shown on event panel)
         if (bankBalanceText != null)
-            bankBalanceText.text = "Balance: \u00a3" + bankBalance.ToString("F0");
+            bankBalanceText.gameObject.SetActive(false);
 
         // Update fund text on event panel
         if (fundText != null)
@@ -219,8 +223,18 @@ public class EmergencyFundUIFlow : MonoBehaviour
         OnTutorialDone?.Invoke();
     }
 
+    void DisableAllButtons()
+    {
+        if (choiceAButton != null) choiceAButton.interactable = false;
+        if (choiceBButton != null) choiceBButton.interactable = false;
+        if (choiceCButton != null) choiceCButton.interactable = false;
+        if (continueButton != null) continueButton.interactable = false;
+        if (finishButton != null) finishButton.interactable = false;
+    }
+
     void HandleChoiceA()
     {
+        DisableAllButtons();
         if (currentState == State.SavingTier)
             OnTierChosen?.Invoke(40); // Strong
         else
@@ -229,6 +243,7 @@ public class EmergencyFundUIFlow : MonoBehaviour
 
     void HandleChoiceB()
     {
+        DisableAllButtons();
         if (currentState == State.SavingTier)
             OnTierChosen?.Invoke(30); // Balanced
         else
@@ -237,17 +252,20 @@ public class EmergencyFundUIFlow : MonoBehaviour
 
     void HandleChoiceC()
     {
+        DisableAllButtons();
         if (currentState == State.SavingTier)
             OnTierChosen?.Invoke(20); // Small
     }
 
     void HandleContinue()
     {
+        DisableAllButtons();
         OnContinue?.Invoke();
     }
 
     void HandleFinish()
     {
+        DisableAllButtons();
         OnFinish?.Invoke();
     }
 

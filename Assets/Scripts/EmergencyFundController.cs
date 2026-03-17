@@ -34,7 +34,8 @@ public class EmergencyFundController : MonoBehaviour
 
     // Game state
     private int currentWeek = 0;
-    private int emergencyFundBalance = 0;
+    private int emergencyFundBalance = 0;  // session savings (starts at 0 each game)
+    private int _persistentFundBalance = 0; // total fund across all games
     private bool _wentIntoDebt = false;
     private int _totalSaved = 0;
     private int _weeksPrepared = 0;
@@ -42,7 +43,7 @@ public class EmergencyFundController : MonoBehaviour
     private string _lastEventId = null;
 
     // Calm mode timing
-    private float TransitionDelay => GameSettings.CalmMode ? 2.5f : 1.5f;
+    private float TransitionDelay => GameSettings.CalmMode ? 1.5f : 0f;
 
     // Inactivity tracking
     private float _idleTimer = 0f;
@@ -75,7 +76,7 @@ public class EmergencyFundController : MonoBehaviour
 
     void OnDestroy()
     {
-        ResetState();
+        CancelInvoke();
     }
 
     void Update()
@@ -479,9 +480,14 @@ public class EmergencyFundController : MonoBehaviour
             DuckSay(DuckReaction.Emotion.Worried, "Try again!");
         }
 
-        string line1 = "Emergency fund saved: \u00a3" + emergencyFundBalance + " / \u00a3" + emergencyFundGoal;
-        string line2 = "Weeks you stayed prepared: " + _weeksPrepared + " / " + totalWeeks;
-        string line3 = "Tip: Saving early makes surprises manageable.";
+        // Commit session savings to persistent fund
+        _persistentFundBalance += emergencyFundBalance;
+        PlayerPrefs.SetInt("EmergencyFundBalance", _persistentFundBalance);
+        PlayerPrefs.Save();
+
+        string line1 = "This session: \u00a3" + emergencyFundBalance + " saved (goal: \u00a3" + emergencyFundGoal + ")";
+        string line2 = "Total emergency fund: \u00a3" + _persistentFundBalance;
+        string line3 = "Weeks you stayed prepared: " + _weeksPrepared + " / " + totalWeeks;
 
         uiFlow.OnFinish = RestartGame;
         uiFlow.ShowFinal(line1, line2, line3);
@@ -518,15 +524,19 @@ public class EmergencyFundController : MonoBehaviour
         float bank = BankAccountService.Instance != null ? BankAccountService.Instance.GetEmergencyBalance() : 0f;
         uiFlow.UpdateHUD(bank, emergencyFundBalance, emergencyFundGoal);
 
-        // Also refresh the BankHud prefab if it exists in the scene
+        // Refresh both balance HUDs
         BankHud bankHud = FindObjectOfType<BankHud>();
         if (bankHud != null)
             bankHud.Refresh();
+
+        EmergencyBankHud emergHud = FindObjectOfType<EmergencyBankHud>();
+        if (emergHud != null)
+            emergHud.Refresh();
     }
 
     void SaveFund()
     {
-        PlayerPrefs.SetInt("EmergencyFundBalance", emergencyFundBalance);
+        PlayerPrefs.SetInt("EmergencyFundBalance", _persistentFundBalance + emergencyFundBalance);
         PlayerPrefs.Save();
     }
 
@@ -554,19 +564,13 @@ public class EmergencyFundController : MonoBehaviour
     void ResetState()
     {
         currentWeek = 0;
+        _persistentFundBalance = PlayerPrefs.GetInt("EmergencyFundBalance", 0);
         emergencyFundBalance = 0;
         _wentIntoDebt = false;
         _totalSaved = 0;
         _weeksPrepared = 0;
         _currentEvent = null;
         _lastEventId = null;
-
-        PlayerPrefs.SetInt("EmergencyFundBalance", 0);
-        PlayerPrefs.Save();
-
-        // Reset emergency bank balance to starting amount
-        if (BankAccountService.Instance != null)
-            BankAccountService.Instance.ResetEmergencyBalance(500f);
     }
 
     // ==================== RESTART ====================

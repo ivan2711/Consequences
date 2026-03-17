@@ -1,5 +1,5 @@
-using UnityEngine;using System.Collections;
-
+using UnityEngine;
+using System.Collections;
 using TMPro;
 
 public class BankHud : MonoBehaviour
@@ -17,7 +17,7 @@ public class BankHud : MonoBehaviour
         Refresh();
     }
 
-private void OnEnable()
+    private void OnEnable()
     {
         Refresh();
     }
@@ -25,16 +25,12 @@ private void OnEnable()
     public void Refresh()
     {
         if (bankText == null)
-        {
             return;
-        }
 
         BankAccountService svc = BankAccountService.Instance;
 
         if (svc == null)
-        {
             svc = FindObjectOfType<BankAccountService>();
-        }
 
         if (svc == null)
         {
