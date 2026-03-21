@@ -1,0 +1,143 @@
+Qwen3-TTS Integration Research
+================================
+Date: 2026-03-21
+Context: Dean suggested Qwen3-TTS. Researched feasibility of bundling it in-app via ONNX.
+
+---
+
+1. MODEL SIZES (Qwen3-TTS 0.6B)
+---------------------------------
+
+FP32 ONNX (zukky/Qwen3-TTS-ONNX-DLL):
+  Total: ~6.55 GB
+  - talker_prefill.onnx      1.78 GB
+  - talker_decode.onnx        1.78 GB
+  - text_project.onnx         1.27 GB
+  - tokenizer12hz_decode.onnx 457 MB
+  - code_predictor.onnx       441 MB
+  - tokenizer12hz_encode.onnx 193 MB
+  - code_predictor_embed.onnx 126 MB
+  - speaker_encoder.onnx      35.6 MB
+  - codec_embed.onnx          12.6 MB
+
+INT8 Quantized (sivasub987/Qwen3-TTS-0.6B-ONNX-INT8):
+  Total: ~2.08 GB (68% smaller)
+  - BUT: speaker_encoder, tokenizer12hz_encode, tokenizer12hz_decode
+    FAIL on ONNX Runtime due to missing ConvInteger operator.
+    Need to mix with FP32 audio decoder = ~2.5 GB effective.
+
+GGUF Q5_K_M (cgisky/qwen3-tts-custom-gguf):
+  Total: ~1.45 GB (smallest working)
+  - Needs GGUF runtime, not standard ONNX Runtime.
+
+
+2. ARCHITECTURE
+----------------
+
+9 sub-models in a pipeline:
+  text_project -> speaker_encoder -> talker_prefill -> talker_decode (autoregressive loop)
+  -> code_predictor (autoregressive, 15 codebook groups) -> tokenizer12hz_decode -> audio
+
+- 28 transformer layers, 16 attention heads, hidden_dim=1024
+- 16 RVQ codebook groups at 12 Hz frame rate
+- Output: 24 kHz mono WAV
+- Autoregressive = must run sequentially, cannot be parallelised
+
+
+3. INFERENCE SPEED
+-------------------
+
+Official benchmarks (GPU, PyTorch):
+  - First-packet latency: ~97 ms
+  - Real-time factor: 0.23-0.31
+
+On CPU (what most users have):
+  - Expected: 3-10 seconds per sentence
+  - No published CPU ONNX benchmarks exist for this model
+
+INT8 typically gives 1.5-3x speedup over FP32 on CPU.
+
+
+4. UNITY INTEGRATION OPTIONS
+------------------------------
+
+Option A: Unity Sentis (ONNX inside Unity)
+  - NOT FEASIBLE: Sentis doesn't support required operators (If, etc.)
+  - 9 sub-models with autoregressive loops too complex for Sentis
+  - Nobody has done this.
+
+Option B: ONNX Runtime in Unity (asus4/onnxruntime-unity)
+  - Feasible but heavy porting work
+  - ElBruno/ElBruno.QwenTTS has full C# pipeline (but .NET 10, needs porting to Unity C# 9)
+  - Package: com.github.asus4.onnxruntime (UPM)
+  - Supports: Windows, macOS, iOS, Android
+  - GPU: CoreML (macOS/iOS), DirectML (Windows), CUDA
+
+Option C: Bundle Python server as executable (PyInstaller)
+  - Simplest but worst UX (subprocess, firewall prompts, port conflicts)
+
+Option D: Use Piper TTS instead
+  - 30 MB model, runs in 20-30ms on CPU
+  - Proven Unity integration (Macoron/piper.unity via Sentis)
+  - Lower voice quality than Qwen3-TTS
+  - Also: Unity's official Jets TTS sample (~30 MB)
+
+
+5. COMPARISON TABLE
+--------------------
+
+                    Qwen3-TTS 0.6B    Piper TTS       Unity Jets TTS
+Model size          2-6.5 GB          20-60 MB        ~30 MB
+CPU inference       3-10 sec          20-30 ms        real-time
+Unity integration   Complex port      Proven plugin   Official sample
+Voice quality       Excellent         Good            Good
+Offline             Yes               Yes             Yes
+
+
+6. WHY THE SIZE VARIES
+-----------------------
+
+The native PyTorch model (BF16) is only 1.83 GB — Dean's suggestion was sound.
+
+The 6.5 GB ONNX FP32 figure is the WORST CASE, caused by:
+  a) BF16 (16-bit) → FP32 (32-bit): doubles weight size (1.83 → ~3.66 GB)
+  b) Prefill/decode split: talker_prefill.onnx and talker_decode.onnx contain the
+     SAME transformer weights duplicated in two separate graphs (+1.78 GB)
+
+More realistic sizes:
+  - ONNX INT8:  ~2 GB    (comparable to original, but some components broken)
+  - ONNX FP16:  ~3.3 GB  (no published version yet, would need manual conversion)
+  - ONNX FP32:  ~6.5 GB  (worst case, weight duplication + format expansion)
+
+The real issue isn't the format — it's that a 0.6B parameter model is inherently
+large and slow on CPU regardless of format. Plus the 9-model pipeline is complex
+to orchestrate in Unity C#.
+
+
+7. HUGGINGFACE SOURCES
+-----------------------
+
+- https://huggingface.co/Qwen/Qwen3-TTS-12Hz-0.6B
+- https://huggingface.co/sivasub987/Qwen3-TTS-0.6B-ONNX-INT8
+- https://huggingface.co/zukky/Qwen3-TTS-ONNX-DLL
+- https://huggingface.co/cgisky/qwen3-tts-custom-gguf
+- https://huggingface.co/unity/inference-engine-jets-text-to-speech
+
+GitHub:
+- https://github.com/QwenLM/Qwen3-TTS
+- https://github.com/elbruno/ElBruno.QwenTTS (C# ONNX pipeline)
+- https://github.com/asus4/onnxruntime-unity (ONNX Runtime Unity plugin)
+- https://github.com/Macoron/piper.unity (Piper TTS Unity)
+
+
+7. CURRENT STATE IN PROJECT
+-----------------------------
+
+- TTS button + TTSManager: DONE (works across all scenes)
+- TTSManager.SetContent() wired into: EmergencyFundUIFlow, SpendingGameController,
+  ShoppingListTutorial, and scene transitions
+- TTSService.cs: currently HTTP client to localhost:7860 (placeholder)
+- TTS/server.py: Python FastAPI server wrapping Qwen3-TTS (dev/testing only)
+- Backend decision pending discussion with Dean
+
+Git tag: stable-before-onnx (restore point before any ONNX work)
