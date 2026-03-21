@@ -106,6 +106,8 @@ public class EmergencyFundUIFlow : MonoBehaviour
         SetText(tutorialBodyText, "Save a little each week so surprises don't turn into debt.\n\nGoal: \u00a3160", 46);
         if (tutorialBodyText != null)
             tutorialBodyText.fontStyle = TMPro.FontStyles.Bold;
+
+        TTSManager.SetContent("Emergency Fund tutorial. Save a little each week so surprises don't turn into debt. Goal: 160 pounds.");
     }
 
     public void ShowSavingTier(int week, int available, int fund, int goal)
@@ -125,6 +127,8 @@ public class EmergencyFundUIFlow : MonoBehaviour
         ShowButton(choiceCButton, choiceCLabel, "Small \u00a320", true);
 
         LayoutButtons(true, true, true);
+
+        TTSManager.SetContent("Week " + week + " of 6. How much will you save? Choose: Strong 40 pounds, Balanced 30 pounds, or Small 20 pounds.");
     }
 
     public void ShowEvent(int week, string title, string body, string choiceA, string choiceB)
@@ -144,6 +148,11 @@ public class EmergencyFundUIFlow : MonoBehaviour
         ShowButton(choiceCButton, choiceCLabel, null, false);
 
         LayoutButtons(choiceA != null, choiceB != null, false);
+
+        string ttsText = "Week " + week + " of 6. " + title + ". " + body;
+        if (choiceA != null) ttsText += " Option A: " + choiceA + ".";
+        if (choiceB != null) ttsText += " Option B: " + choiceB + ".";
+        TTSManager.SetContent(ttsText);
     }
 
     public void ShowFeedback(string title, string body)
@@ -158,6 +167,8 @@ public class EmergencyFundUIFlow : MonoBehaviour
         SetText(feedbackTitleText, title, 56);
         SetText(feedbackBodyText, body, 38);
         if (continueButton != null) continueButton.interactable = true;
+
+        TTSManager.SetContent(title + ". " + body);
     }
 
     public void ShowFinal(string line1, string line2, string line3)
@@ -171,6 +182,8 @@ public class EmergencyFundUIFlow : MonoBehaviour
 
         SetText(finalTitleText, "Season Complete!", 60);
         SetText(finalSummaryText, line1 + "\n\n" + line2 + "\n\n" + line3, 38);
+
+        TTSManager.SetContent("Season Complete! " + line1 + ". " + line2 + ". " + line3);
 
         // Hide default finish button and add Home + Play Again
         if (finishButton != null)

@@ -673,6 +673,7 @@ public class EmergencyFundController : MonoBehaviour
 
     void CheckReengagementTrigger()
     {
+        if (!GameSettings.ShowHints) return;
         if (_reengagePanel == null || _reengagePanel.activeSelf) return;
         if (_reengageCooldown > 0f) return;
         if (currentWeek <= 0 || currentWeek > totalWeeks) return;

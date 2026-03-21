@@ -25,5 +25,6 @@ public class ShoppingListTutorial : MonoBehaviour
         {
             tutorialPanel.SetActive(true);
         }
+        TTSManager.SetContent("Shopping game tutorial. Pick items from the shopping list and stay within your budget. Buy all essentials and maybe one treat.");
     }
 }

@@ -158,7 +158,8 @@ public class ProgressPanel : MonoBehaviour
         if (bank != null)
         {
             SetValue(bankBalanceValue, string.Format("\u00a3{0:0.00}", bank.GetBalance()));
-            SetValue(emergencyFundValue, string.Format("\u00a3{0:0.00}", bank.GetEmergencyBalance()));
+            int fundBalance = PlayerPrefs.GetInt("EmergencyFundBalance", 0);
+            SetValue(emergencyFundValue, "\u00a3" + fundBalance);
         }
 
         if (model != null)

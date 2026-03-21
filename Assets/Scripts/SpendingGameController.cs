@@ -76,6 +76,19 @@ public class SpendingGameController : MonoBehaviour
     private bool _roundInProgress = false; // true while player is shopping, false after Check Out
     private int _roundsCompleted = 0; // only increments — used by AdvanceRound to determine next round
 
+    // Inactivity tracking
+    private float _idleTimer = 0f;
+    private float _idleCooldown = 0f;
+    private const float IdleThresholdSeconds = 60f;
+
+    // Re-engagement popup
+    private GameObject _reengagePanel;
+    private TextMeshProUGUI _reengageText;
+    private float _reengageCooldown = 0f;
+    private const float ReengageCooldownNormal = 60f;
+    private const float ReengageCooldownCalm = 120f;
+    private const float ReengageIdleThreshold = 20f;
+
     // ==================== LIFECYCLE ====================
 
     private void OnDestroy()
@@ -149,8 +162,175 @@ public class SpendingGameController : MonoBehaviour
         // Hide round 3 items initially
         SetRound3ItemsVisible(false);
 
+        BuildReengagementPopup();
+
         StartRound(1);
         Debug.Log("SpendingGameController: Started with 3-round system!");
+    }
+
+    void Update()
+    {
+        if (!_roundInProgress) return;
+
+        bool hasInput = Input.anyKeyDown || Input.GetMouseButtonDown(0) || Input.GetMouseButtonDown(1)
+            || (Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Began);
+
+        if (hasInput)
+        {
+            _idleTimer = 0f;
+            return;
+        }
+
+        _idleTimer += Time.deltaTime;
+
+        if (_idleCooldown > 0f) _idleCooldown -= Time.deltaTime;
+        if (_reengageCooldown > 0f) _reengageCooldown -= Time.deltaTime;
+
+        CheckReengagementTrigger();
+
+        if (_idleTimer >= IdleThresholdSeconds)
+        {
+            if (GameSettings.CalmMode && _idleCooldown > 0f) return;
+            if (PlayerModelService.Instance != null)
+                PlayerModelService.Instance.RecordInactivity();
+            _idleTimer = 0f;
+            _idleCooldown = IdleThresholdSeconds;
+        }
+    }
+
+    // ==================== RE-ENGAGEMENT POPUP ====================
+
+    void BuildReengagementPopup()
+    {
+        var canvasGO = new GameObject("ReengageCanvas");
+        var canvas = canvasGO.AddComponent<Canvas>();
+        canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+        canvas.sortingOrder = 100;
+        canvasGO.AddComponent<GraphicRaycaster>();
+
+        _reengagePanel = new GameObject("ReengagePanel");
+        _reengagePanel.transform.SetParent(canvasGO.transform, false);
+        var panelRect = _reengagePanel.AddComponent<RectTransform>();
+        panelRect.anchorMin = new Vector2(0.15f, 0.30f);
+        panelRect.anchorMax = new Vector2(0.85f, 0.70f);
+        panelRect.offsetMin = Vector2.zero;
+        panelRect.offsetMax = Vector2.zero;
+
+        var bg = _reengagePanel.AddComponent<Image>();
+        bg.color = new Color(0.12f, 0.12f, 0.18f, 0.95f);
+        bg.raycastTarget = true;
+
+        // Find RoundedRect sprite
+        Sprite roundedRect = null;
+        foreach (var s in Resources.FindObjectsOfTypeAll<Sprite>())
+            if (s.name == "RoundedRect") { roundedRect = s; break; }
+        if (roundedRect != null) { bg.sprite = roundedRect; bg.type = Image.Type.Sliced; }
+
+        var textGO = new GameObject("ReengageText");
+        textGO.transform.SetParent(_reengagePanel.transform, false);
+        var textRect = textGO.AddComponent<RectTransform>();
+        textRect.anchorMin = new Vector2(0.05f, 0.55f);
+        textRect.anchorMax = new Vector2(0.95f, 0.95f);
+        textRect.offsetMin = Vector2.zero;
+        textRect.offsetMax = Vector2.zero;
+        _reengageText = textGO.AddComponent<TextMeshProUGUI>();
+        _reengageText.fontSize = 32f;
+        _reengageText.color = Color.white;
+        _reengageText.alignment = TextAlignmentOptions.Center;
+        _reengageText.raycastTarget = false;
+        _reengageText.enableWordWrapping = true;
+
+        CreateReengageButton("Take a hint", new Color(0.3f, 0.8f, 0.4f),
+            new Vector2(0.08f, 0.08f), new Vector2(0.48f, 0.45f), OnTakeHint, roundedRect);
+        CreateReengageButton("Keep going", new Color(0.5f, 0.6f, 0.8f),
+            new Vector2(0.52f, 0.08f), new Vector2(0.92f, 0.45f), OnKeepGoing, roundedRect);
+
+        _reengagePanel.SetActive(false);
+    }
+
+    void CreateReengageButton(string label, Color color, Vector2 anchorMin, Vector2 anchorMax,
+        UnityEngine.Events.UnityAction action, Sprite sprite)
+    {
+        var btnGO = new GameObject(label + "Btn");
+        btnGO.transform.SetParent(_reengagePanel.transform, false);
+        var rect = btnGO.AddComponent<RectTransform>();
+        rect.anchorMin = anchorMin;
+        rect.anchorMax = anchorMax;
+        rect.offsetMin = Vector2.zero;
+        rect.offsetMax = Vector2.zero;
+        var img = btnGO.AddComponent<Image>();
+        img.color = color;
+        if (sprite != null) { img.sprite = sprite; img.type = Image.Type.Sliced; }
+        var btn = btnGO.AddComponent<Button>();
+        btn.onClick.AddListener(action);
+
+        var txtGO = new GameObject("Text");
+        txtGO.transform.SetParent(btnGO.transform, false);
+        var txtRect = txtGO.AddComponent<RectTransform>();
+        txtRect.anchorMin = Vector2.zero;
+        txtRect.anchorMax = Vector2.one;
+        txtRect.offsetMin = Vector2.zero;
+        txtRect.offsetMax = Vector2.zero;
+        var tmp = txtGO.AddComponent<TextMeshProUGUI>();
+        tmp.text = label;
+        tmp.fontSize = 28f;
+        tmp.color = Color.white;
+        tmp.alignment = TextAlignmentOptions.Center;
+        tmp.fontStyle = FontStyles.Bold;
+    }
+
+    void CheckReengagementTrigger()
+    {
+        if (!GameSettings.ShowHints) return;
+        if (_reengagePanel == null || _reengagePanel.activeSelf) return;
+        if (_reengageCooldown > 0f) return;
+        if (!_roundInProgress) return;
+
+        bool idleTrigger = _idleTimer >= ReengageIdleThreshold;
+        bool streakTrigger = PlayerModelService.Instance != null
+            && PlayerModelService.Instance.failedRoundsStreak >= 2;
+
+        if (idleTrigger || streakTrigger)
+        {
+            string msg = idleTrigger
+                ? "Take your time.\nCheck what you really need!"
+                : "Tricky budget!\nFocus on essentials first.";
+            ShowReengagementPopup(msg);
+        }
+    }
+
+    void ShowReengagementPopup(string message)
+    {
+        if (_reengagePanel == null) return;
+        if (_reengageText != null) _reengageText.text = message;
+        _reengagePanel.transform.SetAsLastSibling();
+        _reengagePanel.SetActive(true);
+    }
+
+    void DismissReengagementPopup()
+    {
+        if (_reengagePanel != null) _reengagePanel.SetActive(false);
+        _reengageCooldown = GameSettings.CalmMode ? ReengageCooldownCalm : ReengageCooldownNormal;
+        _idleTimer = 0f;
+    }
+
+    void OnTakeHint()
+    {
+        DismissReengagementPopup();
+        string hint = currentRound switch
+        {
+            1 => "Essentials like bread and milk should come first!",
+            2 => "Tight budget \u2014 skip the treats if you have to.",
+            3 => "Payday is tempting, but saving some is smart!",
+            _ => "Think about what you truly need."
+        };
+        if (duckReaction != null)
+            duckReaction.ShowReaction(DuckReaction.Emotion.Thinking, hint);
+    }
+
+    void OnKeepGoing()
+    {
+        DismissReengagementPopup();
     }
 
     // ==================== ROUND SYSTEM ====================
@@ -221,6 +401,16 @@ public class SpendingGameController : MonoBehaviour
                 : DuckReaction.Emotion.Neutral;
             duckReaction.ShowReaction(emo, RoundDuckLines[round - 1]);
         }
+
+        // TTS content for this round
+        string itemList = "";
+        foreach (var it in GetActiveItems())
+        {
+            if (it.toggle != null && it.toggle.gameObject.activeSelf)
+                itemList += it.itemName + " \u00a3" + it.price.ToString("F2") + ", ";
+        }
+        TTSManager.SetContent("Round " + round + " of " + TotalRounds + ": " + RoundNames[round - 1]
+            + ". Budget: \u00a3" + weeklyBudgetPounds.ToString("F2") + ". Items: " + itemList.TrimEnd(',', ' '));
 
         Debug.Log("[Spending] Round " + round + " started: " + RoundNames[round - 1] + " (Budget: \u00a3" + weeklyBudgetPounds + ")");
     }
@@ -412,6 +602,13 @@ public class SpendingGameController : MonoBehaviour
         // Duck reaction
         ShowDuckFeedback(total, unnecessaryCount, necessaryCount);
 
+        // TTS feedback
+        string ttsRoundFeedback = "Round " + currentRound + " result. You spent \u00a3" + total.ToString("F2")
+            + " out of \u00a3" + weeklyBudgetPounds.ToString("F2") + ". "
+            + necessaryCount + " essentials, " + unnecessaryCount + " treats. "
+            + BuildCommentary(total, unnecessaryCount, necessaryCount);
+        TTSManager.SetContent(ttsRoundFeedback);
+
         // Scorecard at top, commentary in body
         if (scorecardText != null)
             scorecardText.text = BuildScorecard(total, unnecessaryCount, necessaryCount);
@@ -554,6 +751,13 @@ public class SpendingGameController : MonoBehaviour
 
         if (consequencePanel != null)
             consequencePanel.ShowFinalConsequences(totalSaved, totalOverspent, overallStars, roundsAllEssentials, totalTreats);
+
+        // TTS final summary
+        string ttsFinal = "Season Complete! ";
+        if (totalSaved > 0) ttsFinal += "You saved \u00a3" + totalSaved.ToString("F2") + " total. ";
+        if (totalOverspent > 0) ttsFinal += "You overspent by \u00a3" + totalOverspent.ToString("F2") + ". ";
+        ttsFinal += overallStars + " stars overall. " + roundsAllEssentials + " rounds with all essentials. " + totalTreats + " treats bought.";
+        TTSManager.SetContent(ttsFinal);
 
         if (roundText != null)
             roundText.text = "Season Complete!";

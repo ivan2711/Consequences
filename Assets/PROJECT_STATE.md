@@ -205,10 +205,10 @@ Calm Mode is checked throughout. When ON:
 |---|---|---|
 | 1 | Duck mascot grows unboundedly on rapid button clicks | Pop animation stacks when button is clicked fast — duck scales out of scene |
 | 2 | Back button navigates incorrectly | E.g. Settings → Back goes to GameChoice instead of Home. Back behavior inconsistent across scenes |
-| 3 | No option to go home or replay after finishing a game | Game ends on consequence screen with no navigation |
-| 4 | Progress page is completely missing | Scene exists in build (index 4) but has no content/functionality |
-| 5 | Calm Mode doesn't work | Toggle exists but effects not applying |
-| 6 | Inactivity detection not triggering hints | Feature was built (PlayerModelService.RecordInactivity) but hints/prompts not firing |
+| 3 | ~~No option to go home or replay after finishing a game~~ | ✅ Fixed — EndGameButtons added to both games |
+| 4 | ~~Progress page is completely missing~~ | ✅ Fixed — 6-card dashboard with live data from PlayerModelService + BankAccountService |
+| 5 | ~~Calm Mode doesn't work~~ | ✅ Fixed — replaced broken Toggle with Button, synced GameSettings.CalmMode on startup and settings change via SettingsManager |
+| 6 | ~~Inactivity detection not triggering hints~~ | ✅ Fixed — added inactivity detection + hint popup to SpendingGameController, added ShowHints setting check to both games, context-aware hint messages per round/event |
 
 ## Other To-Do
 
@@ -220,6 +220,9 @@ Calm Mode is checked throughout. When ON:
 | 🟠 Test | Touch input (mobile/tablet) not confirmed tested |
 | 🔴 Feature | Speech synthesis / TTS integration |
 | 🔴 Feature | Internationalization (move strings to JSON) |
+| 🔴 Feature | Customizable shopping lists — load items from JSON so different scenarios can be swapped in (e.g. student flat, family shop, party planning). Could allow educators to create their own lists. (NAS feedback) |
+| 🔴 Feature | Savings goal / reward system — long-term goal to save towards across sessions (e.g. start a rock band, build a rocket). Gives saving a tangible, fun purpose. (NAS feedback) |
+| 🔴 Feature | Recipe-based shopping mode — player picks a recipe and shops for ingredients within a budget. Each ingredient has 2-3 options at different price points (e.g. branded vs own-brand vs substitute). Core lesson: "expensive doesn't always mean better." Each option pair is flagged as whether the price gap is justified or not (e.g. own-brand pasta vs branded = same quality, save money = smart; fresh chicken vs processed nuggets = genuinely different, spending more = smart). Scoring rewards recognising when to save and when to spend — not just minimising cost. Teaches value-based thinking, not cheapness. Also includes fake "deals" (e.g. buy 2 get 1 free) that tempt the player to overspend — lesson: a deal isn't a deal if you don't need it, you just end up spending more. Scoring rewards players who resist unnecessary bulk buys. Could be a third game mode or alternative Spending Game scenario. (NAS feedback) |
 
 ---
 

@@ -25,11 +25,15 @@ namespace FinancialLiteracy.Settings
             DontDestroyOnLoad(gameObject);
 
             LoadSettings();
+            GameSettings.CalmMode = currentSettings.calmModeEnabled;
+            GameSettings.ShowHints = currentSettings.showHints;
         }
 
         public void UpdateSettings(SettingsData newSettings)
         {
             currentSettings = newSettings;
+            GameSettings.CalmMode = currentSettings.calmModeEnabled;
+            GameSettings.ShowHints = currentSettings.showHints;
             SaveSettings();
             OnSettingsChanged?.Invoke(currentSettings);
         }
