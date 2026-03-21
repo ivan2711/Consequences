@@ -1,6 +1,11 @@
 # Consequences — Project State
-> Last updated: 2026-03-16
+> Last updated: 2026-03-21
 > Author: Ivan Murtov | UCL CS | Supervised by Prof. Dean Mohamedally | Client: MotionInput Games Ltd
+
+---
+
+## Git Recovery Tags
+- `stable-before-onnx` — stable build with TTS button + all bug fixes, before ONNX integration. To restore: `git reset --hard stable-before-onnx`
 
 ---
 
