@@ -1,0 +1,20 @@
+{
+  "id": "ef_normal_015",
+  "version": 2,
+  "type": "normal",
+  "title": "Movie Night In",
+  "description": "Watched a film at home with the family. Popcorn from the cupboard, no cost.",
+  "weeklyIncomePounds": 60,
+  "costPounds": 0,
+  "bonusPounds": 0,
+  "choices": [
+    { "label": "Great film!", "savePounds": 0, "flavourText": "Cosy night in beats going out." },
+    { "label": "Solid choice", "savePounds": 0, "flavourText": "Saved money and had fun." }
+  ],
+  "duckEmotion": "happy",
+  "duckLine": "Free entertainment!",
+  "difficulty": "easy",
+  "tags": ["routine", "entertainment"],
+  "ageRangeMin": 12, "ageRangeMax": 18,
+  "currencyCode": "GBP", "author": "content-team", "notes": ""
+}

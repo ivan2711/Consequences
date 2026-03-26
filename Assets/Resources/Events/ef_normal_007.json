@@ -1,0 +1,20 @@
+{
+  "id": "ef_normal_007",
+  "version": 2,
+  "type": "normal",
+  "title": "Homework Week",
+  "description": "Spent the week buried in coursework. No time to spend anything!",
+  "weeklyIncomePounds": 60,
+  "costPounds": 0,
+  "bonusPounds": 0,
+  "choices": [
+    { "label": "Keep going", "savePounds": 0, "flavourText": "Head down, savings up." },
+    { "label": "Almost done", "savePounds": 0, "flavourText": "One more essay to go." }
+  ],
+  "duckEmotion": "neutral",
+  "duckLine": "Study hard, save easy!",
+  "difficulty": "easy",
+  "tags": ["routine", "school"],
+  "ageRangeMin": 12, "ageRangeMax": 18,
+  "currencyCode": "GBP", "author": "content-team", "notes": ""
+}

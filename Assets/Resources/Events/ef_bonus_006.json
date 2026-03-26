@@ -1,0 +1,20 @@
+{
+  "id": "ef_bonus_006",
+  "version": 2,
+  "type": "bonus",
+  "title": "Car Boot Sale",
+  "description": "You sold old toys and books at a car boot sale and made £15!",
+  "weeklyIncomePounds": 60,
+  "costPounds": 0,
+  "bonusPounds": 15,
+  "choices": [
+    { "label": "Add to fund", "savePounds": 0, "flavourText": "One person's junk is your savings boost!" },
+    { "label": "Keep in bank", "savePounds": 0, "flavourText": "Nice bit of pocket money." }
+  ],
+  "duckEmotion": "celebrating",
+  "duckLine": "Declutter and earn!",
+  "difficulty": "easy",
+  "tags": ["bonus", "earning"],
+  "ageRangeMin": 12, "ageRangeMax": 18,
+  "currencyCode": "GBP", "author": "content-team", "notes": ""
+}

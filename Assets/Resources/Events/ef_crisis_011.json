@@ -1,0 +1,20 @@
+{
+  "id": "ef_crisis_011",
+  "version": 2,
+  "type": "crisis",
+  "title": "Sports Kit and Fees",
+  "description": "Your football boots broke AND the club membership fee is due. Total: £42.",
+  "weeklyIncomePounds": 60,
+  "costPounds": 42,
+  "bonusPounds": 0,
+  "choices": [
+    { "label": "Pay for both (£42)", "savePounds": 42, "flavourText": "Back on the pitch, fully kitted out." },
+    { "label": "Just the fee (£22)", "savePounds": 22, "flavourText": "Borrowed boots from a teammate." }
+  ],
+  "duckEmotion": "worried",
+  "duckLine": "Sports aren't cheap!",
+  "difficulty": "hard",
+  "tags": ["sport", "essential", "club"],
+  "ageRangeMin": 12, "ageRangeMax": 18,
+  "currencyCode": "GBP", "author": "content-team", "notes": ""
+}

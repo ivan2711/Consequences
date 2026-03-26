@@ -1,0 +1,20 @@
+{
+  "id": "ef_crisis_014",
+  "version": 2,
+  "type": "crisis",
+  "title": "Sibling's Birthday",
+  "description": "Your little sister's birthday is this weekend. A present plus cake ingredients cost £28.",
+  "weeklyIncomePounds": 60,
+  "costPounds": 28,
+  "bonusPounds": 0,
+  "choices": [
+    { "label": "Go all out (£28)", "savePounds": 28, "flavourText": "She was over the moon. Best sibling ever." },
+    { "label": "Just a small gift (£12)", "savePounds": 12, "flavourText": "She still loved it." }
+  ],
+  "duckEmotion": "worried",
+  "duckLine": "Happy birthday to her!",
+  "difficulty": "medium",
+  "tags": ["family", "gift", "food"],
+  "ageRangeMin": 12, "ageRangeMax": 18,
+  "currencyCode": "GBP", "author": "content-team", "notes": ""
+}

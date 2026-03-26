@@ -1,0 +1,20 @@
+{
+  "id": "ef_normal_012",
+  "version": 2,
+  "type": "normal",
+  "title": "Park Kickabout",
+  "description": "Went to the park for a kickabout with mates. Cost nothing, had a laugh.",
+  "weeklyIncomePounds": 60,
+  "costPounds": 0,
+  "bonusPounds": 0,
+  "choices": [
+    { "label": "Great fun!", "savePounds": 0, "flavourText": "Best things in life are free." },
+    { "label": "Bit knackered", "savePounds": 0, "flavourText": "Good exercise though." }
+  ],
+  "duckEmotion": "happy",
+  "duckLine": "Fresh air and football!",
+  "difficulty": "easy",
+  "tags": ["routine", "social", "sport"],
+  "ageRangeMin": 12, "ageRangeMax": 18,
+  "currencyCode": "GBP", "author": "content-team", "notes": ""
+}

@@ -1,0 +1,63 @@
+{
+  "id": "scenario_015",
+  "seasonName": "Park Day",
+  "rounds": [
+    {
+      "budget": 8.50,
+      "roundName": "Standard Week",
+      "recipeName": "Scrambled Eggs on Toast",
+      "duckLine": "Park trip this weekend — get your shop done!",
+      "duckEmotion": "neutral",
+      "essentials": [
+        { "name": "Eggs", "price": 1.80 },
+        { "name": "Bread", "price": 1.20 },
+        { "name": "Butter", "price": 1.30 },
+        { "name": "Milk", "price": 1.10 }
+      ],
+      "treats": [
+        { "name": "Energy Drink", "price": 1.60 },
+        { "name": "Fruit Snack", "price": 0.90 }
+      ],
+      "extraTreats": []
+    },
+    {
+      "budget": 7.50,
+      "roundName": "Budget Week",
+      "recipeName": "Cheese Pasta",
+      "duckLine": "Not much left — essentials first!",
+      "duckEmotion": "worried",
+      "essentials": [
+        { "name": "Pasta", "price": 1.20 },
+        { "name": "Cheese", "price": 1.50 },
+        { "name": "Milk", "price": 1.10 },
+        { "name": "Butter", "price": 1.30 }
+      ],
+      "treats": [
+        { "name": "Biscuits", "price": 1.00 },
+        { "name": "Juice", "price": 1.10 }
+      ],
+      "extraTreats": []
+    },
+    {
+      "budget": 11.00,
+      "roundName": "Payday Week",
+      "recipeName": "Chicken Stew",
+      "duckLine": "Fresh pocket money! Enjoy, but be sensible!",
+      "duckEmotion": "excited",
+      "essentials": [
+        { "name": "Chicken", "price": 2.20 },
+        { "name": "Potatoes", "price": 1.40 },
+        { "name": "Carrots", "price": 1.00 },
+        { "name": "Onions", "price": 0.90 }
+      ],
+      "treats": [
+        { "name": "Fudge", "price": 1.40 },
+        { "name": "Hot Chocolate", "price": 1.60 }
+      ],
+      "extraTreats": [
+        { "name": "Notebook", "price": 2.50 },
+        { "name": "Pen Set", "price": 2.80 }
+      ]
+    }
+  ]
+}

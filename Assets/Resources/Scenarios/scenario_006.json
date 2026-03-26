@@ -1,0 +1,63 @@
+{
+  "id": "scenario_006",
+  "seasonName": "Half Term",
+  "rounds": [
+    {
+      "budget": 7.80,
+      "roundName": "Usual Week",
+      "recipeName": "Cheese Omelette",
+      "duckLine": "Half term break — still need the basics!",
+      "duckEmotion": "neutral",
+      "essentials": [
+        { "name": "Eggs", "price": 1.80 },
+        { "name": "Cheese", "price": 1.60 },
+        { "name": "Onions", "price": 0.90 },
+        { "name": "Tomatoes", "price": 1.20 }
+      ],
+      "treats": [
+        { "name": "Crisps", "price": 1.20 },
+        { "name": "Juice", "price": 1.10 }
+      ],
+      "extraTreats": []
+    },
+    {
+      "budget": 7.00,
+      "roundName": "Tight Week",
+      "recipeName": "Tuna Melt",
+      "duckLine": "Running low — only buy what matters!",
+      "duckEmotion": "worried",
+      "essentials": [
+        { "name": "Bread", "price": 1.30 },
+        { "name": "Tuna", "price": 1.50 },
+        { "name": "Cheese", "price": 1.50 },
+        { "name": "Butter", "price": 1.20 }
+      ],
+      "treats": [
+        { "name": "Granola Bar", "price": 1.30 },
+        { "name": "Iced Tea", "price": 1.10 }
+      ],
+      "extraTreats": []
+    },
+    {
+      "budget": 11.00,
+      "roundName": "Payday Week",
+      "recipeName": "Cottage Pie",
+      "duckLine": "Topped up! But plan your spending!",
+      "duckEmotion": "excited",
+      "essentials": [
+        { "name": "Mince", "price": 2.30 },
+        { "name": "Potatoes", "price": 1.40 },
+        { "name": "Carrots", "price": 0.90 },
+        { "name": "Onions", "price": 0.90 }
+      ],
+      "treats": [
+        { "name": "Cookie", "price": 1.20 },
+        { "name": "Fizzy Drink", "price": 1.20 }
+      ],
+      "extraTreats": [
+        { "name": "Hair Ties", "price": 2.00 },
+        { "name": "Magazine", "price": 3.00 }
+      ]
+    }
+  ]
+}

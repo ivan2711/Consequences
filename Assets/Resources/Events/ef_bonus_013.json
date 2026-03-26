@@ -1,0 +1,20 @@
+{
+  "id": "ef_bonus_013",
+  "version": 2,
+  "type": "bonus",
+  "title": "Christmas Money",
+  "description": "Auntie sent you £20 in a Christmas card!",
+  "weeklyIncomePounds": 60,
+  "costPounds": 0,
+  "bonusPounds": 20,
+  "choices": [
+    { "label": "Add to fund", "savePounds": 0, "flavourText": "Best Christmas present: savings!" },
+    { "label": "Keep in bank", "savePounds": 0, "flavourText": "Thanks, Auntie!" }
+  ],
+  "duckEmotion": "celebrating",
+  "duckLine": "Merry savings!",
+  "difficulty": "easy",
+  "tags": ["bonus", "gift", "seasonal"],
+  "ageRangeMin": 12, "ageRangeMax": 18,
+  "currencyCode": "GBP", "author": "content-team", "notes": ""
+}

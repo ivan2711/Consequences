@@ -1,0 +1,20 @@
+{
+  "id": "ef_bonus_009",
+  "version": 2,
+  "type": "bonus",
+  "title": "Competition Winner",
+  "description": "You won a school art competition! The prize is £25!",
+  "weeklyIncomePounds": 60,
+  "costPounds": 0,
+  "bonusPounds": 25,
+  "choices": [
+    { "label": "Add to fund", "savePounds": 0, "flavourText": "Art skills paying dividends!" },
+    { "label": "Keep in bank", "savePounds": 0, "flavourText": "Nice reward for your talent." }
+  ],
+  "duckEmotion": "celebrating",
+  "duckLine": "You're a winner!",
+  "difficulty": "easy",
+  "tags": ["bonus", "school", "achievement"],
+  "ageRangeMin": 12, "ageRangeMax": 18,
+  "currencyCode": "GBP", "author": "content-team", "notes": ""
+}

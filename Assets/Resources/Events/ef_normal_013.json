@@ -1,0 +1,20 @@
+{
+  "id": "ef_normal_013",
+  "version": 2,
+  "type": "normal",
+  "title": "Cooking at Home",
+  "description": "Helped make dinner at home instead of buying lunch out. Saved without trying.",
+  "weeklyIncomePounds": 60,
+  "costPounds": 0,
+  "bonusPounds": 0,
+  "choices": [
+    { "label": "Tasty!", "savePounds": 0, "flavourText": "Home cooking wins again." },
+    { "label": "Not bad at all", "savePounds": 0, "flavourText": "Might do this more often." }
+  ],
+  "duckEmotion": "happy",
+  "duckLine": "Chef mode activated!",
+  "difficulty": "easy",
+  "tags": ["routine", "food"],
+  "ageRangeMin": 12, "ageRangeMax": 18,
+  "currencyCode": "GBP", "author": "content-team", "notes": ""
+}

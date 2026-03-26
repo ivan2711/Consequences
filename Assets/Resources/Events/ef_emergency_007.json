@@ -1,0 +1,20 @@
+{
+  "id": "ef_emergency_007",
+  "version": 2,
+  "type": "emergency",
+  "title": "Charger Broke",
+  "description": "Your phone charger snapped. A replacement costs £15.",
+  "weeklyIncomePounds": 60,
+  "costPounds": 15,
+  "bonusPounds": 0,
+  "choices": [
+    { "label": "Buy a new one (£15)", "savePounds": 0, "flavourText": "Phone's charging again, sorted." },
+    { "label": "Borrow one at school", "savePounds": 0, "flavourText": "Managed without for now." }
+  ],
+  "duckEmotion": "shocked",
+  "duckLine": "No charge, no phone!",
+  "difficulty": "easy",
+  "tags": ["tech", "essential"],
+  "ageRangeMin": 12, "ageRangeMax": 18,
+  "currencyCode": "GBP", "author": "content-team", "notes": ""
+}

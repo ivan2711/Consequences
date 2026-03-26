@@ -1,0 +1,20 @@
+{
+  "id": "ef_choice_013",
+  "version": 2,
+  "type": "choice",
+  "title": "Bubble Tea Run",
+  "description": "Your group chat is organising a bubble tea run after school. A large costs £8.",
+  "weeklyIncomePounds": 60,
+  "costPounds": 8,
+  "bonusPounds": 0,
+  "choices": [
+    { "label": "Get one (£8)", "savePounds": 0, "flavourText": "Taro flavour, no regrets." },
+    { "label": "Just water today", "savePounds": 0, "flavourText": "Stayed hydrated and saved." }
+  ],
+  "duckEmotion": "thinking",
+  "duckLine": "Tapioca pearls or savings?",
+  "difficulty": "easy",
+  "tags": ["social", "food"],
+  "ageRangeMin": 12, "ageRangeMax": 18,
+  "currencyCode": "GBP", "author": "content-team", "notes": ""
+}

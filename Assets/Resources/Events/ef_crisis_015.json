@@ -1,0 +1,20 @@
+{
+  "id": "ef_crisis_015",
+  "version": 2,
+  "type": "crisis",
+  "title": "End-of-Year Prom",
+  "description": "Prom is coming up! Outfit hire, ticket, and transport add up to £48.",
+  "weeklyIncomePounds": 60,
+  "costPounds": 48,
+  "bonusPounds": 0,
+  "choices": [
+    { "label": "Full prom experience (£48)", "savePounds": 48, "flavourText": "Night to remember. Looked amazing." },
+    { "label": "Budget option (£25)", "savePounds": 25, "flavourText": "Borrowed an outfit, still had a great time." }
+  ],
+  "duckEmotion": "worried",
+  "duckLine": "Prom night pressure!",
+  "difficulty": "hard",
+  "tags": ["school", "social", "clothing"],
+  "ageRangeMin": 12, "ageRangeMax": 18,
+  "currencyCode": "GBP", "author": "content-team", "notes": ""
+}

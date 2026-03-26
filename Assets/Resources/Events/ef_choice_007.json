@@ -1,0 +1,20 @@
+{
+  "id": "ef_choice_007",
+  "version": 2,
+  "type": "choice",
+  "title": "New Game Release",
+  "description": "A game you've been waiting for just dropped. It's £18 on sale.",
+  "weeklyIncomePounds": 60,
+  "costPounds": 18,
+  "bonusPounds": 0,
+  "choices": [
+    { "label": "Buy it (£18)", "savePounds": 0, "flavourText": "Downloading now. Worth the wait!" },
+    { "label": "Wait for a bigger sale", "savePounds": 0, "flavourText": "It'll be cheaper eventually." }
+  ],
+  "duckEmotion": "thinking",
+  "duckLine": "Can you wait?",
+  "difficulty": "medium",
+  "tags": ["entertainment", "gaming"],
+  "ageRangeMin": 12, "ageRangeMax": 18,
+  "currencyCode": "GBP", "author": "content-team", "notes": ""
+}

@@ -103,6 +103,10 @@ private void Awake()
         StopAllCoroutines();
         SetEmotionContent(emotion, message);
 
+        // TTS disabled for NAS build — re-enable when backend is ready
+        // if (!string.IsNullOrEmpty(message))
+        //     TTSManager.SetContent(message);
+
         if (canvasGroup != null)
         {
             canvasGroup.alpha = 1f;

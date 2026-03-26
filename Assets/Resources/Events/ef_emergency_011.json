@@ -1,0 +1,20 @@
+{
+  "id": "ef_emergency_011",
+  "version": 2,
+  "type": "emergency",
+  "title": "Glasses Broken",
+  "description": "You sat on your glasses and snapped the frame. Repair costs £28.",
+  "weeklyIncomePounds": 60,
+  "costPounds": 28,
+  "bonusPounds": 0,
+  "choices": [
+    { "label": "Get them fixed (£28)", "savePounds": 0, "flavourText": "Can see the board again." },
+    { "label": "Use tape for now", "savePounds": 0, "flavourText": "Looks silly but they work." }
+  ],
+  "duckEmotion": "worried",
+  "duckLine": "Can you even read this?",
+  "difficulty": "hard",
+  "tags": ["health", "essential"],
+  "ageRangeMin": 12, "ageRangeMax": 18,
+  "currencyCode": "GBP", "author": "content-team", "notes": ""
+}

@@ -1,0 +1,42 @@
+<string>:28: SyntaxWarning: "\!" is an invalid escape sequence. Such sequences will not work in the future. Did you mean "\\!"? A raw string is also an option.
+<string>:29: SyntaxWarning: "\!" is an invalid escape sequence. Such sequences will not work in the future. Did you mean "\\!"? A raw string is also an option.
+
+********
+Warning: flash-attn is not installed. Will only run the manual PyTorch version. Please install flash-attn for faster inference.
+********
+ 
+======================================================================
+QWEN3-TTS BENCHMARK — CONSEQUENCES FYP
+======================================================================
+Date:     2026-03-21 18:13:36
+Machine:  Ivans-MacBook-Air.local
+Platform: macOS-26.3-arm64-arm-64bit-Mach-O
+CPU:      arm
+Python:   3.14.2
+PyTorch:  2.10.0
+Device:   CPU (no CUDA available)
+Model:    Qwen/Qwen3-TTS-12Hz-0.6B-CustomVoice
+Dtype:    float32
+Voice:    vivian
+======================================================================
+
+Loading model...
+Fetching 4 files:   0%|          | 0/4 [00:00<?, ?it/s]Fetching 4 files: 100%|██████████| 4/4 [00:00<00:00, 73262.95it/s]
+Setting `pad_token_id` to `eos_token_id`:2150 for open-end generation.
+Setting `pad_token_id` to `eos_token_id`:2150 for open-end generation.
+Setting `pad_token_id` to `eos_token_id`:2150 for open-end generation.
+Setting `pad_token_id` to `eos_token_id`:2150 for open-end generation.
+Model loaded in 5.6s
+
+Label        Words   Gen(s)    Audio(s)   RTF    Text
+------------------------------------------------------------------------------------------
+Short        2       2.42      1.12       2.2    "Good job\!"
+Medium       6       6.53      3.12       2.1    "Normal week, buy what you need\!"
+Long         15      15.67     7.36       2.1    "Save a little each week so surprises do not turn into debt. Goal: 160 pounds."
+Very long    27      43.92     19.84      2.2    "Round 1 of 3. Normal Week. Budget: 8 pounds 50. Items: Bread 1 pound 20, Milk 1 pound 50, Eggs 2 pounds 50, Rice 1 pound 80."
+
+RTF = Real-Time Factor. 1.0x means audio generates as fast as it plays.
+Higher RTF = slower. All values > 1.0 mean the user must WAIT.
+
+For comparison: Piper TTS generates in ~0.02-0.03s (20-30ms) on the same CPU.
+======================================================================

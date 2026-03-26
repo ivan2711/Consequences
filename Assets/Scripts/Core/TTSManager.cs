@@ -35,12 +35,12 @@ public class TTSManager : MonoBehaviour
     private readonly Color idleColor = new Color(0.25f, 0.55f, 0.85f);
     private readonly Color speakingColor = new Color(0.3f, 0.75f, 0.4f);
 
-    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
-    static void AutoCreate()
-    {
-        // Ensure TTSManager exists from the very first scene
-        var _ = Instance;
-    }
+    // TTS disabled for NAS build — re-enable when backend is ready
+    // [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
+    // static void AutoCreate()
+    // {
+    //     var _ = Instance;
+    // }
 
     void Awake()
     {

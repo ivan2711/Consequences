@@ -1,0 +1,20 @@
+{
+  "id": "ef_choice_010",
+  "version": 2,
+  "type": "choice",
+  "title": "New Trainers",
+  "description": "You've spotted some nice trainers online for £20. Your current ones are fine though.",
+  "weeklyIncomePounds": 60,
+  "costPounds": 20,
+  "bonusPounds": 0,
+  "choices": [
+    { "label": "Treat yourself (£20)", "savePounds": 0, "flavourText": "Fresh kicks, looking sharp." },
+    { "label": "Old ones are fine", "savePounds": 0, "flavourText": "They've got life in them yet." }
+  ],
+  "duckEmotion": "thinking",
+  "duckLine": "Want or need?",
+  "difficulty": "medium",
+  "tags": ["clothing", "shopping"],
+  "ageRangeMin": 12, "ageRangeMax": 18,
+  "currencyCode": "GBP", "author": "content-team", "notes": ""
+}

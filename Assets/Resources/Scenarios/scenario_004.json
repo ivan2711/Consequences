@@ -1,0 +1,63 @@
+{
+  "id": "scenario_004",
+  "seasonName": "Back to School",
+  "rounds": [
+    {
+      "budget": 8.80,
+      "roundName": "Standard Week",
+      "recipeName": "Cheese Toasties",
+      "duckLine": "New term, fresh start — shop sensibly!",
+      "duckEmotion": "neutral",
+      "essentials": [
+        { "name": "Bread", "price": 1.20 },
+        { "name": "Cheese", "price": 1.60 },
+        { "name": "Butter", "price": 1.30 },
+        { "name": "Tomatoes", "price": 1.20 }
+      ],
+      "treats": [
+        { "name": "Chocolate", "price": 1.50 },
+        { "name": "Energy Drink", "price": 1.60 }
+      ],
+      "extraTreats": []
+    },
+    {
+      "budget": 7.20,
+      "roundName": "Careful Week",
+      "recipeName": "Chicken Wraps",
+      "duckLine": "After all that back-to-school spending, be careful!",
+      "duckEmotion": "worried",
+      "essentials": [
+        { "name": "Chicken", "price": 2.20 },
+        { "name": "Tomatoes", "price": 1.20 },
+        { "name": "Cheese", "price": 1.50 },
+        { "name": "Lettuce", "price": 0.90 }
+      ],
+      "treats": [
+        { "name": "Biscuits", "price": 1.00 },
+        { "name": "Fruit Snack", "price": 0.90 }
+      ],
+      "extraTreats": []
+    },
+    {
+      "budget": 12.50,
+      "roundName": "Bonus Week",
+      "recipeName": "Egg Fried Rice",
+      "duckLine": "Bonus pocket money! Don't blow it all!",
+      "duckEmotion": "excited",
+      "essentials": [
+        { "name": "Rice", "price": 1.30 },
+        { "name": "Eggs", "price": 1.80 },
+        { "name": "Carrots", "price": 0.90 },
+        { "name": "Onions", "price": 0.90 }
+      ],
+      "treats": [
+        { "name": "Popcorn", "price": 1.40 },
+        { "name": "Milkshake", "price": 1.80 }
+      ],
+      "extraTreats": [
+        { "name": "Pen Set", "price": 2.80 },
+        { "name": "Key Ring", "price": 2.00 }
+      ]
+    }
+  ]
+}

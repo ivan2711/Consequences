@@ -1,0 +1,20 @@
+{
+  "id": "ef_bonus_007",
+  "version": 2,
+  "type": "bonus",
+  "title": "Neighbour's Dog Walking",
+  "description": "You walked the neighbour's dog all week and earned £12!",
+  "weeklyIncomePounds": 60,
+  "costPounds": 0,
+  "bonusPounds": 12,
+  "choices": [
+    { "label": "Add to fund", "savePounds": 0, "flavourText": "Dog walks pay off!" },
+    { "label": "Keep in bank", "savePounds": 0, "flavourText": "Treat yourself later maybe." }
+  ],
+  "duckEmotion": "excited",
+  "duckLine": "Good dog, good money!",
+  "difficulty": "easy",
+  "tags": ["bonus", "earning", "job"],
+  "ageRangeMin": 12, "ageRangeMax": 18,
+  "currencyCode": "GBP", "author": "content-team", "notes": ""
+}

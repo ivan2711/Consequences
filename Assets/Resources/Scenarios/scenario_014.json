@@ -1,0 +1,63 @@
+{
+  "id": "scenario_014",
+  "seasonName": "Movie Night",
+  "rounds": [
+    {
+      "budget": 7.80,
+      "roundName": "Steady Week",
+      "recipeName": "Veggie Pasta",
+      "duckLine": "Movie night to plan for — shop smart!",
+      "duckEmotion": "neutral",
+      "essentials": [
+        { "name": "Pasta", "price": 1.20 },
+        { "name": "Tomatoes", "price": 1.30 },
+        { "name": "Cheese", "price": 1.60 },
+        { "name": "Onions", "price": 0.90 }
+      ],
+      "treats": [
+        { "name": "Popcorn", "price": 1.40 },
+        { "name": "Fizzy Drink", "price": 1.20 }
+      ],
+      "extraTreats": []
+    },
+    {
+      "budget": 7.00,
+      "roundName": "Slim Week",
+      "recipeName": "Fish Finger Sandwich",
+      "duckLine": "Spent on snacks already — tighten up!",
+      "duckEmotion": "worried",
+      "essentials": [
+        { "name": "Bread", "price": 1.20 },
+        { "name": "Fish Fingers", "price": 1.80 },
+        { "name": "Lettuce", "price": 0.90 },
+        { "name": "Butter", "price": 1.30 }
+      ],
+      "treats": [
+        { "name": "Sweets", "price": 1.00 },
+        { "name": "Iced Tea", "price": 1.10 }
+      ],
+      "extraTreats": []
+    },
+    {
+      "budget": 10.00,
+      "roundName": "Bonus Week",
+      "recipeName": "Pizza Toast",
+      "duckLine": "Bonus cash! Grab movie snacks wisely!",
+      "duckEmotion": "excited",
+      "essentials": [
+        { "name": "Bread", "price": 1.20 },
+        { "name": "Cheese", "price": 1.60 },
+        { "name": "Tomatoes", "price": 1.20 },
+        { "name": "Ham", "price": 1.50 }
+      ],
+      "treats": [
+        { "name": "Crisps", "price": 1.20 },
+        { "name": "Chocolate", "price": 1.50 }
+      ],
+      "extraTreats": [
+        { "name": "Magazine", "price": 3.00 },
+        { "name": "Lip Balm", "price": 2.20 }
+      ]
+    }
+  ]
+}

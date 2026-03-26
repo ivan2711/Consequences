@@ -1,0 +1,20 @@
+{
+  "id": "ef_bonus_015",
+  "version": 2,
+  "type": "bonus",
+  "title": "Sold Old Games",
+  "description": "You traded in some old video games at the shop and got £16!",
+  "weeklyIncomePounds": 60,
+  "costPounds": 0,
+  "bonusPounds": 16,
+  "choices": [
+    { "label": "Add to fund", "savePounds": 0, "flavourText": "Old games, new savings." },
+    { "label": "Keep in bank", "savePounds": 0, "flavourText": "Might buy something later." }
+  ],
+  "duckEmotion": "excited",
+  "duckLine": "Out with the old!",
+  "difficulty": "easy",
+  "tags": ["bonus", "earning"],
+  "ageRangeMin": 12, "ageRangeMax": 18,
+  "currencyCode": "GBP", "author": "content-team", "notes": ""
+}

@@ -1,0 +1,20 @@
+{
+  "id": "ef_crisis_007",
+  "version": 2,
+  "type": "crisis",
+  "title": "School Trip Emergency",
+  "description": "The school trip deposit is due tomorrow and you also need new school shoes. Total: £45.",
+  "weeklyIncomePounds": 60,
+  "costPounds": 45,
+  "bonusPounds": 0,
+  "choices": [
+    { "label": "Pay for both (£45)", "savePounds": 45, "flavourText": "Trip secured and shoes sorted. Expensive week." },
+    { "label": "Just the trip (£25)", "savePounds": 25, "flavourText": "Trip's more important. Shoes can wait." }
+  ],
+  "duckEmotion": "worried",
+  "duckLine": "That's a big bill!",
+  "difficulty": "hard",
+  "tags": ["school", "clothing", "essential"],
+  "ageRangeMin": 12, "ageRangeMax": 18,
+  "currencyCode": "GBP", "author": "content-team", "notes": ""
+}

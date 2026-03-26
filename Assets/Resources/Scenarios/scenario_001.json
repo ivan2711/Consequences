@@ -1,0 +1,63 @@
+{
+  "id": "scenario_001",
+  "seasonName": "Autumn Term",
+  "rounds": [
+    {
+      "budget": 8.50,
+      "roundName": "Normal Week",
+      "recipeName": "Veggie Omelette",
+      "duckLine": "Normal week — buy what you need!",
+      "duckEmotion": "neutral",
+      "essentials": [
+        { "name": "Eggs", "price": 1.80 },
+        { "name": "Cheese", "price": 1.60 },
+        { "name": "Tomatoes", "price": 1.20 },
+        { "name": "Onions", "price": 0.90 }
+      ],
+      "treats": [
+        { "name": "Crisps", "price": 1.20 },
+        { "name": "Chocolate", "price": 1.50 }
+      ],
+      "extraTreats": []
+    },
+    {
+      "budget": 7.00,
+      "roundName": "Tight Week",
+      "recipeName": "Chicken Stir Fry",
+      "duckLine": "Money's tighter this week — be careful!",
+      "duckEmotion": "worried",
+      "essentials": [
+        { "name": "Chicken", "price": 2.20 },
+        { "name": "Rice", "price": 1.30 },
+        { "name": "Carrots", "price": 0.90 },
+        { "name": "Vegetables", "price": 1.10 }
+      ],
+      "treats": [
+        { "name": "Biscuits", "price": 1.00 },
+        { "name": "Juice", "price": 1.30 }
+      ],
+      "extraTreats": []
+    },
+    {
+      "budget": 12.00,
+      "roundName": "Payday Week",
+      "recipeName": "Pasta Bake",
+      "duckLine": "Payday! But don't splurge everything!",
+      "duckEmotion": "excited",
+      "essentials": [
+        { "name": "Pasta", "price": 1.20 },
+        { "name": "Cheese", "price": 1.60 },
+        { "name": "Tomatoes", "price": 1.20 },
+        { "name": "Milk", "price": 1.10 }
+      ],
+      "treats": [
+        { "name": "Popcorn", "price": 1.40 },
+        { "name": "Fizzy Drink", "price": 1.20 }
+      ],
+      "extraTreats": [
+        { "name": "Magazine", "price": 3.00 },
+        { "name": "Sweets", "price": 1.80 }
+      ]
+    }
+  ]
+}

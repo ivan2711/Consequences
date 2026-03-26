@@ -67,6 +67,11 @@ sysinfo.txt
 # Crashlytics generated file
 crashlytics-build.properties
 
+# TTS server (models + venv are too large for git)
+TTS/model/
+TTS/venv/
+TTS/__pycache__/
+
 # Packed Addressables
 /[Aa]ssets/[Aa]ddressable[Aa]ssets[Dd]ata/*/*.bin*
 

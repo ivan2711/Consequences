@@ -1,0 +1,20 @@
+{
+  "id": "ef_emergency_008",
+  "version": 2,
+  "type": "emergency",
+  "title": "PE Kit Ruined",
+  "description": "Someone spilled paint on your PE kit in art class. New shorts and top cost £22.",
+  "weeklyIncomePounds": 60,
+  "costPounds": 22,
+  "bonusPounds": 0,
+  "choices": [
+    { "label": "Buy new kit (£22)", "savePounds": 0, "flavourText": "Fresh PE kit, no more paint stains." },
+    { "label": "Wash it out", "savePounds": 0, "flavourText": "Still a faint stain, but it'll do." }
+  ],
+  "duckEmotion": "shocked",
+  "duckLine": "Paint everywhere!",
+  "difficulty": "medium",
+  "tags": ["school", "clothing"],
+  "ageRangeMin": 12, "ageRangeMax": 18,
+  "currencyCode": "GBP", "author": "content-team", "notes": ""
+}

@@ -1,0 +1,63 @@
+{
+  "id": "scenario_007",
+  "seasonName": "Sports Day",
+  "rounds": [
+    {
+      "budget": 8.20,
+      "roundName": "Regular Week",
+      "recipeName": "Chicken Sandwich",
+      "duckLine": "Sports day prep — eat well this week!",
+      "duckEmotion": "neutral",
+      "essentials": [
+        { "name": "Bread", "price": 1.20 },
+        { "name": "Chicken", "price": 2.20 },
+        { "name": "Lettuce", "price": 0.90 },
+        { "name": "Butter", "price": 1.30 }
+      ],
+      "treats": [
+        { "name": "Energy Drink", "price": 1.60 },
+        { "name": "Granola Bar", "price": 1.30 }
+      ],
+      "extraTreats": []
+    },
+    {
+      "budget": 7.50,
+      "roundName": "Budget Week",
+      "recipeName": "Veggie Chilli",
+      "duckLine": "Tight budget — focus on essentials!",
+      "duckEmotion": "worried",
+      "essentials": [
+        { "name": "Beans", "price": 1.20 },
+        { "name": "Rice", "price": 1.30 },
+        { "name": "Tomatoes", "price": 1.20 },
+        { "name": "Cheese", "price": 1.50 }
+      ],
+      "treats": [
+        { "name": "Fruit Snack", "price": 0.90 },
+        { "name": "Juice", "price": 1.10 }
+      ],
+      "extraTreats": []
+    },
+    {
+      "budget": 12.00,
+      "roundName": "Treat Week",
+      "recipeName": "Mac and Cheese",
+      "duckLine": "You earned a treat — but keep your head!",
+      "duckEmotion": "excited",
+      "essentials": [
+        { "name": "Pasta", "price": 1.20 },
+        { "name": "Cheese", "price": 1.80 },
+        { "name": "Milk", "price": 1.10 },
+        { "name": "Butter", "price": 1.30 }
+      ],
+      "treats": [
+        { "name": "Smoothie", "price": 1.80 },
+        { "name": "Popcorn", "price": 1.40 }
+      ],
+      "extraTreats": [
+        { "name": "Key Ring", "price": 2.50 },
+        { "name": "Sweets", "price": 1.80 }
+      ]
+    }
+  ]
+}

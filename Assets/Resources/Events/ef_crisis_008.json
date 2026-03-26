@@ -1,0 +1,20 @@
+{
+  "id": "ef_crisis_008",
+  "version": 2,
+  "type": "crisis",
+  "title": "Pet Vet Bill",
+  "description": "Your pet hamster is poorly and needs to see the vet. The bill comes to £40.",
+  "weeklyIncomePounds": 60,
+  "costPounds": 40,
+  "bonusPounds": 0,
+  "choices": [
+    { "label": "Pay the vet (£40)", "savePounds": 40, "flavourText": "Hamster's on the mend. Worth every penny." },
+    { "label": "Ask family to help (£20)", "savePounds": 20, "flavourText": "Split the cost with your parents." }
+  ],
+  "duckEmotion": "worried",
+  "duckLine": "Poor little hamster!",
+  "difficulty": "hard",
+  "tags": ["pet", "health", "family"],
+  "ageRangeMin": 12, "ageRangeMax": 18,
+  "currencyCode": "GBP", "author": "content-team", "notes": ""
+}

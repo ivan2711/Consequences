@@ -1,0 +1,20 @@
+{
+  "id": "ef_emergency_013",
+  "version": 2,
+  "type": "emergency",
+  "title": "Lost Textbook",
+  "description": "You lost your maths textbook and the school says you need to replace it. Cost: £16.",
+  "weeklyIncomePounds": 60,
+  "costPounds": 16,
+  "bonusPounds": 0,
+  "choices": [
+    { "label": "Buy a new copy (£16)", "savePounds": 0, "flavourText": "Lesson learned: look after your stuff." },
+    { "label": "Share with a classmate", "savePounds": 0, "flavourText": "Awkward, but it works for now." }
+  ],
+  "duckEmotion": "worried",
+  "duckLine": "Check under the bed!",
+  "difficulty": "easy",
+  "tags": ["school", "essential"],
+  "ageRangeMin": 12, "ageRangeMax": 18,
+  "currencyCode": "GBP", "author": "content-team", "notes": ""
+}

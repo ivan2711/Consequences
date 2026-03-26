@@ -1,0 +1,20 @@
+{
+  "id": "ef_crisis_012",
+  "version": 2,
+  "type": "crisis",
+  "title": "Family Emergency",
+  "description": "Your mum's short on cash this week and needs help with the electric bill. She's asking for £30.",
+  "weeklyIncomePounds": 60,
+  "costPounds": 30,
+  "bonusPounds": 0,
+  "choices": [
+    { "label": "Help out (£30)", "savePounds": 30, "flavourText": "Family first. She'll pay you back." },
+    { "label": "Give what you can (£15)", "savePounds": 15, "flavourText": "Every bit helps." }
+  ],
+  "duckEmotion": "worried",
+  "duckLine": "Family comes first.",
+  "difficulty": "hard",
+  "tags": ["family", "essential", "bills"],
+  "ageRangeMin": 12, "ageRangeMax": 18,
+  "currencyCode": "GBP", "author": "content-team", "notes": ""
+}

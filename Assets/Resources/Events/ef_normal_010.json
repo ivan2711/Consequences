@@ -1,0 +1,20 @@
+{
+  "id": "ef_normal_010",
+  "version": 2,
+  "type": "normal",
+  "title": "Half-Term Break",
+  "description": "Half-term holidays! You hung out at home and played games all week.",
+  "weeklyIncomePounds": 60,
+  "costPounds": 0,
+  "bonusPounds": 0,
+  "choices": [
+    { "label": "Great week off", "savePounds": 0, "flavourText": "Recharged and ready." },
+    { "label": "Back to it soon", "savePounds": 0, "flavourText": "Enjoyed every minute." }
+  ],
+  "duckEmotion": "happy",
+  "duckLine": "Holiday vibes!",
+  "difficulty": "easy",
+  "tags": ["routine", "holiday"],
+  "ageRangeMin": 12, "ageRangeMax": 18,
+  "currencyCode": "GBP", "author": "content-team", "notes": ""
+}

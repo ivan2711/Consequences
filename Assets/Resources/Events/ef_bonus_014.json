@@ -1,0 +1,20 @@
+{
+  "id": "ef_bonus_014",
+  "version": 2,
+  "type": "bonus",
+  "title": "Babysitting Gig",
+  "description": "You babysat your little cousin for the evening and earned £22!",
+  "weeklyIncomePounds": 60,
+  "costPounds": 0,
+  "bonusPounds": 22,
+  "choices": [
+    { "label": "Add to fund", "savePounds": 0, "flavourText": "Hard work but worth it." },
+    { "label": "Keep in bank", "savePounds": 0, "flavourText": "Earned every penny of that." }
+  ],
+  "duckEmotion": "celebrating",
+  "duckLine": "Great job tonight!",
+  "difficulty": "easy",
+  "tags": ["bonus", "earning", "job"],
+  "ageRangeMin": 12, "ageRangeMax": 18,
+  "currencyCode": "GBP", "author": "content-team", "notes": ""
+}

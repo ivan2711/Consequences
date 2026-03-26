@@ -1,0 +1,63 @@
+{
+  "id": "scenario_003",
+  "seasonName": "Summer Holidays",
+  "rounds": [
+    {
+      "budget": 8.00,
+      "roundName": "Steady Week",
+      "recipeName": "Egg Sandwiches",
+      "duckLine": "Steady week — stick to your plan!",
+      "duckEmotion": "neutral",
+      "essentials": [
+        { "name": "Bread", "price": 1.20 },
+        { "name": "Eggs", "price": 1.80 },
+        { "name": "Butter", "price": 1.30 },
+        { "name": "Lettuce", "price": 1.00 }
+      ],
+      "treats": [
+        { "name": "Sweets", "price": 1.00 },
+        { "name": "Fizzy Drink", "price": 1.20 }
+      ],
+      "extraTreats": []
+    },
+    {
+      "budget": 6.80,
+      "roundName": "Slim Week",
+      "recipeName": "Tuna Pasta",
+      "duckLine": "Not much to spare — choose carefully!",
+      "duckEmotion": "worried",
+      "essentials": [
+        { "name": "Pasta", "price": 1.10 },
+        { "name": "Tuna", "price": 1.50 },
+        { "name": "Tomatoes", "price": 1.20 },
+        { "name": "Cheese", "price": 1.50 }
+      ],
+      "treats": [
+        { "name": "Cereal Bar", "price": 0.80 },
+        { "name": "Juice", "price": 1.10 }
+      ],
+      "extraTreats": []
+    },
+    {
+      "budget": 11.50,
+      "roundName": "Big Shop",
+      "recipeName": "Shepherd's Pie",
+      "duckLine": "Big shop day! Can you resist the extras?",
+      "duckEmotion": "excited",
+      "essentials": [
+        { "name": "Mince", "price": 2.30 },
+        { "name": "Potatoes", "price": 1.40 },
+        { "name": "Carrots", "price": 0.90 },
+        { "name": "Onions", "price": 0.90 }
+      ],
+      "treats": [
+        { "name": "Crisps", "price": 1.20 },
+        { "name": "Chocolate", "price": 1.50 }
+      ],
+      "extraTreats": [
+        { "name": "Comic Book", "price": 3.50 },
+        { "name": "Lip Balm", "price": 2.20 }
+      ]
+    }
+  ]
+}

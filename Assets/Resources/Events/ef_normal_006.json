@@ -1,0 +1,20 @@
+{
+  "id": "ef_normal_006",
+  "version": 2,
+  "type": "normal",
+  "title": "Lazy Sunday",
+  "description": "A chilled weekend with nothing to spend on. You stayed home and watched telly.",
+  "weeklyIncomePounds": 60,
+  "costPounds": 0,
+  "bonusPounds": 0,
+  "choices": [
+    { "label": "Relaxing!", "savePounds": 0, "flavourText": "Sometimes doing nothing is the best plan." },
+    { "label": "Check my balance", "savePounds": 0, "flavourText": "Everything's ticking along nicely." }
+  ],
+  "duckEmotion": "happy",
+  "duckLine": "Rest day!",
+  "difficulty": "easy",
+  "tags": ["routine", "weekend"],
+  "ageRangeMin": 12, "ageRangeMax": 18,
+  "currencyCode": "GBP", "author": "content-team", "notes": ""
+}

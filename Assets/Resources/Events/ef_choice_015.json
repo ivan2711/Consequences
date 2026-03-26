@@ -1,0 +1,20 @@
+{
+  "id": "ef_choice_015",
+  "version": 2,
+  "type": "choice",
+  "title": "Haircut Upgrade",
+  "description": "You fancy a fresh trim at the barber's. A proper cut costs £16.",
+  "weeklyIncomePounds": 60,
+  "costPounds": 16,
+  "bonusPounds": 0,
+  "choices": [
+    { "label": "Get the cut (£16)", "savePounds": 0, "flavourText": "Looking fresh for the week." },
+    { "label": "It can wait", "savePounds": 0, "flavourText": "Still looks alright for now." }
+  ],
+  "duckEmotion": "thinking",
+  "duckLine": "Fresh trim or fresh savings?",
+  "difficulty": "medium",
+  "tags": ["personal", "grooming"],
+  "ageRangeMin": 12, "ageRangeMax": 18,
+  "currencyCode": "GBP", "author": "content-team", "notes": ""
+}

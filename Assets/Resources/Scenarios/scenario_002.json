@@ -1,0 +1,63 @@
+{
+  "id": "scenario_002",
+  "seasonName": "Spring Term",
+  "rounds": [
+    {
+      "budget": 9.00,
+      "roundName": "Regular Week",
+      "recipeName": "French Toast",
+      "duckLine": "A regular week — pick wisely!",
+      "duckEmotion": "neutral",
+      "essentials": [
+        { "name": "Bread", "price": 1.20 },
+        { "name": "Eggs", "price": 1.80 },
+        { "name": "Milk", "price": 1.10 },
+        { "name": "Bananas", "price": 1.00 }
+      ],
+      "treats": [
+        { "name": "Granola Bar", "price": 1.30 },
+        { "name": "Smoothie", "price": 1.80 }
+      ],
+      "extraTreats": []
+    },
+    {
+      "budget": 7.50,
+      "roundName": "Budget Week",
+      "recipeName": "Beans on Toast",
+      "duckLine": "Budget is smaller — think before you buy!",
+      "duckEmotion": "worried",
+      "essentials": [
+        { "name": "Bread", "price": 1.30 },
+        { "name": "Beans", "price": 1.00 },
+        { "name": "Cheese", "price": 1.50 },
+        { "name": "Butter", "price": 1.20 }
+      ],
+      "treats": [
+        { "name": "Fruit Snack", "price": 0.90 },
+        { "name": "Iced Tea", "price": 1.10 }
+      ],
+      "extraTreats": []
+    },
+    {
+      "budget": 13.00,
+      "roundName": "Treat Week",
+      "recipeName": "Chicken Rice Bowl",
+      "duckLine": "Extra cash! Treat yourself, but stay smart!",
+      "duckEmotion": "excited",
+      "essentials": [
+        { "name": "Chicken", "price": 2.20 },
+        { "name": "Rice", "price": 1.30 },
+        { "name": "Tomatoes", "price": 1.20 },
+        { "name": "Onions", "price": 0.90 }
+      ],
+      "treats": [
+        { "name": "Cookie", "price": 1.20 },
+        { "name": "Hot Chocolate", "price": 1.60 }
+      ],
+      "extraTreats": [
+        { "name": "Notebook", "price": 2.50 },
+        { "name": "Stickers", "price": 2.00 }
+      ]
+    }
+  ]
+}

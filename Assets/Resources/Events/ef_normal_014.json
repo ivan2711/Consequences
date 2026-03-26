@@ -1,0 +1,20 @@
+{
+  "id": "ef_normal_014",
+  "version": 2,
+  "type": "normal",
+  "title": "Revision Week",
+  "description": "Exams are coming up. You spent the whole week revising at home.",
+  "weeklyIncomePounds": 60,
+  "costPounds": 0,
+  "bonusPounds": 0,
+  "choices": [
+    { "label": "Keep revising", "savePounds": 0, "flavourText": "Focus now, relax later." },
+    { "label": "Nearly there", "savePounds": 0, "flavourText": "Exams will be over soon." }
+  ],
+  "duckEmotion": "neutral",
+  "duckLine": "You've got this!",
+  "difficulty": "easy",
+  "tags": ["routine", "school"],
+  "ageRangeMin": 12, "ageRangeMax": 18,
+  "currencyCode": "GBP", "author": "content-team", "notes": ""
+}

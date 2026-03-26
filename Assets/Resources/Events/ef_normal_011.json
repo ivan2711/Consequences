@@ -1,0 +1,20 @@
+{
+  "id": "ef_normal_011",
+  "version": 2,
+  "type": "normal",
+  "title": "Library Visit",
+  "description": "Spent the afternoon at the library. Borrowed some books for free.",
+  "weeklyIncomePounds": 60,
+  "costPounds": 0,
+  "bonusPounds": 0,
+  "choices": [
+    { "label": "Love free books", "savePounds": 0, "flavourText": "Libraries are an underrated gem." },
+    { "label": "Quiet afternoon", "savePounds": 0, "flavourText": "Peaceful and productive." }
+  ],
+  "duckEmotion": "neutral",
+  "duckLine": "Knowledge is free!",
+  "difficulty": "easy",
+  "tags": ["routine", "education"],
+  "ageRangeMin": 12, "ageRangeMax": 18,
+  "currencyCode": "GBP", "author": "content-team", "notes": ""
+}

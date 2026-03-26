@@ -141,10 +141,24 @@ public void ShowConsequences(float totalSpent, float budget, float saved, bool h
         if (panelBg != null)
             panelBg.color = new Color(0.10f, 0.12f, 0.20f, 1f);
 
+        // Nudge text elements down to make room for stars/jar/award
+        if (titleText != null)
+        {
+            RectTransform tRT = titleText.GetComponent<RectTransform>();
+            if (tRT != null)
+                tRT.anchoredPosition = new Vector2(tRT.anchoredPosition.x, tRT.anchoredPosition.y - 75f);
+        }
+        if (futureText != null)
+        {
+            RectTransform fRT = futureText.GetComponent<RectTransform>();
+            if (fRT != null)
+                fRT.anchoredPosition = new Vector2(fRT.anchoredPosition.x, fRT.anchoredPosition.y - 75f);
+        }
+
         // Title — driven by essentials coverage first, then overall stars
         if (titleText != null)
         {
-            titleText.fontSize = 44;
+            titleText.fontSize = 52;
             titleText.fontStyle = FontStyles.Bold;
             if (!fedAllRounds && overallStars <= 1)
             {
@@ -165,7 +179,7 @@ public void ShowConsequences(float totalSpent, float budget, float saved, bool h
         // Scorecard + projection
         if (futureText != null)
         {
-            futureText.fontSize = 38;
+            futureText.fontSize = 46;
             futureText.color = Color.white;
 
             string good  = "<color=#88FF88>";

@@ -1,0 +1,63 @@
+{
+  "id": "scenario_010",
+  "seasonName": "Rainy Day",
+  "rounds": [
+    {
+      "budget": 7.50,
+      "roundName": "Standard Week",
+      "recipeName": "Tuna Sandwiches",
+      "duckLine": "Rainy day — grab the essentials quick!",
+      "duckEmotion": "neutral",
+      "essentials": [
+        { "name": "Bread", "price": 1.20 },
+        { "name": "Tuna", "price": 1.50 },
+        { "name": "Tomatoes", "price": 1.20 },
+        { "name": "Butter", "price": 1.30 }
+      ],
+      "treats": [
+        { "name": "Sweets", "price": 1.00 },
+        { "name": "Juice", "price": 1.10 }
+      ],
+      "extraTreats": []
+    },
+    {
+      "budget": 7.00,
+      "roundName": "Tight Week",
+      "recipeName": "Chips and Eggs",
+      "duckLine": "Wet weather, thin wallet — be smart!",
+      "duckEmotion": "worried",
+      "essentials": [
+        { "name": "Potatoes", "price": 1.40 },
+        { "name": "Eggs", "price": 1.80 },
+        { "name": "Beans", "price": 1.00 },
+        { "name": "Bread", "price": 1.20 }
+      ],
+      "treats": [
+        { "name": "Biscuits", "price": 1.00 },
+        { "name": "Hot Chocolate", "price": 1.60 }
+      ],
+      "extraTreats": []
+    },
+    {
+      "budget": 10.50,
+      "roundName": "Bonus Week",
+      "recipeName": "Chicken Curry",
+      "duckLine": "Sun's out! A little extra to spend!",
+      "duckEmotion": "excited",
+      "essentials": [
+        { "name": "Chicken", "price": 2.20 },
+        { "name": "Rice", "price": 1.30 },
+        { "name": "Onions", "price": 0.90 },
+        { "name": "Tomatoes", "price": 1.20 }
+      ],
+      "treats": [
+        { "name": "Chocolate", "price": 1.50 },
+        { "name": "Cookie", "price": 1.20 }
+      ],
+      "extraTreats": [
+        { "name": "Magazine", "price": 3.00 },
+        { "name": "Lip Balm", "price": 2.20 }
+      ]
+    }
+  ]
+}

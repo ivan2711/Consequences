@@ -93,17 +93,20 @@ public class TTSService : MonoBehaviour
     private IEnumerator FetchAndPlay(string text, Action onComplete = null)
     {
         string url = $"{serverUrl}/tts?text={UnityWebRequest.EscapeURL(text)}";
+        Debug.Log("[TTS] Requesting: " + url);
 
         using (var request = UnityWebRequestMultimedia.GetAudioClip(url, AudioType.WAV))
         {
+            request.timeout = 60; // Model inference can take 5-20s
             yield return request.SendWebRequest();
 
             if (request.result != UnityWebRequest.Result.Success)
             {
-                Debug.LogWarning("[TTS] Request failed: " + request.error);
+                Debug.LogWarning("[TTS] Request failed: " + request.error + " (HTTP " + request.responseCode + ")");
                 onComplete?.Invoke();
                 yield break;
             }
+            Debug.Log("[TTS] Audio received, " + request.downloadedBytes + " bytes");
 
             AudioClip clip = DownloadHandlerAudioClip.GetContent(request);
             if (clip == null || clip.length == 0)

@@ -1,0 +1,63 @@
+{
+  "id": "scenario_005",
+  "seasonName": "Christmas Week",
+  "rounds": [
+    {
+      "budget": 8.50,
+      "roundName": "Normal Week",
+      "recipeName": "Jacket Potatoes",
+      "duckLine": "Christmas is coming — keep saving!",
+      "duckEmotion": "neutral",
+      "essentials": [
+        { "name": "Potatoes", "price": 1.40 },
+        { "name": "Cheese", "price": 1.60 },
+        { "name": "Beans", "price": 1.00 },
+        { "name": "Butter", "price": 1.30 }
+      ],
+      "treats": [
+        { "name": "Hot Chocolate", "price": 1.60 },
+        { "name": "Fudge", "price": 1.40 }
+      ],
+      "extraTreats": []
+    },
+    {
+      "budget": 6.50,
+      "roundName": "Saving Week",
+      "recipeName": "Scrambled Eggs",
+      "duckLine": "Saving for presents — budget is tight!",
+      "duckEmotion": "worried",
+      "essentials": [
+        { "name": "Eggs", "price": 1.80 },
+        { "name": "Bread", "price": 1.20 },
+        { "name": "Butter", "price": 1.30 },
+        { "name": "Milk", "price": 1.10 }
+      ],
+      "treats": [
+        { "name": "Biscuits", "price": 1.00 },
+        { "name": "Cereal Bar", "price": 0.80 }
+      ],
+      "extraTreats": []
+    },
+    {
+      "budget": 14.00,
+      "roundName": "Splurge Week",
+      "recipeName": "Roast Chicken",
+      "duckLine": "Christmas money! Temptation everywhere!",
+      "duckEmotion": "excited",
+      "essentials": [
+        { "name": "Chicken", "price": 2.40 },
+        { "name": "Potatoes", "price": 1.40 },
+        { "name": "Carrots", "price": 1.00 },
+        { "name": "Onions", "price": 0.90 }
+      ],
+      "treats": [
+        { "name": "Chocolate", "price": 1.50 },
+        { "name": "Sweets", "price": 1.20 }
+      ],
+      "extraTreats": [
+        { "name": "Toy", "price": 3.50 },
+        { "name": "Stickers", "price": 2.00 }
+      ]
+    }
+  ]
+}

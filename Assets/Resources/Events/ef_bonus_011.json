@@ -1,0 +1,20 @@
+{
+  "id": "ef_bonus_011",
+  "version": 2,
+  "type": "bonus",
+  "title": "Tutoring a Classmate",
+  "description": "You helped a younger student with their homework and their parents gave you £14!",
+  "weeklyIncomePounds": 60,
+  "costPounds": 0,
+  "bonusPounds": 14,
+  "choices": [
+    { "label": "Add to fund", "savePounds": 0, "flavourText": "Brains and savings!" },
+    { "label": "Keep in bank", "savePounds": 0, "flavourText": "Earned it the smart way." }
+  ],
+  "duckEmotion": "celebrating",
+  "duckLine": "Teach and earn!",
+  "difficulty": "easy",
+  "tags": ["bonus", "earning", "school"],
+  "ageRangeMin": 12, "ageRangeMax": 18,
+  "currencyCode": "GBP", "author": "content-team", "notes": ""
+}

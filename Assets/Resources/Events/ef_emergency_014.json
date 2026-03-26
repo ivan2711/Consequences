@@ -1,0 +1,20 @@
+{
+  "id": "ef_emergency_014",
+  "version": 2,
+  "type": "emergency",
+  "title": "Water Bottle Leaked",
+  "description": "Your water bottle leaked all over your school bag. A new bag costs £22.",
+  "weeklyIncomePounds": 60,
+  "costPounds": 22,
+  "bonusPounds": 0,
+  "choices": [
+    { "label": "Buy a new bag (£22)", "savePounds": 0, "flavourText": "Waterproof this time." },
+    { "label": "Dry it out", "savePounds": 0, "flavourText": "Smells a bit damp but it'll be fine." }
+  ],
+  "duckEmotion": "shocked",
+  "duckLine": "Everything's soaked!",
+  "difficulty": "medium",
+  "tags": ["school", "essential"],
+  "ageRangeMin": 12, "ageRangeMax": 18,
+  "currencyCode": "GBP", "author": "content-team", "notes": ""
+}

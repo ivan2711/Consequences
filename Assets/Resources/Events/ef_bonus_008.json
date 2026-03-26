@@ -1,0 +1,20 @@
+{
+  "id": "ef_bonus_008",
+  "version": 2,
+  "type": "bonus",
+  "title": "Cashback Surprise",
+  "description": "You got a £10 cashback reward from a loyalty card!",
+  "weeklyIncomePounds": 60,
+  "costPounds": 0,
+  "bonusPounds": 10,
+  "choices": [
+    { "label": "Add to fund", "savePounds": 0, "flavourText": "Free money into savings!" },
+    { "label": "Keep in bank", "savePounds": 0, "flavourText": "Saved it for a rainy day." }
+  ],
+  "duckEmotion": "excited",
+  "duckLine": "Loyalty pays off!",
+  "difficulty": "easy",
+  "tags": ["bonus", "reward"],
+  "ageRangeMin": 12, "ageRangeMax": 18,
+  "currencyCode": "GBP", "author": "content-team", "notes": ""
+}

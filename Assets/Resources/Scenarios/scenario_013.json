@@ -1,0 +1,63 @@
+{
+  "id": "scenario_013",
+  "seasonName": "Picnic Plan",
+  "rounds": [
+    {
+      "budget": 8.20,
+      "roundName": "Regular Week",
+      "recipeName": "Chicken Sandwiches",
+      "duckLine": "Planning a picnic — shop for the week!",
+      "duckEmotion": "neutral",
+      "essentials": [
+        { "name": "Bread", "price": 1.20 },
+        { "name": "Chicken", "price": 2.20 },
+        { "name": "Lettuce", "price": 1.00 },
+        { "name": "Butter", "price": 1.30 }
+      ],
+      "treats": [
+        { "name": "Smoothie", "price": 1.80 },
+        { "name": "Cookie", "price": 1.20 }
+      ],
+      "extraTreats": []
+    },
+    {
+      "budget": 7.50,
+      "roundName": "Careful Week",
+      "recipeName": "Tomato Rice",
+      "duckLine": "Picnic supplies cost a bit — be careful now!",
+      "duckEmotion": "worried",
+      "essentials": [
+        { "name": "Rice", "price": 1.30 },
+        { "name": "Tomatoes", "price": 1.20 },
+        { "name": "Eggs", "price": 1.80 },
+        { "name": "Onions", "price": 0.90 }
+      ],
+      "treats": [
+        { "name": "Juice", "price": 1.10 },
+        { "name": "Granola Bar", "price": 1.30 }
+      ],
+      "extraTreats": []
+    },
+    {
+      "budget": 12.00,
+      "roundName": "Treat Week",
+      "recipeName": "Spaghetti Bolognese",
+      "duckLine": "Picnic day! Go on, grab something nice!",
+      "duckEmotion": "excited",
+      "essentials": [
+        { "name": "Pasta", "price": 1.20 },
+        { "name": "Mince", "price": 2.30 },
+        { "name": "Tomatoes", "price": 1.20 },
+        { "name": "Onions", "price": 0.90 }
+      ],
+      "treats": [
+        { "name": "Chocolate", "price": 1.50 },
+        { "name": "Fizzy Drink", "price": 1.20 }
+      ],
+      "extraTreats": [
+        { "name": "Comic Book", "price": 3.00 },
+        { "name": "Sweets", "price": 1.80 }
+      ]
+    }
+  ]
+}

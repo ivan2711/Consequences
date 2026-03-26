@@ -44,18 +44,29 @@ GGUF Q5_K_M (cgisky/qwen3-tts-custom-gguf):
 - Autoregressive = must run sequentially, cannot be parallelised
 
 
-3. INFERENCE SPEED
--------------------
+3. INFERENCE SPEED — MEASURED ON OUR HARDWARE
+-----------------------------------------------
 
-Official benchmarks (GPU, PyTorch):
+Device: Apple Silicon CPU (M-series Mac), no GPU
+Model: Qwen3-TTS-12Hz-0.6B-CustomVoice, FP32, PyTorch
+Voice: vivian
+
+  Text Length          Words   Gen Time   Audio Length   RTF
+  ---------------------------------------------------------------
+  Short ("Good job!")    2      4.4s        1.4s         3.1x
+  Medium (6 words)      6      7.1s        3.1s         2.3x
+  Long (15 words)       15     16.0s       7.4s         2.2x
+  Very long (27 words)  27     42.6s       19.0s        2.2x
+
+RTF = Real-Time Factor. 1.0 = real-time. Higher = slower.
+Qwen3-TTS runs at ~2-3x slower than real-time on CPU.
+
+Even a 2-word phrase ("Good job!") takes 4.4 seconds.
+For comparison, Piper TTS generates in 20-30 MILLISECONDS on the same CPU.
+
+Official GPU benchmarks (for reference):
   - First-packet latency: ~97 ms
   - Real-time factor: 0.23-0.31
-
-On CPU (what most users have):
-  - Expected: 3-10 seconds per sentence
-  - No published CPU ONNX benchmarks exist for this model
-
-INT8 typically gives 1.5-3x speedup over FP32 on CPU.
 
 
 4. UNITY INTEGRATION OPTIONS

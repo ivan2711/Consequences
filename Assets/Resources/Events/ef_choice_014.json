@@ -1,0 +1,20 @@
+{
+  "id": "ef_choice_014",
+  "version": 2,
+  "type": "choice",
+  "title": "School Trip Snacks",
+  "description": "School trip tomorrow and everyone's bringing sweets and snacks. A big bag costs £10.",
+  "weeklyIncomePounds": 60,
+  "costPounds": 10,
+  "bonusPounds": 0,
+  "choices": [
+    { "label": "Stock up (£10)", "savePounds": 0, "flavourText": "Most popular person on the bus." },
+    { "label": "Bring stuff from home", "savePounds": 0, "flavourText": "Raided the cupboard instead." }
+  ],
+  "duckEmotion": "thinking",
+  "duckLine": "Sharing is nice but costly!",
+  "difficulty": "easy",
+  "tags": ["school", "food", "social"],
+  "ageRangeMin": 12, "ageRangeMax": 18,
+  "currencyCode": "GBP", "author": "content-team", "notes": ""
+}

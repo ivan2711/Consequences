@@ -1,0 +1,63 @@
+{
+  "id": "scenario_008",
+  "seasonName": "Birthday Week",
+  "rounds": [
+    {
+      "budget": 9.00,
+      "roundName": "Normal Week",
+      "recipeName": "Tuna Salad",
+      "duckLine": "Birthday coming up — save where you can!",
+      "duckEmotion": "neutral",
+      "essentials": [
+        { "name": "Tuna", "price": 1.50 },
+        { "name": "Eggs", "price": 1.80 },
+        { "name": "Tomatoes", "price": 1.20 },
+        { "name": "Bread", "price": 1.20 }
+      ],
+      "treats": [
+        { "name": "Chocolate", "price": 1.50 },
+        { "name": "Cookie", "price": 1.20 }
+      ],
+      "extraTreats": []
+    },
+    {
+      "budget": 7.30,
+      "roundName": "Careful Week",
+      "recipeName": "Tomato Pasta",
+      "duckLine": "Spent a bit on party stuff — watch the budget!",
+      "duckEmotion": "worried",
+      "essentials": [
+        { "name": "Pasta", "price": 1.20 },
+        { "name": "Tomatoes", "price": 1.20 },
+        { "name": "Onions", "price": 0.90 },
+        { "name": "Cheese", "price": 1.60 }
+      ],
+      "treats": [
+        { "name": "Cereal Bar", "price": 0.80 },
+        { "name": "Iced Tea", "price": 1.10 }
+      ],
+      "extraTreats": []
+    },
+    {
+      "budget": 13.50,
+      "roundName": "Splurge Week",
+      "recipeName": "Chicken Dinner",
+      "duckLine": "Birthday money! So many choices!",
+      "duckEmotion": "excited",
+      "essentials": [
+        { "name": "Chicken", "price": 2.40 },
+        { "name": "Potatoes", "price": 1.40 },
+        { "name": "Carrots", "price": 1.00 },
+        { "name": "Vegetables", "price": 1.20 }
+      ],
+      "treats": [
+        { "name": "Fudge", "price": 1.40 },
+        { "name": "Milkshake", "price": 1.80 }
+      ],
+      "extraTreats": [
+        { "name": "Toy", "price": 3.50 },
+        { "name": "Comic Book", "price": 3.00 }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "id": "ef_emergency_012",
+  "version": 2,
+  "type": "emergency",
+  "title": "School Shoes Worn Out",
+  "description": "The sole of your school shoe has come apart. New shoes cost £25.",
+  "weeklyIncomePounds": 60,
+  "costPounds": 25,
+  "bonusPounds": 0,
+  "choices": [
+    { "label": "Buy new shoes (£25)", "savePounds": 0, "flavourText": "Proper shoes again, phew." },
+    { "label": "Superglue them", "savePounds": 0, "flavourText": "Holding together... for now." }
+  ],
+  "duckEmotion": "worried",
+  "duckLine": "Your toe is showing!",
+  "difficulty": "medium",
+  "tags": ["school", "clothing", "essential"],
+  "ageRangeMin": 12, "ageRangeMax": 18,
+  "currencyCode": "GBP", "author": "content-team", "notes": ""
+}

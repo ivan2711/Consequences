@@ -1,0 +1,63 @@
+{
+  "id": "scenario_009",
+  "seasonName": "Exam Season",
+  "rounds": [
+    {
+      "budget": 8.00,
+      "roundName": "Steady Week",
+      "recipeName": "Beans on Toast",
+      "duckLine": "Exams soon — keep things simple!",
+      "duckEmotion": "neutral",
+      "essentials": [
+        { "name": "Bread", "price": 1.20 },
+        { "name": "Beans", "price": 1.00 },
+        { "name": "Cheese", "price": 1.50 },
+        { "name": "Butter", "price": 1.30 }
+      ],
+      "treats": [
+        { "name": "Biscuits", "price": 1.00 },
+        { "name": "Hot Chocolate", "price": 1.60 }
+      ],
+      "extraTreats": []
+    },
+    {
+      "budget": 6.80,
+      "roundName": "Slim Week",
+      "recipeName": "Leek and Potato Soup",
+      "duckLine": "Revision snacks only — keep it lean!",
+      "duckEmotion": "worried",
+      "essentials": [
+        { "name": "Potatoes", "price": 1.40 },
+        { "name": "Milk", "price": 1.20 },
+        { "name": "Bread", "price": 1.30 },
+        { "name": "Butter", "price": 1.30 }
+      ],
+      "treats": [
+        { "name": "Fruit Snack", "price": 0.90 },
+        { "name": "Cereal Bar", "price": 0.80 }
+      ],
+      "extraTreats": []
+    },
+    {
+      "budget": 12.50,
+      "roundName": "Big Shop",
+      "recipeName": "Spaghetti Bolognese",
+      "duckLine": "Exams done! Time to celebrate — wisely!",
+      "duckEmotion": "excited",
+      "essentials": [
+        { "name": "Pasta", "price": 1.20 },
+        { "name": "Mince", "price": 2.30 },
+        { "name": "Tomatoes", "price": 1.20 },
+        { "name": "Onions", "price": 0.90 }
+      ],
+      "treats": [
+        { "name": "Crisps", "price": 1.20 },
+        { "name": "Fizzy Drink", "price": 1.20 }
+      ],
+      "extraTreats": [
+        { "name": "Notebook", "price": 2.50 },
+        { "name": "Pen Set", "price": 2.80 }
+      ]
+    }
+  ]
+}

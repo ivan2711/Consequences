@@ -1,0 +1,63 @@
+{
+  "id": "scenario_012",
+  "seasonName": "Holiday Prep",
+  "rounds": [
+    {
+      "budget": 8.80,
+      "roundName": "Usual Week",
+      "recipeName": "Porridge with Fruit",
+      "duckLine": "Holiday's coming — start planning!",
+      "duckEmotion": "neutral",
+      "essentials": [
+        { "name": "Oats", "price": 1.30 },
+        { "name": "Milk", "price": 1.20 },
+        { "name": "Bananas", "price": 1.10 },
+        { "name": "Apples", "price": 1.40 }
+      ],
+      "treats": [
+        { "name": "Crisps", "price": 1.20 },
+        { "name": "Milkshake", "price": 1.80 }
+      ],
+      "extraTreats": []
+    },
+    {
+      "budget": 6.50,
+      "roundName": "Saving Week",
+      "recipeName": "Tuna Bake",
+      "duckLine": "Saving up for holiday — every penny counts!",
+      "duckEmotion": "worried",
+      "essentials": [
+        { "name": "Pasta", "price": 1.20 },
+        { "name": "Tuna", "price": 1.50 },
+        { "name": "Cheese", "price": 1.50 },
+        { "name": "Milk", "price": 1.10 }
+      ],
+      "treats": [
+        { "name": "Fruit Snack", "price": 0.90 },
+        { "name": "Cereal Bar", "price": 0.80 }
+      ],
+      "extraTreats": []
+    },
+    {
+      "budget": 13.00,
+      "roundName": "Big Shop",
+      "recipeName": "Beef Stew",
+      "duckLine": "Holiday prep shop! Lots of temptation!",
+      "duckEmotion": "excited",
+      "essentials": [
+        { "name": "Mince", "price": 2.30 },
+        { "name": "Potatoes", "price": 1.40 },
+        { "name": "Carrots", "price": 1.00 },
+        { "name": "Onions", "price": 0.90 }
+      ],
+      "treats": [
+        { "name": "Popcorn", "price": 1.40 },
+        { "name": "Energy Drink", "price": 1.60 }
+      ],
+      "extraTreats": [
+        { "name": "Toy", "price": 3.50 },
+        { "name": "Key Ring", "price": 2.50 }
+      ]
+    }
+  ]
+}

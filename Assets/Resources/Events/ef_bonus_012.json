@@ -1,0 +1,20 @@
+{
+  "id": "ef_bonus_012",
+  "version": 2,
+  "type": "bonus",
+  "title": "Found Money",
+  "description": "You found a £10 note on the ground and no one claimed it at lost property!",
+  "weeklyIncomePounds": 60,
+  "costPounds": 0,
+  "bonusPounds": 10,
+  "choices": [
+    { "label": "Add to fund", "savePounds": 0, "flavourText": "Lucky find, smart save." },
+    { "label": "Keep in bank", "savePounds": 0, "flavourText": "Finders keepers!" }
+  ],
+  "duckEmotion": "excited",
+  "duckLine": "Lucky duck!",
+  "difficulty": "easy",
+  "tags": ["bonus", "luck"],
+  "ageRangeMin": 12, "ageRangeMax": 18,
+  "currencyCode": "GBP", "author": "content-team", "notes": ""
+}

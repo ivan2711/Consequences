@@ -1,0 +1,20 @@
+{
+  "id": "ef_bonus_010",
+  "version": 2,
+  "type": "bonus",
+  "title": "Refund Received",
+  "description": "That broken item you returned last month? The £18 refund just came through!",
+  "weeklyIncomePounds": 60,
+  "costPounds": 0,
+  "bonusPounds": 18,
+  "choices": [
+    { "label": "Add to fund", "savePounds": 0, "flavourText": "Money back where it belongs." },
+    { "label": "Keep in bank", "savePounds": 0, "flavourText": "Bonus cash in the account." }
+  ],
+  "duckEmotion": "excited",
+  "duckLine": "Money back!",
+  "difficulty": "easy",
+  "tags": ["bonus", "refund"],
+  "ageRangeMin": 12, "ageRangeMax": 18,
+  "currencyCode": "GBP", "author": "content-team", "notes": ""
+}
