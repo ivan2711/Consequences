@@ -3,7 +3,7 @@
   "seasonName": "Birthday Week",
   "rounds": [
     {
-      "budget": 9.00,
+      "budget": 8.50,
       "roundName": "Normal Week",
       "recipeName": "Tuna Salad",
       "duckLine": "Birthday coming up — save where you can!",
@@ -21,7 +21,7 @@
       "extraTreats": []
     },
     {
-      "budget": 7.30,
+      "budget": 6.50,
       "roundName": "Careful Week",
       "recipeName": "Tomato Pasta",
       "duckLine": "Spent a bit on party stuff — watch the budget!",
@@ -39,7 +39,7 @@
       "extraTreats": []
     },
     {
-      "budget": 13.50,
+      "budget": 12.00,
       "roundName": "Splurge Week",
       "recipeName": "Chicken Dinner",
       "duckLine": "Birthday money! So many choices!",

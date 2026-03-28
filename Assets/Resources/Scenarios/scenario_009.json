@@ -3,7 +3,7 @@
   "seasonName": "Exam Season",
   "rounds": [
     {
-      "budget": 8.00,
+      "budget": 7.50,
       "roundName": "Steady Week",
       "recipeName": "Beans on Toast",
       "duckLine": "Exams soon — keep things simple!",
@@ -39,7 +39,7 @@
       "extraTreats": []
     },
     {
-      "budget": 12.50,
+      "budget": 11.50,
       "roundName": "Big Shop",
       "recipeName": "Spaghetti Bolognese",
       "duckLine": "Exams done! Time to celebrate — wisely!",

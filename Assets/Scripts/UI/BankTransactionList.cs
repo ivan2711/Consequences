@@ -26,23 +26,25 @@ public class BankTransactionList : MonoBehaviour
 
         if (transactions.Count == 0)
         {
-            GameObject item = Instantiate(transactionItemPrefab, contentParent);
-            Image rowBg = item.GetComponent<Image>();
-            if (rowBg != null)
-                rowBg.color = new Color(1f, 1f, 1f, 0f);
-            TextMeshProUGUI descText = FindChildText(item.transform, "DescText");
-            if (descText != null)
-            {
-                descText.text = "No transactions yet.\nPlay a game to see activity here!";
-                descText.color = new Color(0.7f, 0.7f, 0.75f);
-                descText.fontSize = 24;
-                descText.alignment = TextAlignmentOptions.Center;
-            }
-            // Hide other fields
-            TextMeshProUGUI amt = FindChildText(item.transform, "AmountText");
-            if (amt != null) amt.gameObject.SetActive(false);
-            TextMeshProUGUI time = FindChildText(item.transform, "TimeText");
-            if (time != null) time.gameObject.SetActive(false);
+            // Parent the message to the panel itself, not the scroll content
+            Transform panel = contentParent.parent != null ? contentParent.parent : contentParent;
+            // Go up until we find the "Recent Transactions" panel
+            if (panel.parent != null) panel = panel.parent;
+
+            var emptyGO = new GameObject("EmptyMessage");
+            emptyGO.transform.SetParent(panel, false);
+            var rt = emptyGO.AddComponent<RectTransform>();
+            rt.anchorMin = new Vector2(0.05f, 0.1f);
+            rt.anchorMax = new Vector2(0.95f, 0.75f);
+            rt.offsetMin = Vector2.zero;
+            rt.offsetMax = Vector2.zero;
+            var tmp = emptyGO.AddComponent<TextMeshProUGUI>();
+            tmp.text = "No transactions yet.\nPlay a game to see activity here!";
+            tmp.color = new Color(0.7f, 0.7f, 0.75f);
+            tmp.fontSize = 40;
+            tmp.fontStyle = FontStyles.Italic;
+            tmp.alignment = TextAlignmentOptions.Center;
+            tmp.enableAutoSizing = false;
             return;
         }
 

@@ -40,10 +40,28 @@ public class BankAccountService : MonoBehaviour
         }
     }
 
+    // JSON-friendly wrapper for serialization (DateTime → string)
+    [System.Serializable]
+    private class TransactionData
+    {
+        public string desc;
+        public float amt;
+        public string time;
+        public string cat;
+    }
+
+    [System.Serializable]
+    private class TransactionList
+    {
+        public List<TransactionData> items = new List<TransactionData>();
+    }
+
     private float balancePounds = 500f;
     private float emergencyBalancePounds = 0f;
     private List<Transaction> transactions = new List<Transaction>();
     private List<Transaction> emergencyTransactions = new List<Transaction>();
+
+    private const int MaxStoredTransactions = 50;
 
     private void Awake()
     {
@@ -61,6 +79,9 @@ public class BankAccountService : MonoBehaviour
 
         emergencyBalancePounds = PlayerPrefs.HasKey("EmergencyBankBalance")
             ? PlayerPrefs.GetFloat("EmergencyBankBalance") : 0f;
+
+        transactions = LoadTransactions("BankTransactions");
+        emergencyTransactions = LoadTransactions("EmergencyTransactions");
     }
 
     public float GetBalance()
@@ -80,6 +101,7 @@ public class BankAccountService : MonoBehaviour
         transactions.Add(new Transaction(description, -amountPounds, DateTime.Now, category));
 
         PlayerPrefs.SetFloat("BankBalance", balancePounds);
+        SaveTransactions("BankTransactions", transactions);
         PlayerPrefs.Save();
 
         return true;
@@ -97,6 +119,7 @@ public class BankAccountService : MonoBehaviour
         transactions.Add(new Transaction(description, amountPounds, DateTime.Now, "income"));
 
         PlayerPrefs.SetFloat("BankBalance", balancePounds);
+        SaveTransactions("BankTransactions", transactions);
         PlayerPrefs.Save();
     }
 
@@ -124,6 +147,7 @@ public class BankAccountService : MonoBehaviour
         emergencyBalancePounds -= actual;
         emergencyTransactions.Add(new Transaction(description, -amount, DateTime.Now, category));
         PlayerPrefs.SetFloat("EmergencyBankBalance", emergencyBalancePounds);
+        SaveTransactions("EmergencyTransactions", emergencyTransactions);
         PlayerPrefs.Save();
         return actual >= amount;
     }
@@ -134,6 +158,7 @@ public class BankAccountService : MonoBehaviour
         emergencyBalancePounds += amount;
         emergencyTransactions.Add(new Transaction(description, amount, DateTime.Now, "income"));
         PlayerPrefs.SetFloat("EmergencyBankBalance", emergencyBalancePounds);
+        SaveTransactions("EmergencyTransactions", emergencyTransactions);
         PlayerPrefs.Save();
     }
 
@@ -142,6 +167,7 @@ public class BankAccountService : MonoBehaviour
         emergencyBalancePounds = startingAmount;
         emergencyTransactions.Clear();
         PlayerPrefs.SetFloat("EmergencyBankBalance", emergencyBalancePounds);
+        SaveTransactions("EmergencyTransactions", emergencyTransactions);
         PlayerPrefs.Save();
     }
 
@@ -150,5 +176,50 @@ public class BankAccountService : MonoBehaviour
         if (count <= 0) return new List<Transaction>();
         int start = Mathf.Max(0, emergencyTransactions.Count - count);
         return emergencyTransactions.GetRange(start, emergencyTransactions.Count - start);
+    }
+
+    private void SaveTransactions(string key, List<Transaction> txList)
+    {
+        var data = new TransactionList();
+        // Keep only the most recent transactions
+        int start = Mathf.Max(0, txList.Count - MaxStoredTransactions);
+        for (int i = start; i < txList.Count; i++)
+        {
+            var tx = txList[i];
+            data.items.Add(new TransactionData
+            {
+                desc = tx.description,
+                amt = tx.amountPounds,
+                time = tx.timestamp.ToString("o"),
+                cat = tx.category
+            });
+        }
+        PlayerPrefs.SetString(key, JsonUtility.ToJson(data));
+    }
+
+    private List<Transaction> LoadTransactions(string key)
+    {
+        var list = new List<Transaction>();
+        if (!PlayerPrefs.HasKey(key)) return list;
+
+        try
+        {
+            var data = JsonUtility.FromJson<TransactionList>(PlayerPrefs.GetString(key));
+            if (data != null && data.items != null)
+            {
+                foreach (var td in data.items)
+                {
+                    DateTime ts;
+                    if (!DateTime.TryParse(td.time, out ts))
+                        ts = DateTime.Now;
+                    list.Add(new Transaction(td.desc, td.amt, ts, td.cat));
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            Debug.LogWarning("[BankAccount] Failed to load transactions: " + e.Message);
+        }
+        return list;
     }
 }

@@ -3,7 +3,7 @@
   "seasonName": "Spring Term",
   "rounds": [
     {
-      "budget": 9.00,
+      "budget": 7.50,
       "roundName": "Regular Week",
       "recipeName": "French Toast",
       "duckLine": "A regular week — pick wisely!",
@@ -21,7 +21,7 @@
       "extraTreats": []
     },
     {
-      "budget": 7.50,
+      "budget": 6.50,
       "roundName": "Budget Week",
       "recipeName": "Beans on Toast",
       "duckLine": "Budget is smaller — think before you buy!",
@@ -39,7 +39,7 @@
       "extraTreats": []
     },
     {
-      "budget": 13.00,
+      "budget": 11.00,
       "roundName": "Treat Week",
       "recipeName": "Chicken Rice Bowl",
       "duckLine": "Extra cash! Treat yourself, but stay smart!",

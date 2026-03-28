@@ -158,7 +158,7 @@ public void ShowConsequences(float totalSpent, float budget, float saved, bool h
         // Title — driven by essentials coverage first, then overall stars
         if (titleText != null)
         {
-            titleText.fontSize = 52;
+            titleText.fontSize = 42;
             titleText.fontStyle = FontStyles.Bold;
             if (!fedAllRounds && overallStars <= 1)
             {
@@ -179,7 +179,7 @@ public void ShowConsequences(float totalSpent, float budget, float saved, bool h
         // Scorecard + projection
         if (futureText != null)
         {
-            futureText.fontSize = 46;
+            futureText.fontSize = 42;
             futureText.color = Color.white;
 
             string good  = "<color=#88FF88>";

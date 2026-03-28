@@ -3,7 +3,7 @@
   "seasonName": "Snowy Week",
   "rounds": [
     {
-      "budget": 8.50,
+      "budget": 8.00,
       "roundName": "Normal Week",
       "recipeName": "Baked Potato",
       "duckLine": "Snow outside — warm food matters!",
@@ -21,7 +21,7 @@
       "extraTreats": []
     },
     {
-      "budget": 7.20,
+      "budget": 7.00,
       "roundName": "Budget Week",
       "recipeName": "Egg and Soldiers",
       "duckLine": "Heating costs up — less for treats!",

@@ -191,10 +191,7 @@ private void Awake()
         // Update message
         if (duckMessage != null)
         {
-            if (_originalMessageFontSize < 0)
-                _originalMessageFontSize = duckMessage.fontSize;
             duckMessage.text = message;
-            duckMessage.fontSize = _originalMessageFontSize - 2;
         }
     }
     

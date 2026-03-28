@@ -3,7 +3,7 @@
   "seasonName": "Back to School",
   "rounds": [
     {
-      "budget": 8.80,
+      "budget": 8.00,
       "roundName": "Standard Week",
       "recipeName": "Cheese Toasties",
       "duckLine": "New term, fresh start — shop sensibly!",
@@ -39,7 +39,7 @@
       "extraTreats": []
     },
     {
-      "budget": 12.50,
+      "budget": 10.00,
       "roundName": "Bonus Week",
       "recipeName": "Egg Fried Rice",
       "duckLine": "Bonus pocket money! Don't blow it all!",

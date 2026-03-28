@@ -70,17 +70,17 @@ public class ProgressPanel : MonoBehaviour
             "Emergency Fund", "\u00a30.00", new Color(0.4f, 0.7f, 1f), cardColor, roundedRect);
 
         successStreakValue = CreateCard(startX + 2 * (cardW + gapX), startY + cardH + gapY, cardW, cardH,
-            "Success Streak", "0", new Color(0.4f, 0.9f, 0.5f), cardColor, roundedRect);
+            "Budget Streak", "0", new Color(0.4f, 0.9f, 0.5f), cardColor, roundedRect);
 
         // Row 2 (bottom): Times Overspent, Treat Ratio, Engagement
         overspendValue = CreateCard(startX, startY, cardW, cardH,
-            "Times Overspent", "0", new Color(1f, 0.45f, 0.4f), cardColor, roundedRect);
+            "Recent Over Budget", "0", new Color(1f, 0.45f, 0.4f), cardColor, roundedRect);
 
         treatRatioValue = CreateCard(startX + cardW + gapX, startY, cardW, cardH,
-            "Treat Ratio", "0%", new Color(1f, 0.8f, 0.3f), cardColor, roundedRect);
+            "Treats vs Needs", "0%", new Color(1f, 0.8f, 0.3f), cardColor, roundedRect);
 
         engagementValue = CreateCard(startX + 2 * (cardW + gapX), startY, cardW, cardH,
-            "Engagement", "OK", new Color(0.4f, 0.9f, 0.5f), cardColor, roundedRect);
+            "How You're Doing", "Welcome!", new Color(0.4f, 0.9f, 0.5f), cardColor, roundedRect);
 
         // Home button
         var homeBtn = CreatePanel(transform, "HomeButton",
@@ -169,7 +169,14 @@ public class ProgressPanel : MonoBehaviour
             SetValue(treatRatioValue, string.Format("{0:0}%", model.treatRatioAvg * 100f));
 
             var state = model.GetEngagementState();
-            SetValue(engagementValue, state.ToString());
+            string stateLabel = state switch
+            {
+                PlayerModelService.EngagementState.OK => "Doing Great!",
+                PlayerModelService.EngagementState.Frustrated => "Keep Going!",
+                PlayerModelService.EngagementState.Bored => "Come Back Soon!",
+                _ => "Welcome!"
+            };
+            SetValue(engagementValue, stateLabel);
             if (engagementValue != null)
             {
                 engagementValue.color = state switch

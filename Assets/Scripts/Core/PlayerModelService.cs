@@ -63,6 +63,7 @@ public class PlayerModelService : MonoBehaviour
         {
             failedRoundsStreak = 0;
             successStreak++;
+            if (overspendCount > 0) overspendCount--;
         }
 
         float treatRatio = (totalItems > 0) ? (float)treatsChosen / totalItems : 0f;

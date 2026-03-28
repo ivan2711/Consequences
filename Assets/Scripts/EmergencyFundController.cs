@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using System.Collections;
 
 public class EmergencyFundController : MonoBehaviour
 {
@@ -48,7 +49,7 @@ public class EmergencyFundController : MonoBehaviour
     // Inactivity tracking
     private float _idleTimer = 0f;
     private float _idleCooldown = 0f;
-    private const float IdleThresholdSeconds = 60f;
+    private const float IdleThresholdSeconds = 90f;
 
     // Re-engagement popup
     private GameObject _reengagePanel;
@@ -56,7 +57,8 @@ public class EmergencyFundController : MonoBehaviour
     private float _reengageCooldown = 0f;
     private const float ReengageCooldownNormal = 60f;
     private const float ReengageCooldownCalm = 120f;
-    private const float ReengageIdleThreshold = 20f;
+    private const float ReengageIdleThreshold = 90f;
+    private GameObject _hintButton;
 
     // ==================== LIFECYCLE ====================
 
@@ -69,6 +71,8 @@ public class EmergencyFundController : MonoBehaviour
 
         ResetState();
         BuildReengagementPopup();
+        SetupDuckPanel();
+        StartCoroutine(CreateHintButtonDelayed());
 
         uiFlow.OnTutorialDone = () => Invoke("StartNewWeek", 0.3f);
         uiFlow.ShowTutorial();
@@ -708,12 +712,118 @@ public class EmergencyFundController : MonoBehaviour
     void OnTakeHint()
     {
         DismissReengagementPopup();
-        DuckSay(DuckReaction.Emotion.Thinking,
-            _currentEvent != null ? _currentEvent.duckLine : "Think about what matters most.");
+        string hint = GetSmartHint();
+        DuckSay(DuckReaction.Emotion.Thinking, hint);
     }
 
     void OnKeepGoing()
     {
         DismissReengagementPopup();
+    }
+
+    string GetSmartHint()
+    {
+        string weekType = currentWeek > 0 && currentWeek <= WeekEventTypes.Length
+            ? WeekEventTypes[currentWeek - 1] : "normal";
+
+        float fundPercent = emergencyFundGoal > 0 ? (float)emergencyFundBalance / emergencyFundGoal : 0f;
+
+        // Context-aware hints
+        if (emergencyFundBalance == 0 && currentWeek <= 2)
+            return "Try saving something each week \u2014 even a small amount helps!";
+        if (emergencyFundBalance == 0 && currentWeek > 2)
+            return "Your fund is empty. Emergencies can hit anytime \u2014 save what you can!";
+        if (_wentIntoDebt)
+            return "You went into debt earlier. Building the fund back up will protect you.";
+        if (weekType == "emergency" || weekType == "crisis")
+            return "An emergency is coming! A bigger fund means less stress.";
+        if (weekType == "bonus")
+            return "Bonus money! Adding it to your fund is the safest choice.";
+        if (weekType == "choice")
+            return "This is optional spending \u2014 skipping it keeps your fund safe.";
+        if (fundPercent >= 1f)
+            return "You've hit your goal! Keep it topped up for the weeks ahead.";
+        if (fundPercent >= 0.6f)
+            return "You're over halfway to your goal \u2014 keep going!";
+        if (fundPercent >= 0.3f)
+            return "Good start! The balanced tier is a safe bet most weeks.";
+        if (currentWeek >= 5)
+            return "Last stretch! Every pound in the fund counts now.";
+        return "Think about what matters most \u2014 saving now means safety later.";
+    }
+
+    // ==================== HINT BUTTON ====================
+
+    IEnumerator CreateHintButtonDelayed()
+    {
+        yield return null; // wait one frame for canvas
+        CreateHintButton();
+    }
+
+    void CreateHintButton()
+    {
+        if (_hintButton != null) return;
+        if (!GameSettings.ShowHints) return;
+
+        Canvas canvas = FindObjectOfType<Canvas>();
+        if (canvas == null) return;
+
+        Sprite roundedRect = null;
+        var allSprites = Resources.FindObjectsOfTypeAll<Sprite>();
+        foreach (var s in allSprites)
+            if (s.name == "RoundedRect") { roundedRect = s; break; }
+
+        _hintButton = new GameObject("HintButton");
+        _hintButton.transform.SetParent(canvas.transform, false);
+        // Position under the duck mascot panel
+        var rect = _hintButton.AddComponent<RectTransform>();
+        rect.anchorMin = new Vector2(0.02f, 0.60f);
+        rect.anchorMax = new Vector2(0.18f, 0.67f);
+        rect.offsetMin = Vector2.zero;
+        rect.offsetMax = Vector2.zero;
+
+        var bg = _hintButton.AddComponent<Image>();
+        bg.color = new Color(0.3f, 0.6f, 0.9f, 0.9f);
+        if (roundedRect != null) { bg.sprite = roundedRect; bg.type = Image.Type.Sliced; }
+
+        var btn = _hintButton.AddComponent<Button>();
+        btn.onClick.AddListener(OnHintButtonPressed);
+
+        var textGO = new GameObject("Text");
+        textGO.transform.SetParent(_hintButton.transform, false);
+        var textRect = textGO.AddComponent<RectTransform>();
+        textRect.anchorMin = Vector2.zero;
+        textRect.anchorMax = Vector2.one;
+        textRect.offsetMin = Vector2.zero;
+        textRect.offsetMax = Vector2.zero;
+        var tmp = textGO.AddComponent<TextMeshProUGUI>();
+        tmp.text = "Hint";
+        tmp.fontSize = 34;
+        tmp.color = Color.white;
+        tmp.fontStyle = FontStyles.Bold;
+        tmp.alignment = TextAlignmentOptions.Center;
+        tmp.raycastTarget = false;
+    }
+
+    void OnHintButtonPressed()
+    {
+        string hint = GetSmartHint();
+        DuckSay(DuckReaction.Emotion.Thinking, hint);
+    }
+
+    // ==================== DUCK PANEL SETUP ====================
+
+    void SetupDuckPanel()
+    {
+        if (duckReaction == null) return;
+
+        // Set message text to auto-size 18-32pt, centered
+        if (duckReaction.duckMessage != null)
+        {
+            duckReaction.duckMessage.enableAutoSizing = true;
+            duckReaction.duckMessage.fontSizeMin = 22f;
+            duckReaction.duckMessage.fontSizeMax = 34f;
+            duckReaction.duckMessage.alignment = TextAlignmentOptions.Center;
+        }
     }
 }

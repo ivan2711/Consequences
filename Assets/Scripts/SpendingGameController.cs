@@ -75,6 +75,7 @@ public class SpendingGameController : MonoBehaviour
     private GameObject _savingsJarDisplay; // jar icon + savings text
     private GameObject _awardDisplay; // trophy + award title at end
     private Sprite _starFilledSprite;
+    private Sprite _starEmptySprite;
     private Sprite _flameSprite;
     private Sprite _jarSprite;
     private Sprite _priceTagSprite;
@@ -83,7 +84,7 @@ public class SpendingGameController : MonoBehaviour
     // Inactivity tracking
     private float _idleTimer = 0f;
     private float _idleCooldown = 0f;
-    private const float IdleThresholdSeconds = 60f;
+    private const float IdleThresholdSeconds = 90f;
 
     // Re-engagement popup
     private GameObject _reengagePanel;
@@ -91,7 +92,8 @@ public class SpendingGameController : MonoBehaviour
     private float _reengageCooldown = 0f;
     private const float ReengageCooldownNormal = 60f;
     private const float ReengageCooldownCalm = 120f;
-    private const float ReengageIdleThreshold = 20f;
+    private const float ReengageIdleThreshold = 90f;
+    private GameObject _hintButton;
 
     // ==================== LIFECYCLE ====================
 
@@ -112,6 +114,7 @@ public class SpendingGameController : MonoBehaviour
 
         // Load fun feature sprites
         _starFilledSprite = LoadSpriteFromResources("star_filled");
+        _starEmptySprite = LoadSpriteFromResources("star_empty");
         _flameSprite = LoadSpriteFromResources("streak_flame");
         _jarSprite = LoadSpriteFromResources("savings_jar");
         _priceTagSprite = LoadSpriteFromResources("price_tag");
@@ -331,15 +334,68 @@ public class SpendingGameController : MonoBehaviour
     void OnTakeHint()
     {
         DismissReengagementPopup();
-        string hint = currentRound switch
-        {
-            1 => "Essentials like bread and milk should come first!",
-            2 => "Tight budget \u2014 skip the treats if you have to.",
-            3 => "Payday is tempting, but saving some is smart!",
-            _ => "Think about what you truly need."
-        };
+        string hint = GetSmartHint();
         if (duckReaction != null)
             duckReaction.ShowReaction(DuckReaction.Emotion.Thinking, hint);
+    }
+
+    string GetSmartHint()
+    {
+        // Analyse current selections
+        int essentialsSelected = 0;
+        int treatsSelected = 0;
+        float totalSelected = 0f;
+        int essentialsTotal = 0;
+
+        foreach (var it in items)
+        {
+            if (it.isNecessary) essentialsTotal++;
+            if (it.toggle != null && it.toggle.isOn)
+            {
+                totalSelected += it.price;
+                if (it.isNecessary) essentialsSelected++;
+                else treatsSelected++;
+            }
+        }
+        if (currentRound == 3)
+        {
+            foreach (var it in round3ExtraItems)
+            {
+                if (it.toggle != null && it.toggle.isOn)
+                {
+                    totalSelected += it.price;
+                    treatsSelected++;
+                }
+            }
+        }
+
+        bool nothingSelected = essentialsSelected == 0 && treatsSelected == 0;
+        bool allEssentials = essentialsSelected >= essentialsTotal;
+        bool overBudget = totalSelected > weeklyBudgetPounds;
+        float remaining = weeklyBudgetPounds - totalSelected;
+
+        // Priority-based hints
+        if (nothingSelected)
+            return "Start by picking the ingredients for this week's recipe!";
+        if (essentialsSelected == 0 && treatsSelected > 0)
+            return "You've only picked treats so far \u2014 don't forget the essentials!";
+        if (!allEssentials && overBudget)
+            return "You're over budget and missing essentials. Try swapping a treat for a need.";
+        if (overBudget && treatsSelected > 1)
+            return "Over budget! Dropping a treat would bring you back on track.";
+        if (overBudget)
+            return "You've gone over budget by \u00a3" + (totalSelected - weeklyBudgetPounds).ToString("F2") + ". Can you swap something cheaper?";
+        if (!allEssentials && treatsSelected == 0)
+            return "You still need " + (essentialsTotal - essentialsSelected) + " more essential" + ((essentialsTotal - essentialsSelected) > 1 ? "s" : "") + " for the recipe.";
+        if (!allEssentials)
+            return "You're missing some essentials \u2014 the recipe needs all of them!";
+        if (allEssentials && treatsSelected == 0 && remaining > 1f)
+            return "All essentials covered! You have \u00a3" + remaining.ToString("F2") + " left \u2014 one treat won't hurt.";
+        if (allEssentials && treatsSelected <= 1 && remaining > 0.5f)
+            return "Nice balance! You have \u00a3" + remaining.ToString("F2") + " to spare \u2014 saving it is smart!";
+        if (allEssentials && treatsSelected > 2)
+            return "That's a lot of treats! Consider dropping one to save some money.";
+        return "Looking good \u2014 check your total before you check out!";
     }
 
     void OnKeepGoing()
@@ -503,6 +559,10 @@ public class SpendingGameController : MonoBehaviour
         // Set budget for this round (from JSON scenario or fallback)
         weeklyBudgetPounds = GetRoundBudget(round);
 
+        // Deposit this round's budget into the bank (weekly income)
+        if (BankAccountService.Instance != null)
+            BankAccountService.Instance.Earn(weeklyBudgetPounds, "Week " + round + " Budget");
+
         // Update money counter budget
         if (moneyCounter != null)
         {
@@ -562,6 +622,9 @@ public class SpendingGameController : MonoBehaviour
             if (tut != null)
                 tut.ShowTutorial();
         }
+
+        // Show hint button during shopping
+        ShowHintButton(true);
 
         // Duck intro for this round (from JSON scenario)
         if (duckReaction != null)
@@ -847,7 +910,7 @@ public class SpendingGameController : MonoBehaviour
         }
         if (feedbackText != null)
         {
-            feedbackText.text = BuildCommentary(total, unnecessaryCount, necessaryCount);
+            feedbackText.text = "\n" + BuildCommentary(total, unnecessaryCount, necessaryCount);
             // Push feedback text down to make room for stars/streak/jar (once)
             if (!_feedbackTextNudged)
             {
@@ -871,9 +934,10 @@ public class SpendingGameController : MonoBehaviour
             }
         }
 
-        // Hide round counter so it doesn't overlap stars
+        // Hide round counter and hint button during feedback
         if (roundText != null)
             roundText.gameObject.SetActive(false);
+        ShowHintButton(false);
 
         // Show feedback panel (NO consequence panel yet — save for final)
         if (feedbackPanel != null)
@@ -1006,9 +1070,12 @@ public class SpendingGameController : MonoBehaviour
         if (consequencePanel != null)
             consequencePanel.ShowFinalConsequences(totalSaved, totalOverspent, overallStars, roundsAllEssentials, totalTreats);
 
+        // Show overall stars (independent of round 3)
+        Transform awardParent = feedbackPanel != null ? feedbackPanel.transform : null;
+        ShowRoundStars(overallStars, awardParent);
+
         // Show award + final savings jar on feedback panel
         string awardTitle = GetAwardTitle(overallStars, roundsAllEssentials, totalTreats, totalSaved);
-        Transform awardParent = feedbackPanel != null ? feedbackPanel.transform : null;
         ShowAward(awardTitle, awardParent);
         // Keep savings jar visible in final view
         UpdateSavingsJar(0f, awardParent);
@@ -1092,11 +1159,11 @@ public class SpendingGameController : MonoBehaviour
         {
             RectTransform rt = btn.GetComponent<RectTransform>();
             if (rt != null)
-                rt.sizeDelta = new Vector2(rt.sizeDelta.x, 150f);
+                rt.sizeDelta = new Vector2(rt.sizeDelta.x, 200f);
             LayoutElement le = btn.GetComponent<LayoutElement>();
             if (le == null) le = btn.gameObject.AddComponent<LayoutElement>();
-            le.minHeight = 150f;
-            le.preferredHeight = 150f;
+            le.minHeight = 200f;
+            le.preferredHeight = 200f;
         }
     }
 
@@ -1119,16 +1186,19 @@ public class SpendingGameController : MonoBehaviour
         if (GameSettings.CalmMode)
         {
             if (allEssentials && withinBudget) return 3;
-            if (allEssentials && total <= weeklyBudgetPounds + 2f) return 2;
-            if (necessaryCount >= 3 && withinBudget) return 1;
+            if (allEssentials && total <= weeklyBudgetPounds + 3f) return 2;
+            if (necessaryCount >= 2 && withinBudget) return 2;
+            if (necessaryCount >= 2) return 1;
             return 0;
         }
 
         // Essentials first: saving money while going hungry scores poorly
         if (allEssentials && withinBudget && unnecessaryCount <= 1) return 3;
         if (allEssentials && withinBudget) return 2;
-        if ((allEssentials && total <= weeklyBudgetPounds + 2f) ||
+        if (allEssentials && total <= weeklyBudgetPounds + 2f) return 2;
+        if ((allEssentials && total <= weeklyBudgetPounds + 3f) ||
             (necessaryCount >= 3 && withinBudget)) return 1;
+        if (necessaryCount >= 2) return 1;
         return 0;
     }
 
@@ -1142,12 +1212,12 @@ public class SpendingGameController : MonoBehaviour
 
         string header = "Round " + currentRound + " of " + TotalRounds
                       + "  |  " + GetRoundName(currentRound)
-                      + "  |  Budget: \u00a3" + weeklyBudgetPounds.ToString("F2") + "\n";
+                      + "  |  Budget: \u00a3" + weeklyBudgetPounds.ToString("F2");
 
         string recipe = GetRecipeName(currentRound);
         string essLine = allEssentials
-            ? "Recipe: " + (recipe ?? "Dinner") + " \u2714"
-            : "Recipe: " + (recipe ?? "Dinner") + " \u2014 " + necessaryCount + " / 4 ingredients";
+            ? "Recipe: " + (recipe ?? "Dinner") + " - All ingredients"
+            : "Recipe: " + (recipe ?? "Dinner") + " - " + necessaryCount + " / 4 ingredients";
         string treatLine = unnecessaryCount == 0 ? "Treats: None"
             : unnecessaryCount == 1              ? "Treats: 1"
                                                  : "Treats: " + unnecessaryCount;
@@ -1155,7 +1225,7 @@ public class SpendingGameController : MonoBehaviour
             ? string.Format("Budget: \u00a3{0:F2} spent  (saved \u00a3{1:F2})", total, remaining)
             : string.Format("Budget: \u00a3{0:F2} spent  (over by \u00a3{1:F2})", total, over);
 
-        return header + essLine + "     " + treatLine + "     " + budgetLine;
+        return header + "\n\n" + essLine + "\n" + treatLine + "\n" + budgetLine;
     }
 
     private string BuildCommentary(float total, int unnecessaryCount, int necessaryCount)
@@ -1167,7 +1237,7 @@ public class SpendingGameController : MonoBehaviour
         float recipeCost = 0f;
         foreach (var it in items)
             if (it.isNecessary) recipeCost += it.price;
-        float takeawayCost = Mathf.Round(recipeCost * 2.2f);
+        float takeawayCost = Mathf.Round(recipeCost * 3f);
         float saving = takeawayCost - recipeCost;
 
         int missingEssentials = 4 - necessaryCount;
@@ -1181,7 +1251,7 @@ public class SpendingGameController : MonoBehaviour
         // === EMPTY BASKET ===
         if (total == 0)
             return "Empty basket! Takeaway tonight: \u00a3" + takeawayCost.ToString("F0")
-                + ".\nThat\u2019s \u00a3" + saving.ToString("F2") + " wasted vs cooking at home.";
+                + ".\nThat\u2019s \u00a3" + saving.ToString("F2") + " wasted vs cooking at home.\n";
 
         // === MISSING INGREDIENTS ===
         if (!allEssentials)
@@ -1189,14 +1259,14 @@ public class SpendingGameController : MonoBehaviour
             string miss = missingEssentials == 1
                 ? "1 ingredient short for " + recipeRef + "!"
                 : missingEssentials + " ingredients short for " + recipeRef + "!";
-            string cost = "Takeaway costs \u00a3" + saving.ToString("F2") + " more than cooking.";
+            string cost = "Takeaway costs \u00a3" + saving.ToString("F2") + " more than cooking.\n";
             if (!withinBudget)
                 return miss + " And over budget by \u00a3" + over.ToString("F2") + ".\n" + cost;
             return miss + "\n" + cost;
         }
 
         // === ALL INGREDIENTS ===
-        string win = recipeRef + " sorted! Saved \u00a3" + saving.ToString("F2") + " vs takeaway.";
+        string win = recipeRef + " sorted! Saved \u00a3" + saving.ToString("F2") + " vs takeaway.\n";
 
         if (!withinBudget)
             return win + "\nBut over budget by \u00a3" + over.ToString("F2") + " \u2014 drop a treat!";
@@ -1350,6 +1420,11 @@ public class SpendingGameController : MonoBehaviour
             if (panelImg != null)
                 panelImg.color = new Color(0.12f, 0.14f, 0.22f, 1f);
 
+            // Make feedback panel taller (stretch towards top)
+            RectTransform panelRT = feedbackPanel.GetComponent<RectTransform>();
+            if (panelRT != null)
+                panelRT.offsetMax = new Vector2(panelRT.offsetMax.x, panelRT.offsetMax.y + 15f);
+
             // Find text objects by name and wire references
             TMP_Text[] allTexts = feedbackPanel.GetComponentsInChildren<TMP_Text>(true);
             foreach (TMP_Text t in allTexts)
@@ -1358,7 +1433,8 @@ public class SpendingGameController : MonoBehaviour
                 if (n.Contains("title") && !n.Contains("star"))
                 {
                     t.color = Color.white;
-                    t.fontSize = 36;
+                    t.enableAutoSizing = false;
+                    t.fontSize = 42;
                     t.fontStyle = FontStyles.Normal;
                     t.alignment = TextAlignmentOptions.TopLeft;
                     if (scorecardText == null)
@@ -1367,14 +1443,25 @@ public class SpendingGameController : MonoBehaviour
                 else if (n.Contains("message") || (n.Contains("feedback") && !n.Contains("title")))
                 {
                     t.color = Color.white;
-                    t.fontSize = 44;
+                    t.enableAutoSizing = false;
+                    t.fontSize = 42;
+                    // Widen text area — stretch anchors to full panel width
+                    RectTransform msgRT = t.GetComponent<RectTransform>();
+                    if (msgRT != null)
+                    {
+                        msgRT.anchorMin = new Vector2(0f, msgRT.anchorMin.y);
+                        msgRT.anchorMax = new Vector2(1f, msgRT.anchorMax.y);
+                        msgRT.offsetMin = new Vector2(62f, msgRT.offsetMin.y);
+                        msgRT.offsetMax = new Vector2(-15f, msgRT.offsetMax.y);
+                    }
                     if (feedbackText == null)
                         feedbackText = t;
                 }
                 else if (n.Contains("total"))
                 {
                     t.color = new Color(1f, 0.9f, 0.3f);
-                    t.fontSize = 44;
+                    t.enableAutoSizing = false;
+                    t.fontSize = 42;
                     t.fontStyle = FontStyles.Bold;
                     if (totalText == null)
                         totalText = t;
@@ -1509,7 +1596,8 @@ public class SpendingGameController : MonoBehaviour
             foreach (TMP_Text t in cpTexts)
             {
                 string n = t.gameObject.name.ToLower();
-                t.fontSize = 44;
+                t.enableAutoSizing = false;
+                t.fontSize = 42;
                 t.color = Color.white;
                 if (n.Contains("title") || n.Contains("amount") || n.Contains("saving") || n.Contains("debt"))
                     t.fontStyle = FontStyles.Bold;
@@ -1533,6 +1621,55 @@ public class SpendingGameController : MonoBehaviour
             EnlargePanelButtons(cpBtns);
 
             Debug.Log("[Spending] ConsequencePanel styled");
+        }
+
+        // ---- Fix DuckReactionPanel (make taller so messages don't get squished) ----
+        if (duckReaction != null)
+        {
+            RectTransform duckPanelRT = duckReaction.GetComponent<RectTransform>();
+            if (duckPanelRT != null)
+            {
+                // Make panel 40% taller
+                Vector2 sd = duckPanelRT.sizeDelta;
+                duckPanelRT.sizeDelta = new Vector2(sd.x, sd.y * 1.4f);
+            }
+
+            // Find the background Panel child and stretch it too
+            Transform bgPanel = duckReaction.transform.Find("Panel");
+            if (bgPanel != null)
+            {
+                RectTransform bgRT = bgPanel.GetComponent<RectTransform>();
+                if (bgRT != null)
+                {
+                    bgRT.anchorMin = Vector2.zero;
+                    bgRT.anchorMax = Vector2.one;
+                    bgRT.offsetMin = Vector2.zero;
+                    bgRT.offsetMax = Vector2.zero;
+                }
+            }
+
+            // Fix the message text — enable auto-sizing so long messages shrink to fit
+            if (duckReaction.duckMessage != null)
+            {
+                duckReaction.duckMessage.enableAutoSizing = true;
+                duckReaction.duckMessage.fontSizeMin = 18f;
+                duckReaction.duckMessage.fontSizeMax = 32f;
+                duckReaction.duckMessage.enableWordWrapping = true;
+                duckReaction.duckMessage.overflowMode = TextOverflowModes.Ellipsis;
+                duckReaction.duckMessage.alignment = TextAlignmentOptions.Center;
+
+                // Stretch message area to full panel width
+                RectTransform msgRT = duckReaction.duckMessage.GetComponent<RectTransform>();
+                if (msgRT != null)
+                {
+                    msgRT.anchorMin = new Vector2(0f, 0f);
+                    msgRT.anchorMax = new Vector2(1f, 0.45f);
+                    msgRT.offsetMin = new Vector2(5f, 0f);
+                    msgRT.offsetMax = new Vector2(-5f, 0f);
+                }
+            }
+
+            Debug.Log("[Spending] DuckReactionPanel enlarged");
         }
     }
 
@@ -1712,6 +1849,7 @@ public class SpendingGameController : MonoBehaviour
         yield return null; // wait one frame for canvas to be ready
         if (roundText == null)
             CreateRoundText();
+        CreateHintButton();
         // Update text for current round after creation
         if (roundText != null)
             roundText.text = "Round " + currentRound + " of " + TotalRounds + ": " + GetRoundName(currentRound);
@@ -1738,10 +1876,10 @@ public class SpendingGameController : MonoBehaviour
         go.transform.SetParent(canvas.transform, false);
 
         RectTransform rect = go.AddComponent<RectTransform>();
-        rect.anchorMin = new Vector2(0.05f, 0.85f);
-        rect.anchorMax = new Vector2(0.95f, 0.93f);
-        rect.offsetMin = new Vector2(0f, 20f);
-        rect.offsetMax = new Vector2(0f, 20f);
+        rect.anchorMin = new Vector2(0.05f, 0.88f);
+        rect.anchorMax = new Vector2(0.95f, 0.95f);
+        rect.offsetMin = Vector2.zero;
+        rect.offsetMax = Vector2.zero;
 
         roundText = go.AddComponent<TMPro.TextMeshProUGUI>();
         roundText.text = "Round 1 of 3";
@@ -1750,6 +1888,66 @@ public class SpendingGameController : MonoBehaviour
         roundText.fontStyle = TMPro.FontStyles.Bold;
         roundText.alignment = TMPro.TextAlignmentOptions.Center;
         roundText.raycastTarget = false;
+    }
+
+    void CreateHintButton()
+    {
+        if (_hintButton != null) return;
+        if (!GameSettings.ShowHints) return;
+
+        Canvas canvas = FindObjectOfType<Canvas>();
+        if (canvas == null) return;
+
+        // Find RoundedRect sprite for button background
+        Sprite roundedRect = null;
+        var allSprites = Resources.FindObjectsOfTypeAll<Sprite>();
+        foreach (var s in allSprites)
+            if (s.name == "RoundedRect") { roundedRect = s; break; }
+
+        _hintButton = new GameObject("HintButton");
+        _hintButton.transform.SetParent(canvas.transform, false);
+        var rect = _hintButton.AddComponent<RectTransform>();
+        rect.anchorMin = new Vector2(0.82f, 0.82f);
+        rect.anchorMax = new Vector2(0.98f, 0.89f);
+        rect.offsetMin = Vector2.zero;
+        rect.offsetMax = Vector2.zero;
+
+        var bg = _hintButton.AddComponent<Image>();
+        bg.color = new Color(0.3f, 0.6f, 0.9f, 0.9f);
+        if (roundedRect != null) { bg.sprite = roundedRect; bg.type = Image.Type.Sliced; }
+
+        var btn = _hintButton.AddComponent<Button>();
+        btn.onClick.AddListener(OnHintButtonPressed);
+
+        var textGO = new GameObject("Text");
+        textGO.transform.SetParent(_hintButton.transform, false);
+        var textRect = textGO.AddComponent<RectTransform>();
+        textRect.anchorMin = Vector2.zero;
+        textRect.anchorMax = Vector2.one;
+        textRect.offsetMin = Vector2.zero;
+        textRect.offsetMax = Vector2.zero;
+        var tmp = textGO.AddComponent<TextMeshProUGUI>();
+        tmp.text = "Hint";
+        tmp.fontSize = 28;
+        tmp.color = Color.white;
+        tmp.fontStyle = FontStyles.Bold;
+        tmp.alignment = TextAlignmentOptions.Center;
+        tmp.raycastTarget = false;
+
+        _hintButton.SetActive(false);
+    }
+
+    void ShowHintButton(bool show)
+    {
+        if (_hintButton == null) CreateHintButton();
+        if (_hintButton != null) _hintButton.SetActive(show && GameSettings.ShowHints);
+    }
+
+    void OnHintButtonPressed()
+    {
+        string hint = GetSmartHint();
+        if (duckReaction != null)
+            duckReaction.ShowReaction(DuckReaction.Emotion.Thinking, hint);
     }
 
     // ==================== FUN FEATURES ====================
@@ -1796,11 +1994,11 @@ public class SpendingGameController : MonoBehaviour
             var starRT = starGO.AddComponent<RectTransform>();
             starRT.sizeDelta = new Vector2(120f, 120f);
             var img = starGO.AddComponent<Image>();
-            img.sprite = _starFilledSprite;
+            bool earned = i < stars;
+            img.sprite = earned ? _starFilledSprite : (_starEmptySprite != null ? _starEmptySprite : _starFilledSprite);
             img.preserveAspect = true;
             img.raycastTarget = false;
-            // Filled = gold, empty = dark grey
-            img.color = (i < stars) ? new Color(1f, 0.85f, 0f) : new Color(0.25f, 0.25f, 0.3f);
+            img.color = earned ? new Color(1f, 0.85f, 0f) : new Color(0.45f, 0.5f, 0.65f);
         }
     }
 
@@ -1976,8 +2174,8 @@ public class SpendingGameController : MonoBehaviour
         rt.anchorMin = new Vector2(0.5f, 0f);
         rt.anchorMax = new Vector2(0.5f, 0f);
         rt.pivot = new Vector2(0.5f, 0f);
-        rt.anchoredPosition = new Vector2(0f, 12f);
-        rt.sizeDelta = new Vector2(320f, 80f);
+        rt.anchoredPosition = new Vector2(-40f, 112f);
+        rt.sizeDelta = new Vector2(400f, 90f);
 
         var hlg = _awardDisplay.AddComponent<HorizontalLayoutGroup>();
         hlg.spacing = 10f;
@@ -1989,7 +2187,7 @@ public class SpendingGameController : MonoBehaviour
         var trophyGO = new GameObject("Trophy");
         trophyGO.transform.SetParent(_awardDisplay.transform, false);
         var trophyRT = trophyGO.AddComponent<RectTransform>();
-        trophyRT.sizeDelta = new Vector2(60f, 60f);
+        trophyRT.sizeDelta = new Vector2(80f, 80f);
         var trophyImg = trophyGO.AddComponent<Image>();
         trophyImg.sprite = _trophySprite;
         trophyImg.preserveAspect = true;
@@ -2000,10 +2198,10 @@ public class SpendingGameController : MonoBehaviour
         var textGO = new GameObject("AwardText");
         textGO.transform.SetParent(_awardDisplay.transform, false);
         var textRT = textGO.AddComponent<RectTransform>();
-        textRT.sizeDelta = new Vector2(240f, 70f);
+        textRT.sizeDelta = new Vector2(300f, 80f);
         var tmp = textGO.AddComponent<TextMeshProUGUI>();
         tmp.text = awardTitle;
-        tmp.fontSize = 36f;
+        tmp.fontSize = 40f;
         tmp.color = awardColor;
         tmp.fontStyle = FontStyles.Bold;
         tmp.alignment = TextAlignmentOptions.MidlineLeft;
