@@ -72,6 +72,11 @@ TTS/model/
 TTS/venv/
 TTS/__pycache__/
 
+# Build output
+builds/
+windows_build/
+Assets/Screenshots/
+
 # Packed Addressables
 /[Aa]ssets/[Aa]ddressable[Aa]ssets[Dd]ata/*/*.bin*
 
