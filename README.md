@@ -1,6 +1,6 @@
 # Consequences
 
-A gamified financial literacy application for secondary school students (ages 11–16), built in Unity as a final-year MEng project at UCL.
+A gamified financial literacy application for secondary school students, built in Unity as a final-year MEng project at UCL.
 
 ## About
 
@@ -10,8 +10,8 @@ The project is developed in collaboration with the **National Autistic Society**
 
 ## Minigames
 
-- **Budget & Spending** — Players make spending decisions and see the consequences of their choices over time.
-- **Emergency Fund Building** — Players learn to set aside savings and handle unexpected expenses.
+- **Budget & Spending** - Players make spending decisions and see the consequences of their choices over time.
+- **Emergency Fund Building** - Players learn to set aside savings and handle unexpected expenses.
 
 More minigames are planned.
 
@@ -26,7 +26,7 @@ This is an active final-year project (UCL MEng Mathematical Computation, 2025–
 
 ## Author
 
-**Ivan Murtov** — MEng Mathematical Computation, University College London
+**Ivan Murtov** - MEng Mathematical Computation, University College London
 Supervised by Prof. Dean Mohamedally
 
 [LinkedIn](https://linkedin.com/in/yourprofile) · [Email](mailto:your.email@ucl.ac.uk)
