@@ -29,4 +29,4 @@ This is an active final-year project (UCL MEng Mathematical Computation, 2025–
 **Ivan Murtov** - MEng Mathematical Computation, University College London
 Supervised by Prof. Dean Mohamedally
 
-[LinkedIn]([(https://www.linkedin.com/in/ivan-murtov/)]) · [Email](mailto:ivan.murtov.20@ucl.ac.uk)
+[LinkedIn](https://www.linkedin.com/in/ivan-murtov/) · [Email](mailto:ivan.murtov.20@ucl.ac.uk)
